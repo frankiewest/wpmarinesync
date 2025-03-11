@@ -1,0 +1,91 @@
+# Copyright (C) 2025 Hampshire Web Design
+# This file is distributed under the GPL2.
+msgid ""
+msgstr ""
+"Project-Id-Version: MarineSync 1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/frankiewest/wp-marinesync/issues\n"
+"POT-Creation-Date: 2025-03-11T10:00:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: WP-CLI 2.8.0\n"
+"X-Domain: marinesync\n"
+
+#. Plugin Name of the plugin
+msgid "MarineSync"
+msgstr ""
+
+#. Description of the plugin
+msgid "A plugin to sync down boat listings from various providers."
+msgstr ""
+
+#. Author of the plugin
+msgid "Hampshire Web Design"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://hampshirewebdesign.net"
+msgstr ""
+
+#: admin/admin-page.php:25
+msgid "MarineSync Settings"
+msgstr ""
+
+#: admin/admin-page.php:26
+msgid "Sync Settings"
+msgstr ""
+
+#: admin/admin-page.php:45
+msgid "API Settings"
+msgstr ""
+
+#: admin/admin-page.php:52
+msgid "API Key"
+msgstr ""
+
+#: admin/admin-page.php:60
+msgid "Sync Interval"
+msgstr ""
+
+#: admin/admin-page.php:75
+msgid "Save Settings"
+msgstr ""
+
+#: includes/class-boat-listing.php:35
+msgid "Boats"
+msgstr ""
+
+#: includes/class-boat-listing.php:36
+msgid "Boat"
+msgstr ""
+
+#: includes/class-boat-listing.php:37
+msgid "Add New Boat"
+msgstr ""
+
+#: includes/class-boat-listing.php:38
+msgid "Edit Boat"
+msgstr ""
+
+#: includes/class-boat-listing.php:39
+msgid "New Boat"
+msgstr ""
+
+#: includes/class-boat-listing.php:40
+msgid "View Boat"
+msgstr ""
+
+#: includes/class-boat-listing.php:41
+msgid "Search Boats"
+msgstr ""
+
+#: includes/class-boat-listing.php:42
+msgid "No boats found"
+msgstr ""
+
+#: includes/class-boat-listing.php:43
+msgid "No boats found in Trash"
+msgstr ""
