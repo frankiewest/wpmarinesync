@@ -36,8 +36,36 @@ if ( ! defined( 'MARINESYNC_PLUGIN_VERSION' ) ) {
 require_once MARINESYNC_PLUGIN_DIR . 'includes/acf-add-boat-data.php';
 require_once MARINESYNC_PLUGIN_DIR . 'includes/class-marinesync-post-type.php';
 
+// Check for ACF dependency
+function marinesync_check_acf_dependency() {
+    if (!class_exists('ACF')) {
+        add_action('admin_notices', function() {
+            ?>
+            <div class="notice notice-warning is-dismissible">
+                <p><?php _e('MarineSync requires Advanced Custom Fields (ACF) to be installed and activated. Please <a href="' . admin_url('plugin-install.php?s=Advanced+Custom+Fields&tab=search&type=term') . '">install ACF</a> to use this plugin.', 'marinesync'); ?></p>
+            </div>
+            <?php
+        });
+        
+        // Disable the activate link
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) {
+            unset($links['activate']);
+            return $links;
+        });
+        
+        return false;
+    }
+    return true;
+}
+
 // Define activation and deactivation hooks
 function marinesync_activate() {
+    // Check for ACF dependency
+    if (!marinesync_check_acf_dependency()) {
+        deactivate_plugins(plugin_basename(__FILE__));
+        wp_die(__('MarineSync requires Advanced Custom Fields (ACF) to be installed and activated. Please install ACF and try again.', 'marinesync'));
+    }
+    
     // Register post type on activation to enable permalink flushing
     MarineSync_Post_Type::register();
     

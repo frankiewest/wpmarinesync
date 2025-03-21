@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * Class to add boat data to ACF
+ * 
+ * @since 1.0.0
+ * 
+ * @return void
+ */
 class Acf_add_boat_data {
     public static function add_boat_data() {
         if ( ! function_exists( 'acf_add_local_field_group' ) ) {
