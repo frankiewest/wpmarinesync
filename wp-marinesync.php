@@ -75,13 +75,28 @@ function marinesync_activate() {
     error_log('MS007: Registering post type');
     MarineSync_Post_Type::register();
     
-    error_log('MS008: Adding ACF fields');
-    Acf_add_boat_data::add_boat_data();
+    error_log('MS008: Attempting to add ACF fields');
+    try {
+        if (!class_exists('Acf_add_boat_data')) {
+            error_log('MS008a: Acf_add_boat_data class not found');
+            return;
+        }
+        
+        if (!method_exists('Acf_add_boat_data', 'add_boat_data')) {
+            error_log('MS008b: add_boat_data method not found');
+            return;
+        }
+        
+        $result = Acf_add_boat_data::add_boat_data();
+        error_log('MS008c: ACF fields addition result: ' . ($result ? 'success' : 'failed'));
+    } catch (Exception $e) {
+        error_log('MS008d: Error adding ACF fields: ' . $e->getMessage());
+    }
     
     error_log('MS009: Flushing rewrite rules');
     flush_rewrite_rules();
     
-    error_log('MS010: MarineSync activation completed successfully');
+    error_log('MS010: MarineSync activation completed');
 }
 register_activation_hook( __FILE__, 'marinesync_activate' );
 
