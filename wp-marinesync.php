@@ -87,8 +87,16 @@ function marinesync_activate() {
             return;
         }
         
-        $result = Acf_add_boat_data::add_boat_data();
-        error_log('MS008c: ACF fields addition result: ' . ($result ? 'success' : 'failed'));
+        // Always schedule for init hook to ensure proper order
+        error_log('MS008e: Scheduling ACF field group creation for init hook');
+        add_action('init', function() {
+            // Add a small delay to ensure ACF is fully loaded
+            add_action('acf/init', function() {
+                $result = Acf_add_boat_data::add_boat_data();
+                error_log('MS008f: ACF fields addition result (acf/init hook): ' . ($result ? 'success' : 'failed'));
+            }, 1);
+        }, 20);
+        
     } catch (Exception $e) {
         error_log('MS008d: Error adding ACF fields: ' . $e->getMessage());
     }
@@ -117,6 +125,18 @@ function marinesync_init() {
     error_log('MS015: Registering post type');
 }
 add_action( 'init', 'marinesync_init' );
+
+// Add ACF field group when ACF is fully loaded
+function marinesync_add_acf_fields() {
+    error_log('MS016: ACF init hook triggered');
+    if (class_exists('Acf_add_boat_data') && method_exists('Acf_add_boat_data', 'add_boat_data')) {
+        $result = Acf_add_boat_data::add_boat_data();
+        error_log('MS017: ACF fields addition result: ' . ($result ? 'success' : 'failed'));
+    } else {
+        error_log('MS018: Acf_add_boat_data class or method not found');
+    }
+}
+add_action('acf/init', 'marinesync_add_acf_fields', 1);
 
 // Add deactivation confirmation
 function marinesync_add_deactivation_dialog() {

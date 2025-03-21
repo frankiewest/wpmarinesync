@@ -2782,6 +2782,17 @@ class Acf_add_boat_data {
                 'active' => true,
                 'description' => '',
                 'show_in_rest' => 0,
+                'modified' => time(),
+                'parent' => 0,
+                'is_sync' => false,
+                'local' => 'php',
+                'location_rules' => array(
+                    array(
+                        'param' => 'post_type',
+                        'operator' => '==',
+                        'value' => 'marinesync-boats',
+                    ),
+                ),
             ));
             error_log('MS044: Field group added successfully');
             return true;
