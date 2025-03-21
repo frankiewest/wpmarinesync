@@ -42,7 +42,7 @@ function marinesync_check_acf_dependency() {
         add_action('admin_notices', function() {
             ?>
             <div class="notice notice-warning is-dismissible">
-                <p><?php _e('MarineSync requires Advanced Custom Fields (ACF) to be installed and activated. Please <a href="' . admin_url('plugin-install.php?s=Advanced+Custom+Fields&tab=search&type=term') . '">install ACF</a> to use this plugin.', 'marinesync'); ?></p>
+                <p><?php _e('MarineSync requires Advanced Custom Fields (ACF) to be installed and activated. Please <a href="' . admin_url('plugin-install.php?tab=plugin-information&plugin=advanced-custom-fields&TB_iframe=true&width=600&height=550') . '">install ACF</a> to use this plugin.', 'marinesync'); ?></p>
             </div>
             <?php
         });
