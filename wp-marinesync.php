@@ -38,7 +38,9 @@ require_once MARINESYNC_PLUGIN_DIR . 'includes/class-marinesync-post-type.php';
 
 // Check for ACF dependency
 function marinesync_check_acf_dependency() {
+    error_log('MS001: Checking ACF dependency');
     if (!class_exists('ACF')) {
+        error_log('MS002: ACF not found - displaying warning notice');
         add_action('admin_notices', function() {
             ?>
             <div class="notice notice-warning is-dismissible">
@@ -47,7 +49,7 @@ function marinesync_check_acf_dependency() {
             <?php
         });
         
-        // Disable the activate link
+        error_log('MS003: Disabling activate link for MarineSync');
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) {
             unset($links['activate']);
             return $links;
@@ -55,55 +57,64 @@ function marinesync_check_acf_dependency() {
         
         return false;
     }
+    error_log('MS004: ACF dependency check passed');
     return true;
 }
 
 // Define activation and deactivation hooks
 function marinesync_activate() {
+    error_log('MS005: Starting MarineSync activation');
+    
     // Check for ACF dependency
     if (!marinesync_check_acf_dependency()) {
+        error_log('MS006: ACF dependency check failed - deactivating plugin');
         deactivate_plugins(plugin_basename(__FILE__));
         wp_die(__('MarineSync requires Advanced Custom Fields (ACF) to be installed and activated. Please install ACF and try again.', 'marinesync'));
     }
     
-    // Register post type on activation to enable permalink flushing
+    error_log('MS007: Registering post type');
     MarineSync_Post_Type::register();
     
-    // Add ACF fields
+    error_log('MS008: Adding ACF fields');
     Acf_add_boat_data::add_boat_data();
     
-    // Flush rewrite rules
+    error_log('MS009: Flushing rewrite rules');
     flush_rewrite_rules();
+    
+    error_log('MS010: MarineSync activation completed successfully');
 }
 register_activation_hook( __FILE__, 'marinesync_activate' );
 
 function marinesync_deactivate() {
-    // The actual cleanup is handled via admin-ajax
-    // This function now only flushes rewrite rules
+    error_log('MS011: Starting MarineSync deactivation');
     flush_rewrite_rules();
+    error_log('MS012: MarineSync deactivation completed');
 }
 register_deactivation_hook( __FILE__, 'marinesync_deactivate' );
 
 // Initialize the plugin
 function marinesync_init() {
-    // Load text domain for translations
+    error_log('MS013: Initializing MarineSync');
     load_plugin_textdomain( 'marinesync', false, MARINESYNC_PLUGIN_DIR . 'languages' );
+    error_log('MS014: Loading text domain');
     
-    // Register the custom post type
     MarineSync_Post_Type::register();
+    error_log('MS015: Registering post type');
 }
 add_action( 'init', 'marinesync_init' );
 
 // Add deactivation confirmation
 function marinesync_add_deactivation_dialog() {
-    // Only add the script on the plugins page
+    error_log('MS016: Checking if deactivation dialog should be added');
     $screen = get_current_screen();
     if ($screen && $screen->id == 'plugins') {
+        error_log('MS017: Adding deactivation dialog to plugins page');
         ?>
         <script type="text/javascript">
             jQuery(document).ready(function($) {
                 // Find the MarineSync deactivation link
                 $('tr[data-slug="wpmarinesync"] .deactivate a').click(function(e) {
+                    error_log('MS018: Deactivation link clicked');
                     e.preventDefault();
                     
                     var deactivateURL = $(this).attr('href');
@@ -127,18 +138,22 @@ function marinesync_add_deactivation_dialog() {
                     
                     $('body').append(modalHtml);
                     $('#marinesync-deactivate-modal').show();
+                    error_log('MS019: Deactivation modal displayed');
                     
                     // Handle Export & Deactivate
                     $('#marinesync-export-deactivate').click(function() {
+                        error_log('MS020: Export & Deactivate button clicked');
                         window.location.href = ajaxurl + '?action=marinesync_export_boats&then=deactivate&redirect=' + encodeURIComponent(deactivateURL);
                     });
                     
                     // Handle Delete & Deactivate
                     $('#marinesync-delete-deactivate').click(function() {
+                        error_log('MS021: Delete & Deactivate button clicked');
                         if (confirm('Are you sure? This will permanently delete all your boat listings!')) {
                             $.post(ajaxurl, {
                                 action: 'marinesync_delete_data'
                             }).done(function() {
+                                error_log('MS022: Data deletion completed, proceeding with deactivation');
                                 window.location.href = deactivateURL;
                             });
                         }
@@ -146,11 +161,13 @@ function marinesync_add_deactivation_dialog() {
                     
                     // Handle Just Deactivate
                     $('#marinesync-just-deactivate').click(function() {
+                        error_log('MS023: Just Deactivate button clicked');
                         window.location.href = deactivateURL;
                     });
                     
                     // Handle Cancel
                     $('#marinesync-cancel').click(function() {
+                        error_log('MS024: Cancel button clicked');
                         $('#marinesync-deactivate-modal').remove();
                     });
                 });
@@ -163,8 +180,11 @@ add_action('admin_footer', 'marinesync_add_deactivation_dialog');
 
 // Handle AJAX actions for export and delete
 function marinesync_handle_export_boats() {
+    error_log('MS025: Starting boat export process');
+    
     // Check for admin capabilities
     if (!current_user_can('manage_options')) {
+        error_log('MS026: Unauthorized access attempt to export boats');
         wp_die('Unauthorized access');
     }
     
@@ -176,10 +196,12 @@ function marinesync_handle_export_boats() {
         'numberposts' => -1,
         'post_status' => 'any',
     ));
+    error_log('MS027: Found ' . count($boat_posts) . ' boat posts to export');
     
     $export_data = array();
     
     foreach ($boat_posts as $post) {
+        error_log('MS028: Processing boat post ID: ' . $post->ID);
         // Get all meta for each post
         $meta = get_post_meta($post->ID);
         
@@ -198,6 +220,7 @@ function marinesync_handle_export_boats() {
     
     // Generate JSON file
     $filename = 'marinesync-export-' . date('Y-m-d') . '.json';
+    error_log('MS029: Generating export file: ' . $filename);
     
     header('Content-Type: application/json');
     header('Content-Disposition: attachment; filename=' . $filename);
@@ -207,6 +230,7 @@ function marinesync_handle_export_boats() {
     
     // Check if we should deactivate after export
     if (isset($_GET['then']) && $_GET['then'] === 'deactivate' && isset($_GET['redirect'])) {
+        error_log('MS030: Export completed, proceeding with deactivation');
         ?>
         <script type="text/javascript">
             window.location.href = <?php echo json_encode(esc_url_raw($_GET['redirect'])); ?>;
@@ -214,13 +238,17 @@ function marinesync_handle_export_boats() {
         <?php
     }
     
+    error_log('MS031: Export process completed');
     exit;
 }
 add_action('wp_ajax_marinesync_export_boats', 'marinesync_handle_export_boats');
 
 function marinesync_delete_data() {
+    error_log('MS032: Starting data deletion process');
+    
     // Check for admin capabilities
     if (!current_user_can('manage_options')) {
+        error_log('MS033: Unauthorized access attempt to delete data');
         wp_die('Unauthorized access');
     }
     
@@ -232,28 +260,35 @@ function marinesync_delete_data() {
         'numberposts' => -1,
         'post_status' => 'any',
     ));
+    error_log('MS034: Found ' . count($boat_posts) . ' boat posts to delete');
     
     // Delete each post and its meta
     foreach ($boat_posts as $post) {
+        error_log('MS035: Deleting boat post ID: ' . $post->ID);
         wp_delete_post($post->ID, true);
     }
     
     // Remove ACF field group
     if (function_exists('acf_get_field_groups')) {
+        error_log('MS036: Checking for ACF field groups to delete');
         $field_groups = acf_get_field_groups(array(
             'title' => 'Boat Data'
         ));
         
         if (!empty($field_groups)) {
+            error_log('MS037: Found ' . count($field_groups) . ' ACF field groups to delete');
             foreach ($field_groups as $field_group) {
+                error_log('MS038: Deleting ACF field group ID: ' . $field_group['ID']);
                 acf_delete_field_group($field_group['ID']);
             }
         }
     }
     
     // Clean up options
+    error_log('MS039: Cleaning up plugin options');
     $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE 'marinesync_%'");
     
+    error_log('MS040: Data deletion process completed successfully');
     wp_send_json_success();
     exit;
 }
