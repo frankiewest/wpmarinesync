@@ -30,19 +30,37 @@ define('MARINESYNC_PLUGIN_URL', \plugin_dir_url(__FILE__));
 
 // Autoloader for plugin classes
 spl_autoload_register(function ($class) {
+    // Project-specific namespace prefix
     $prefix = 'MarineSync\\';
+    
+    // Base directory for the namespace prefix
     $base_dir = MARINESYNC_PLUGIN_DIR . 'includes/';
     
+    // Check if the class uses the namespace prefix
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) {
         return;
     }
     
+    // Get the relative class name
     $relative_class = substr($class, $len);
+    
+    // Convert the relative class name to a file path
     $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
     
+    error_log('MS050: Attempting to load class file: ' . $file);
+    
+    // If the file exists, require it
     if (file_exists($file)) {
+        error_log('MS051: Found class file: ' . $file);
         require $file;
+        if (class_exists($class)) {
+            error_log('MS052: Successfully loaded class: ' . $class);
+        } else {
+            error_log('MS053: Class not found after loading file: ' . $class);
+        }
+    } else {
+        error_log('MS054: Class file not found: ' . $file);
     }
 });
 
