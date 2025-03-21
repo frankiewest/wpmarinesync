@@ -120,6 +120,7 @@ class MarineSync_Admin_Page {
                                     <option value="boats" <?php selected($this->options['feed_provider'], 'boats'); ?>><?php _e('Boats.com', 'marinesync'); ?></option>
                                     <option value="yachtworld" <?php selected($this->options['feed_provider'], 'yachtworld'); ?>><?php _e('YachtWorld', 'marinesync'); ?></option>
                                     <option value="boatshop" <?php selected($this->options['feed_provider'], 'boatshop'); ?>><?php _e('BoatShop', 'marinesync'); ?></option>
+                                    <option value="rightboat" <?php selected($this->options['feed_provider'], 'rightboat'); ?>><?php _e('Rightboat', 'marinesync'); ?></option>
                                 </select>
                                 <p class="description"><?php _e('Select the provider of your boat feed.', 'marinesync'); ?></p>
                             </div>

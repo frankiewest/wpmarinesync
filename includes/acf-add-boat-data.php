@@ -2769,7 +2769,7 @@ class Acf_add_boat_data {
                         array(
                             'param' => 'post_type',
                             'operator' => '==',
-                            'value' => 'product',
+                            'value' => 'marinesync-boats',
                         ),
                     ),
                 ),
