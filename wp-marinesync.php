@@ -319,14 +319,14 @@ function marinesync_enqueue_admin_assets($hook) {
         'marinesync-admin',
         plugin_dir_url(__FILE__) . 'assets/css/admin.css',
         array(),
-        MARINESYNC_VERSION
+        MARINESYNC_PLUGIN_VERSION
     );
 
     wp_enqueue_script(
         'marinesync-admin',
         plugin_dir_url(__FILE__) . 'assets/js/admin.js',
         array('jquery'),
-        MARINESYNC_VERSION,
+        MARINESYNC_PLUGIN_VERSION,
         true
     );
 
