@@ -339,4 +339,4 @@ add_action('admin_enqueue_scripts', 'marinesync_enqueue_admin_assets');
 
 // Initialize admin interface
 require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
-new MarineSync_Admin_Page();
+MarineSync_Admin_Page::get_instance();
