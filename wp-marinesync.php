@@ -308,3 +308,35 @@ function marinesync_delete_data() {
     exit;
 }
 add_action('wp_ajax_marinesync_delete_data', 'marinesync_delete_data');
+
+// Enqueue admin assets
+function marinesync_enqueue_admin_assets($hook) {
+    if ('toplevel_page_marinesync' !== $hook) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'marinesync-admin',
+        plugin_dir_url(__FILE__) . 'assets/css/admin.css',
+        array(),
+        MARINESYNC_VERSION
+    );
+
+    wp_enqueue_script(
+        'marinesync-admin',
+        plugin_dir_url(__FILE__) . 'assets/js/admin.js',
+        array('jquery'),
+        MARINESYNC_VERSION,
+        true
+    );
+
+    wp_localize_script('marinesync-admin', 'marinesyncAdmin', array(
+        'nonce' => wp_create_nonce('marinesync_admin_nonce'),
+        'ajaxurl' => admin_url('admin-ajax.php')
+    ));
+}
+add_action('admin_enqueue_scripts', 'marinesync_enqueue_admin_assets');
+
+// Initialize admin interface
+require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
+new MarineSync_Admin_Page();
