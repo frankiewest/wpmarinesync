@@ -17,126 +17,127 @@
  * GitHub Branch: main
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly.
+namespace MarineSync;
+
+if (!defined('ABSPATH')) {
+    exit;
 }
 
-// Define constants for the plugin
-if ( ! defined( 'MARINESYNC_PLUGIN_DIR' ) ) {
-    define( 'MARINESYNC_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-}
-if ( ! defined( 'MARINESYNC_PLUGIN_URL' ) ) {
-    define( 'MARINESYNC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-}
-if ( ! defined( 'MARINESYNC_PLUGIN_VERSION' ) ) {
-    define( 'MARINESYNC_PLUGIN_VERSION', '1.0' );
-}
+// Define plugin constants
+define('MARINESYNC_VERSION', '1.0.0');
+define('MARINESYNC_PLUGIN_DIR', \plugin_dir_path(__FILE__));
+define('MARINESYNC_PLUGIN_URL', \plugin_dir_url(__FILE__));
 
-// Include required files
-require_once MARINESYNC_PLUGIN_DIR . 'includes/acf-add-boat-data.php';
-require_once MARINESYNC_PLUGIN_DIR . 'includes/class-marinesync-post-type.php';
+// Autoloader for plugin classes
+spl_autoload_register(function ($class) {
+    $prefix = 'MarineSync\\';
+    $base_dir = MARINESYNC_PLUGIN_DIR . 'includes/';
+    
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+    
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    
+    if (file_exists($file)) {
+        require $file;
+    }
+});
 
 // Check for ACF dependency
-function marinesync_check_acf_dependency() {
-    error_log('MS001: Checking ACF dependency');
+function marinesync_check_acf() {
     if (!class_exists('ACF')) {
-        error_log('MS002: ACF not found - displaying warning notice');
-        add_action('admin_notices', function() {
-            ?>
-            <div class="notice notice-warning is-dismissible">
-                <p><?php _e('MarineSync requires Advanced Custom Fields (ACF) to be installed and activated. Please <a href="' . admin_url('plugin-install.php?tab=plugin-information&plugin=advanced-custom-fields&TB_iframe=true&width=600&height=550') . '">install ACF</a> to use this plugin.', 'marinesync'); ?></p>
-            </div>
-            <?php
+        \add_action('admin_notices', function() {
+            echo '<div class="error"><p>' . \__('MarineSync requires Advanced Custom Fields PRO to be installed and activated.', 'marinesync') . '</p></div>';
         });
-        
-        error_log('MS003: Disabling activate link for MarineSync');
-        add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) {
-            unset($links['activate']);
-            return $links;
-        });
-        
         return false;
     }
-    error_log('MS004: ACF dependency check passed');
     return true;
 }
 
-// Define activation and deactivation hooks
+// Activation hook
 function marinesync_activate() {
-    error_log('MS005: Starting MarineSync activation');
+    error_log('MS001: Starting plugin activation');
     
-    // Check for ACF dependency
-    if (!marinesync_check_acf_dependency()) {
-        error_log('MS006: ACF dependency check failed - deactivating plugin');
-        deactivate_plugins(plugin_basename(__FILE__));
-        wp_die(__('MarineSync requires Advanced Custom Fields (ACF) to be installed and activated. Please install ACF and try again.', 'marinesync'));
+    if (!marinesync_check_acf()) {
+        error_log('MS002: ACF not found, activation aborted');
+        return;
     }
     
-    error_log('MS007: Registering post type');
-    MarineSync_Post_Type::register();
+    error_log('MS003: ACF found, proceeding with activation');
     
-    error_log('MS008: Attempting to add ACF fields');
-    try {
-        if (!class_exists('Acf_add_boat_data')) {
-            error_log('MS008a: Acf_add_boat_data class not found');
-            return;
-        }
-        
-        if (!method_exists('Acf_add_boat_data', 'add_boat_data')) {
-            error_log('MS008b: add_boat_data method not found');
-            return;
-        }
-        
-        // Always schedule for init hook to ensure proper order
-        error_log('MS008e: Scheduling ACF field group creation for init hook');
-        add_action('init', function() {
-            // Add a small delay to ensure ACF is fully loaded
-            add_action('acf/init', function() {
-                $result = Acf_add_boat_data::add_boat_data();
-                error_log('MS008f: ACF fields addition result (acf/init hook): ' . ($result ? 'success' : 'failed'));
-            }, 1);
-        }, 20);
-        
-    } catch (Exception $e) {
-        error_log('MS008d: Error adding ACF fields: ' . $e->getMessage());
+    // Register post type
+    PostType\MarineSync_Post_Type::register();
+    error_log('MS004: Post type registered');
+    
+    // Add ACF fields
+    if (function_exists('acf_add_local_field_group')) {
+        ACF\Acf_add_boat_data::add_boat_data();
+        error_log('MS005: ACF fields added');
+    } else {
+        \add_action('acf/init', function() {
+            ACF\Acf_add_boat_data::add_boat_data();
+            error_log('MS006: ACF fields added via acf/init hook');
+        });
     }
     
-    error_log('MS009: Flushing rewrite rules');
-    flush_rewrite_rules();
+    // Flush rewrite rules
+    \flush_rewrite_rules();
+    error_log('MS007: Rewrite rules flushed');
     
-    error_log('MS010: MarineSync activation completed');
+    error_log('MS008: Plugin activation complete');
 }
-register_activation_hook( __FILE__, 'marinesync_activate' );
 
+// Deactivation hook
 function marinesync_deactivate() {
-    error_log('MS011: Starting MarineSync deactivation');
-    flush_rewrite_rules();
-    error_log('MS012: MarineSync deactivation completed');
-}
-register_deactivation_hook( __FILE__, 'marinesync_deactivate' );
-
-// Initialize the plugin
-function marinesync_init() {
-    error_log('MS013: Initializing MarineSync');
-    load_plugin_textdomain( 'marinesync', false, MARINESYNC_PLUGIN_DIR . 'languages' );
-    error_log('MS014: Loading text domain');
+    error_log('MS009: Starting plugin deactivation');
     
-    MarineSync_Post_Type::register();
-    error_log('MS015: Registering post type');
+    // Clear scheduled hooks
+    \wp_clear_scheduled_hook('marinesync_process_feed');
+    error_log('MS010: Scheduled hooks cleared');
+    
+    // Flush rewrite rules
+    \flush_rewrite_rules();
+    error_log('MS011: Rewrite rules flushed');
+    
+    error_log('MS012: Plugin deactivation complete');
 }
-add_action( 'init', 'marinesync_init' );
+
+// Initialize plugin
+function marinesync_init() {
+    error_log('MS013: Starting plugin initialization');
+    
+    // Register post type
+    PostType\MarineSync_Post_Type::register();
+    
+    // Add ACF fields
+    if (function_exists('acf_add_local_field_group')) {
+        ACF\Acf_add_boat_data::add_boat_data();
+    }
+    
+    error_log('MS014: Plugin initialization complete');
+}
+
+// Register activation and deactivation hooks
+\register_activation_hook(__FILE__, __NAMESPACE__ . '\marinesync_activate');
+\register_deactivation_hook(__FILE__, __NAMESPACE__ . '\marinesync_deactivate');
+
+// Initialize plugin
+\add_action('init', __NAMESPACE__ . '\marinesync_init');
 
 // Add ACF field group when ACF is fully loaded
 function marinesync_add_acf_fields() {
     error_log('MS016: ACF init hook triggered');
-    if (class_exists('Acf_add_boat_data') && method_exists('Acf_add_boat_data', 'add_boat_data')) {
-        $result = Acf_add_boat_data::add_boat_data();
+    if (class_exists('ACF\Acf_add_boat_data') && method_exists('ACF\Acf_add_boat_data', 'add_boat_data')) {
+        $result = ACF\Acf_add_boat_data::add_boat_data();
         error_log('MS017: ACF fields addition result: ' . ($result ? 'success' : 'failed'));
     } else {
         error_log('MS018: Acf_add_boat_data class or method not found');
     }
 }
-add_action('acf/init', 'marinesync_add_acf_fields', 1);
+add_action('acf/init', 'MarineSync\\marinesync_add_acf_fields', 1);
 
 // Add deactivation confirmation
 function marinesync_add_deactivation_dialog() {
@@ -211,7 +212,7 @@ function marinesync_add_deactivation_dialog() {
         <?php
     }
 }
-add_action('admin_footer', 'marinesync_add_deactivation_dialog');
+add_action('admin_footer', 'MarineSync\\marinesync_add_deactivation_dialog');
 
 // Handle AJAX actions for export and delete
 function marinesync_handle_export_boats() {
@@ -276,7 +277,7 @@ function marinesync_handle_export_boats() {
     error_log('MS031: Export process completed');
     exit;
 }
-add_action('wp_ajax_marinesync_export_boats', 'marinesync_handle_export_boats');
+add_action('wp_ajax_marinesync_export_boats', 'MarineSync\\marinesync_handle_export_boats');
 
 function marinesync_delete_data() {
     error_log('MS032: Starting data deletion process');
@@ -327,7 +328,7 @@ function marinesync_delete_data() {
     wp_send_json_success();
     exit;
 }
-add_action('wp_ajax_marinesync_delete_data', 'marinesync_delete_data');
+add_action('wp_ajax_marinesync_delete_data', 'MarineSync\\marinesync_delete_data');
 
 // Enqueue admin assets
 function marinesync_enqueue_admin_assets($hook) {
@@ -339,14 +340,14 @@ function marinesync_enqueue_admin_assets($hook) {
         'marinesync-admin',
         plugin_dir_url(__FILE__) . 'assets/css/admin.css',
         array(),
-        MARINESYNC_PLUGIN_VERSION
+        MARINESYNC_VERSION
     );
 
     wp_enqueue_script(
         'marinesync-admin',
         plugin_dir_url(__FILE__) . 'assets/js/admin.js',
         array('jquery'),
-        MARINESYNC_PLUGIN_VERSION,
+        MARINESYNC_VERSION,
         true
     );
 
@@ -355,7 +356,7 @@ function marinesync_enqueue_admin_assets($hook) {
         'ajaxurl' => admin_url('admin-ajax.php')
     ));
 }
-add_action('admin_enqueue_scripts', 'marinesync_enqueue_admin_assets');
+add_action('admin_enqueue_scripts', 'MarineSync\\marinesync_enqueue_admin_assets');
 
 // Initialize admin interface
 require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
