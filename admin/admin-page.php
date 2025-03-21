@@ -3,6 +3,8 @@
  * Admin interface for MarineSync feed settings
  */
 
+namespace MarineSync;
+
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
