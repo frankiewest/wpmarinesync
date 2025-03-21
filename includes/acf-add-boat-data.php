@@ -2418,8 +2418,8 @@ class Acf_add_boat_data {
             ),
             array(
                 'key' => 'field_67ae02538e670',
-                'label' => 'Blige Pump',
-                'name' => 'blige_pump',
+                'label' => 'Bilge Pump',
+                'name' => 'bilge_pump',
                 'aria-label' => '',
                 'type' => 'text',
                 'instructions' => '',
