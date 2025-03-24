@@ -275,20 +275,3 @@ MarineSync_Admin_Page::get_instance();
 // Initialise functions.php
 require_once plugin_dir_path(__FILE__) . 'includes/functions.php';
 Functions_MarineSync::get_instance();
-
-// Add custom field to select an office
-add_filter('acf/load_field/key=field_68fb3c7ee9a41', function($field) {
-	$choices = array();
-	if (function_exists('get_field')) {
-		$offices = get_field('offices', 'ms-global-options');
-		if (is_array($offices) && !empty($offices)) {
-			foreach ($offices as $office) {
-				if (!empty($office['id']) && !empty($office['office_name'])) {
-					$choices[$office['id']] = $office['office_name'] . ' (ID: ' . $office['id'] . ')';
-				}
-			}
-		}
-	}
-	$field['choices'] = $choices;
-	return $field;
-});
