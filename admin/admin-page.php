@@ -70,7 +70,7 @@ class MarineSync_Admin_Page {
 	    }
 
 	    // Check if file exists
-	    $file_path = plugin_dir_path(dirname(__FILE__)) . 'assets/css/admin.css';
+	    $file_path = MARINESYNC_PLUGIN_URL . 'assets/css/admin.css';
 	    if (!file_exists($file_path)) {
 		    error_log('MS304: CSS file not found at: ' . $file_path);
 	    } else {
