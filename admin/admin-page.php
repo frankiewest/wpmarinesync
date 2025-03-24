@@ -55,9 +55,14 @@ class MarineSync_Admin_Page {
     }
 
     public function enqueue_admin_scripts($hook) {
-        if ('toplevel_page_marinesync' !== $hook) {
-            return;
-        }
+	    error_log('MS300: Admin scripts hook: ' . $hook);
+
+	    if ('toplevel_page_marinesync' !== $hook) {
+		    error_log('MS301: Not loading scripts - wrong hook');
+		    return;
+	    }
+
+	    error_log('MS302: Enqueuing admin styles from: ' . MARINESYNC_PLUGIN_URL . 'assets/css/admin.css');
 
         wp_enqueue_style('marinesync-admin-css', MARINESYNC_PLUGIN_URL . 'assets/css/admin.css', array(), MARINESYNC_PLUGIN_VERSION);
         wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), MARINESYNC_PLUGIN_VERSION, true);
