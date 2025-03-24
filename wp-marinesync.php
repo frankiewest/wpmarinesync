@@ -222,7 +222,7 @@ function marinesync_handle_export_boats() {
     // Get all boat posts
     $boat_posts = get_posts(array(
         'post_type' => 'marinesync-boats',
-        'numberposts' => -1,
+        'posts_per_page' => -1,
         'post_status' => 'any',
     ));
     error_log('MS027: Found ' . count($boat_posts) . ' boat posts to export');

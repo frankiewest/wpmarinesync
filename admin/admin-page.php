@@ -25,8 +25,19 @@ class MarineSync_Admin_Page {
 		add_action('admin_menu', array($this, 'add_admin_menu'));
 		add_action('admin_init', array($this, 'register_settings'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+
+		// Register AJAX handlers
 		add_action('wp_ajax_marinesync_run_feed', array($this, 'ajax_run_feed'));
 		add_action('wp_ajax_marinesync_check_feed_status', array($this, 'ajax_check_feed_status'));
+		add_action('wp_ajax_marinesync_export_boats', array($this, 'ajax_export_boats'));
+
+		// Initialize options
+		$this->options = get_option('marinesync_feed_settings', array(
+			'feed_format' => 'auto',
+			'feed_url' => '',
+			'feed_provider' => '',
+			'feed_frequency' => 24
+		));
 	}
 
 	// Enqueue admin scripts
@@ -123,6 +134,15 @@ class MarineSync_Admin_Page {
 
 	// Overview/Dashboard page
 	public function render_overview_page() {
+        // Make sure options are loaded
+		if (empty($this->options)) {
+			$this->options = get_option('marinesync_feed_settings', array(
+				'feed_format' => 'auto',
+				'feed_url' => '',
+				'feed_provider' => '',
+				'feed_frequency' => 24
+			));
+		}
 		?>
         <div class="wrap marinesync-admin">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
