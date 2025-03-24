@@ -2786,18 +2786,22 @@ class Acf_add_boat_data {
                 ),
             ),
         );
-        
-        $args = array(
-            'menu_order' => 0,
-            'position' => 'normal',
-            'style' => 'default',
-            'label_placement' => 'top',
-            'instruction_placement' => 'label',
-            'hide_on_screen' => '',
-            'active' => true,
-            'description' => '',
-            'show_in_rest' => 0
-        );
+
+	    $args = array(
+		    'key' => 'group_67addc1021662',
+		    'title' => 'Boat Data',
+		    'fields' => $fields['fields'],
+		    'location' => $location,
+		    'menu_order' => 0,
+		    'position' => 'normal',
+		    'style' => 'default',
+		    'label_placement' => 'top',
+		    'instruction_placement' => 'label',
+		    'hide_on_screen' => '',
+		    'active' => true,
+		    'description' => '',
+		    'show_in_rest' => 0
+	    );
         
         acf_add_local_field_group($args);
         
