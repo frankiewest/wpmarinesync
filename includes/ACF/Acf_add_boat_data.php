@@ -832,22 +832,6 @@ class Acf_add_boat_data {
 		            'ui' => 1,
 		            'ajax' => 0,
 		            'placeholder' => '',
-		            'load_choices' => array(
-			            'callback' => function() {
-				            $choices = array();
-				            if (function_exists('get_field')) {
-					            $offices = get_field('offices', 'ms-global-options');
-					            if (is_array($offices) && !empty($offices)) {
-						            foreach ($offices as $office) {
-							            if (!empty($office['id']) && !empty($office['office_name'])) {
-								            $choices[$office['id']] = $office['office_name'] . ' (ID: ' . $office['id'] . ')';
-							            }
-						            }
-					            }
-				            }
-				            return $choices;
-			            }
-		            ),
 	            ),
                 array(
                     'key' => 'field_67ae177aa6f3a',
@@ -3303,6 +3287,22 @@ class Acf_add_boat_data {
 				'parent_slug' => 'marinesync',
 				'redirect' => false,
 			) );
+
+			add_filter('acf/load_field/key=field_68fb3c7ee9a41', function($field) {
+				$choices = array();
+				if (function_exists('get_field')) {
+					$offices = get_field('offices', 'ms-global-options');
+					if (is_array($offices) && !empty($offices)) {
+						foreach ($offices as $office) {
+							if (!empty($office['id']) && !empty($office['office_name'])) {
+								$choices[$office['id']] = $office['office_name'] . ' (ID: ' . $office['id'] . ')';
+							}
+						}
+					}
+				}
+				$field['choices'] = $choices;
+				return $field;
+			});
 		} else {
 			error_log('MS014: No options page found');
 		}
