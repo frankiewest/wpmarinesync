@@ -273,14 +273,3 @@ MarineSync_Admin_Page::get_instance();
 // Initialise functions.php
 require_once plugin_dir_path(__FILE__) . 'includes/functions.php';
 Functions_MarineSync::get_instance();
-
-add_filter('script_loader_src', 'fix_https_for_javascript', 10, 2);
-add_filter('style_loader_src', 'fix_https_for_stylesheets', 10, 2);
-
-function fix_https_for_javascript($src, $handle) {
-	return str_replace('http://', 'https://', $src);
-}
-
-function fix_https_for_stylesheets($src, $handle) {
-	return str_replace('http://', 'https://', $src);
-}
