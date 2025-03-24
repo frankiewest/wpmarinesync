@@ -323,34 +323,6 @@ function marinesync_delete_data() {
 }
 add_action('wp_ajax_marinesync_delete_data', 'MarineSync\\marinesync_delete_data');
 
-// Enqueue admin assets
-function marinesync_enqueue_admin_assets($hook) {
-    if ('toplevel_page_marinesync' !== $hook) {
-        return;
-    }
-
-    wp_enqueue_style(
-        'marinesync-admin',
-        plugin_dir_url(__FILE__) . 'assets/css/admin.css',
-        array(),
-        MARINESYNC_PLUGIN_VERSION
-    );
-
-    wp_enqueue_script(
-        'marinesync-admin',
-        plugin_dir_url(__FILE__) . 'assets/js/admin.js',
-        array('jquery'),
-        MARINESYNC_PLUGIN_VERSION,
-        true
-    );
-
-    wp_localize_script('marinesync-admin', 'marinesyncAdmin', array(
-        'nonce' => wp_create_nonce('marinesync_admin_nonce'),
-        'ajaxurl' => admin_url('admin-ajax.php')
-    ));
-}
-add_action('admin_enqueue_scripts', 'MarineSync\\marinesync_enqueue_admin_assets');
-
 function marinesync_register_acf_fields() {
 	if (function_exists('acf_add_local_field_group')) {
 		error_log('MS200: Registering ACF fields via global hook');
