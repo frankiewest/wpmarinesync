@@ -64,6 +64,19 @@ class MarineSync_Admin_Page {
 
 	    error_log('MS302: Enqueuing admin styles from: ' . MARINESYNC_PLUGIN_URL . 'assets/css/admin.css');
 
+	    // Check if constant is defined
+	    if (!defined('MARINESYNC_PLUGIN_URL')) {
+		    error_log('MS303: MARINESYNC_PLUGIN_URL constant not defined!');
+	    }
+
+	    // Check if file exists
+	    $file_path = plugin_dir_path(dirname(__FILE__)) . 'assets/css/admin.css';
+	    if (!file_exists($file_path)) {
+		    error_log('MS304: CSS file not found at: ' . $file_path);
+	    } else {
+		    error_log('MS305: CSS file exists at: ' . $file_path);
+	    }
+
         wp_enqueue_style('marinesync-admin-css', MARINESYNC_PLUGIN_URL . 'assets/css/admin.css', array(), MARINESYNC_PLUGIN_VERSION);
         wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), MARINESYNC_PLUGIN_VERSION, true);
 
@@ -245,4 +258,4 @@ class MarineSync_Admin_Page {
 }
 
 // Initialize the admin page
-MarineSync_Admin_Page::get_instance();
+\MarineSync\MarineSync_Admin_Page::get_instance();
