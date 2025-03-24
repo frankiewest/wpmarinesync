@@ -334,3 +334,7 @@ add_action('acf/init', 'MarineSync\\marinesync_register_acf_fields');
 // Initialize admin interface
 require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
 MarineSync_Admin_Page::get_instance();
+
+// Initialise functions.php
+require_once plugin_dir_path(__FILE__) . 'includes/functions.php';
+Functions_MarineSync::get_instance();
