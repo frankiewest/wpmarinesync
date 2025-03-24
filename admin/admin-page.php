@@ -303,7 +303,7 @@ class MarineSync_Admin_Page {
                 <div class="marinesync-admin-main">
                     <div class="marinesync-card">
                         <h2><?php _e('Export Options', 'marinesync'); ?></h2>
-                        <p><?php _e('Export your boat listings as a JSON file.', 'marinesync'); ?></p>
+                        <p><?php _e('Export your boat listings as an Open Marine compliant XML file.', 'marinesync'); ?></p>
 
                         <form method="post" action="<?php echo esc_url(admin_url('admin-ajax.php?action=marinesync_export_boats')); ?>">
 							<?php wp_nonce_field('marinesync_export_nonce', 'export_nonce'); ?>
@@ -325,10 +325,6 @@ class MarineSync_Admin_Page {
                             <li>
                                 <strong><?php _e('Total Boats:', 'marinesync'); ?></strong>
                                 <span><?php echo esc_html($this->get_total_boats()); ?></span>
-                            </li>
-                            <li>
-                                <strong><?php _e('Format:', 'marinesync'); ?></strong>
-                                <span>JSON</span>
                             </li>
                         </ul>
                     </div>
