@@ -359,14 +359,26 @@ class MarineSync_Admin_Page {
                         <div id="export-message"></div>
 
                         <form id="export-form" method="post">
-							<?php wp_nonce_field('marinesync_admin_nonce', 'nonce'); ?>
+			                <?php wp_nonce_field('marinesync_admin_nonce', 'nonce'); ?>
 
                             <p>
                                 <button type="button" id="export-boats" class="button button-primary">
-									<?php _e('Export All Boats', 'marinesync'); ?>
+					                <?php _e('Export All Boats', 'marinesync'); ?>
                                 </button>
                             </p>
                         </form>
+                    </div>
+
+                    <div class="marinesync-card">
+                        <h2><?php _e('Export URL', 'marinesync'); ?></h2>
+                        <p><?php _e('Your XML export file is available at this URL:', 'marinesync'); ?></p>
+
+                        <div class="form-field">
+                            <input type="text" readonly value="/wp-content/uploads/marinesync-exports/marinesync-export-marinesync.xml" class="regular-text"
+                                   onclick="this.select();" style="width: 100%;">
+                        </div>
+
+                        <p class="description"><?php _e('This URL can be used in third-party systems that need to access your boat data.', 'marinesync'); ?></p>
                     </div>
                 </div>
 
