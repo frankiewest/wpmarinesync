@@ -30,7 +30,7 @@ class MarineSync_Admin_Page {
     }
 
     // Enqueue admin scripts
-	function enqueue_admin_scripts($hook) {
+	public function enqueue_admin_scripts($hook) {
 		error_log('MS300: Admin scripts hook: ' . $hook);
 
 		if ('toplevel_page_marinesync' !== $hook) {
@@ -59,7 +59,7 @@ class MarineSync_Admin_Page {
 			MARINESYNC_PLUGIN_VERSION
 		);
 		error_log('MS311: Is style enqueued? ' . (wp_style_is('marinesync-admin-css', 'enqueued') ? 'Yes' : 'No'));
-		wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), time(), true);
+		wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), MARINESYNC_PLUGIN_VERSION, true);
 
 		wp_localize_script('marinesync-admin-js', 'marinesyncAdmin', array(
 			'ajaxurl' => admin_url('admin-ajax.php'),
