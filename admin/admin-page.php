@@ -54,8 +54,13 @@ class MarineSync_Admin_Page {
         return $sanitized;
     }
 
-    public function enqueue_admin_scripts() {
+    public function enqueue_admin_scripts($hook) {
+	    error_log('MS300: Admin scripts hook: ' . $hook);
 
+	    if ('toplevel_page_marinesync' !== $hook) {
+		    error_log('MS301: Not loading scripts - wrong hook');
+		    return;
+	    }
 
 	    error_log('MS302: Enqueuing admin styles from: ' . MARINESYNC_PLUGIN_URL . 'assets/css/admin.css');
 
