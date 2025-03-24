@@ -374,7 +374,7 @@ class MarineSync_Admin_Page {
                         <p><?php _e('Your XML export file is available at this URL:', 'marinesync'); ?></p>
 
                         <div class="form-field">
-                            <input type="text" readonly value="/wp-content/uploads/marinesync-exports/marinesync-export-marinesync.xml" class="regular-text"
+                            <input type="text" readonly value="<?php echo esc_url(site_url('/wp-content/uploads/marinesync-exports/marinesync-export-' . sanitize_title(get_bloginfo('name')) . '.xml')); ?>" class="regular-text"
                                    onclick="this.select();" style="width: 100%;">
                         </div>
 
