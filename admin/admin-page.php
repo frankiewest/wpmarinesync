@@ -670,11 +670,11 @@ class MarineSync_Admin_Page {
 
 						$vat_country = MarineSync_Post_Type::get_boat_field('vat_country', $post->ID);
 						if ($vat_country) {
-							$asking_price->addAttribute('vat_country', $vat_country);
+							$asking_price->addAttribute( 'vat_country', $vat_country );
 						}
 
 						// Add marketing desc
-						$marketing_descs = $boat->addChild('marketing_descs');
+						$marketing_descs = $advert_features->addChild('marketing_descs');
 
 						$desc = get_post_field('post_content', $post->ID);
 						$marketing_desc = $marketing_descs->addChild('marketing_desc');
@@ -705,7 +705,7 @@ class MarineSync_Admin_Page {
 							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('model', $post->ID)));
 
 						// Add boat features
-						$boat_features = $advert_features->addChild('boat_features');
+						$boat_features = $boat->addChild('boat_features');
 
 						// Add dimensions
 						$dimensions = $boat_features->addChild('dimensions');
