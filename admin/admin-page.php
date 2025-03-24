@@ -456,6 +456,8 @@ class MarineSync_Admin_Page {
 
 	// Handle AJAX actions for export and delete
 	public function ajax_export_boats() {
+		check_ajax_referer('marinesync_admin_nonce', 'nonce');
+
 		error_log('MS025: Starting boat export process');
 
 		// Check for admin capabilities
