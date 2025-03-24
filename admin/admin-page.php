@@ -631,8 +631,11 @@ class MarineSync_Admin_Page {
 						// Add marketing desc
 						$marketing_descs = $boat->addChild('marketing_descs');
 
-						$desc = MarineSync_Post_Type::get_boat_field('marketing_desc', $post->ID);
-						$marketing_desc = $marketing_descs->addChild('marketing_desc', htmlspecialchars((string)$desc));
+						$desc = get_post_field('post_content', $post->ID);
+						$marketing_desc = $marketing_descs->addChild('marketing_desc');
+						$marketing_desc_node = dom_import_simplexml($marketing_desc);
+						$cdata = $marketing_desc_node->ownerDocument->createCDATASection($desc);
+						$marketing_desc_node->appendChild($cdata);
 
 						$lang = MarineSync_Post_Type::get_boat_field('marketing_desc_language', $post->ID);
 						if ($lang) {
@@ -640,7 +643,10 @@ class MarineSync_Admin_Page {
 						}
 
 						$short_desc = MarineSync_Post_Type::get_boat_field('marketing_short_desc', $post->ID);
-						$marketing_short_desc = $marketing_descs->addChild('marketing_short_desc', htmlspecialchars((string)$short_desc));
+						$marketing_short_desc = $marketing_descs->addChild('marketing_short_desc');
+						$marketing_short_desc_node = dom_import_simplexml($marketing_short_desc);
+						$short_cdata = $marketing_short_desc_node->ownerDocument->createCDATASection($desc);
+						$marketing_short_desc_node->appendChild($short_cdata);
 
 						$short_lang = MarineSync_Post_Type::get_boat_field('marketing_short_desc_language', $post->ID);
 						if ($short_lang) {
