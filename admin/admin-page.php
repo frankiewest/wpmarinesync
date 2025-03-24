@@ -42,6 +42,55 @@ class MarineSync_Admin_Page {
 		));
 	}
 
+    /**
+     * Safely adds a child element to an XML element
+     *
+     * @param \SimpleXMLElement $parent The parent element
+     * @param string $name The name of the child element
+     * @param mixed $value The value of the child element
+     * @return \SimpleXMLElement|null The created child element or null if value was empty
+     */
+    private function safe_add_child($parent, $name, $value) {
+        if (empty($value) && $value !== '0') {
+            return null;
+        }
+        return $parent->addChild($name, htmlspecialchars((string)$value));
+    }
+
+    /**
+     * Safely adds an attribute to an XML element
+     *
+     * @param \SimpleXMLElement $element The element to add the attribute to
+     * @param string $name The name of the attribute
+     * @param mixed $value The value of the attribute
+     * @return bool True if attribute was added, false otherwise
+     */
+    private function safe_add_attribute($element, $name, $value) {
+        if (empty($value) && $value !== '0') {
+            return false;
+        }
+        $element->addAttribute($name, (string)$value);
+        return true;
+    }
+
+    /**
+     * Safely adds an item element with value attribute to an XML parent
+     *
+     * @param \SimpleXMLElement $parent The parent element
+     * @param string $name The name of the item
+     * @param mixed $value The value of the item
+     * @return \SimpleXMLElement|null The created element or null if value was empty
+     */
+    private function safe_add_item($parent, $name, $value) {
+        if (empty($value) && $value !== '0') {
+            return null;
+        }
+        $item = $parent->addChild('item');
+        $item->addAttribute('name', $name);
+        $item->addAttribute('value', (string)$value);
+        return $item;
+    }
+
 	// Enqueue admin scripts
 	public function enqueue_admin_scripts($hook) {
 		error_log('MS300: Admin scripts hook: ' . $hook);
@@ -371,207 +420,312 @@ class MarineSync_Admin_Page {
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
 		));
-		error_log('MS027: Found ' . count($boat_posts) . ' boat posts to export');
 
-		// Create XML document
-		$xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><open_marine version="1.7" language="en" origin="'.esc_attr(get_bloginfo('name')).'" date="'.date('Y-m-d\TH:i:s').'"></open_marine>');
+		$count = count($boat_posts);
+		error_log('MS027: Found ' . $count . ' boat posts to export');
 
-		// Add broker information
-		$broker = $xml->addChild('broker');
-        $broker->addAttribute('code', $this->options['broker_code']);
+		try {
+			// Create XML document
+			$xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><open_marine version="1.7" language="en" origin="'.esc_attr(get_bloginfo('name')).'" date="'.date('Y-m-d\TH:i:s').'"></open_marine>');
 
-        // Add offices information
-        $offices = $xml->addChild('offices');
+			// Add broker information
+			$broker = $xml->addChild('broker');
+			// Use a default broker code if not set
+			$broker_code = isset($this->options['broker_code']) ? $this->options['broker_code'] : 'default';
+			$broker->addAttribute('code', $broker_code);
+			error_log('MS032: Added broker information');
 
-        // Get office option ACF field
-        $office = get_field('offices', 'option');
-        if(!empty ($office)) {
-            foreach($office as $item) {
-                // Add office information
-                $office = $offices->addChild('office');
-                $office->addAttribute('id', $item['id']);
-                $office->addChild('office_name', $item['office_name']);
-                $office->addChild('email', $item['office_email']);
+			// Add offices information
+			$offices = $xml->addChild('offices');
 
-                // Add name information
-                $name = $office->addChild('name', $item['name']);
-                $name->addChild('title', $item['title']);
-                $name->addChild('forename', $item['forename']);
-                $name->addChild('surname', $item['surname']);
+			// Check if ACF is active before using get_field
+			if (function_exists('get_field')) {
+				// Get office option ACF field
+				$office_data = get_field('offices', 'option');
+				if(!empty($office_data)) {
+					error_log('MS033: Processing ' . count($office_data) . ' offices');
+					foreach($office_data as $item) {
+						try {
+							// Add office information
+							$office = $offices->addChild('office');
+							$office->addAttribute('id', isset($item['id']) ? $item['id'] : '');
+							$office->addChild('office_name', isset($item['office_name']) ? $item['office_name'] : '');
+							$office->addChild('email', isset($item['office_email']) ? $item['office_email'] : '');
 
-                // Add address
-                $office->addChild('address', $item['address']);
-                $office->addChild('town', $item['town']);
-                $office->addChild('county', $item['county']);
-                $office->addChild('postcode', $item['postcode']);
-                $office->addChild('country', $item['country']);
+							// Add name information
+							$name = $office->addChild('name', isset($item['name']) ? $item['name'] : '');
+							$name->addChild('title', isset($item['title']) ? $item['title'] : '');
+							$name->addChild('forename', isset($item['forename']) ? $item['forename'] : '');
+							$name->addChild('surname', isset($item['surname']) ? $item['surname'] : '');
 
-                // add daytime phone and evening phone
-                $office->addChild('daytime_phone', $item['daytime_phone']);
-                $office->addChild('evening_phone', $item['evening_phone']);
+							// Add address
+							$office->addChild('address', isset($item['address']) ? $item['address'] : '');
+							$office->addChild('town', isset($item['town']) ? $item['town'] : '');
+							$office->addChild('county', isset($item['county']) ? $item['county'] : '');
+							$office->addChild('postcode', isset($item['postcode']) ? $item['postcode'] : '');
+							$office->addChild('country', isset($item['country']) ? $item['country'] : '');
 
-                // Add mobile phone and fax
-                $office->addChild('mobile', $item['mobile']);
-                $office->addChild('fax', $item['fax']);
+							// add daytime phone and evening phone
+							$office->addChild('daytime_phone', isset($item['daytime_phone']) ? $item['daytime_phone'] : '');
+							$office->addChild('evening_phone', isset($item['evening_phone']) ? $item['evening_phone'] : '');
 
-                // Add website
-                $office->addChild('website', $item['website']);
-            }
-        }
+							// Add mobile phone and fax
+							$office->addChild('mobile', isset($item['mobile']) ? $item['mobile'] : '');
+							$office->addChild('fax', isset($item['fax']) ? $item['fax'] : '');
 
-        // Create <adverts>
-        $adverts = $xml->addChild('adverts');
+							// Add website
+							$office->addChild('website', isset($item['website']) ? $item['website'] : '');
+						} catch (\Exception $e) {
+							error_log('MS034: Error adding office: ' . $e->getMessage());
+						}
+					}
+				} else {
+					error_log('MS035: No office data found in ACF fields');
+				}
+			} else {
+				error_log('MS036: ACF function get_field not available');
+			}
 
-		foreach ($boat_posts as $post) {
-			error_log('MS028: Processing boat post ID: ' . $post->ID);
+			// Create <adverts>
+			$adverts = $xml->addChild('adverts');
+			error_log('MS037: Starting boat entries processing');
 
-			// Add boat element
-			$boat = $adverts->addChild('advert');
-			$boat->addAttribute('ref', $post->ID);
+			foreach ($boat_posts as $index => $post) {
+				try {
+					error_log('MS038: Processing boat post ID: ' . $post->ID . ' (' . ($index + 1) . '/' . $count . ')');
 
-			// Add advert attr
-			$boat->addAttribute('status', MarineSync_Post_Type::get_boat_field('status', $post->ID));
-            $boat->addAttribute('last_modified', get_the_modified_date('Y-m-d\TH:i:s', $post->ID));
-            $boat->addAttribute('office_id', MarineSync_Post_Type::get_boat_field('office_id', $post->ID));
+					// Add boat element
+					$boat = $adverts->addChild('advert');
+					$boat->addAttribute('ref', $post->ID);
 
-            // Add advert_media
-            $advert_media = $boat->addChild('advert_media');
-            $images = get_field('images', $post->ID);
-            if(!empty($images)) {
-                foreach($images as $image) {
-                    $media = $advert_media->addChild('media', $image['url']);
-                    $media->addAttribute('type', 'image/'.$image['type']);
-                    $media->addAttribute('caption', $image['caption']);
-                    $media->addAttribute('primary', $image['primary']);
-                    $media->addAttribute('file_mtime', $image['file_mtime']);
-                }
-            }
+					// Check if MarineSync_Post_Type class and method exist
+					if (class_exists('MarineSync\\PostType\\MarineSync_Post_Type') &&
+					    method_exists('MarineSync\\PostType\\MarineSync_Post_Type', 'get_boat_field')) {
 
-            // Add advert features
-            $advert_features = $boat->addChild('advert_features');
-            $advert_features->addChild('title', MarineSync_Post_Type::get_boat_field('title', $post->ID));
-            $advert_features->addChild('boat_type', MarineSync_Post_Type::get_boat_field('boat_type', $post->ID));
-            $advert_features->addChild('boat_category', MarineSync_Post_Type::get_boat_field('boat_category', $post->ID));
-            $advert_features->addChild('new_or_used', MarineSync_Post_Type::get_boat_field('new_or_used', $post->ID));
+						// Add advert attr - check each field exists before adding
+						$status = MarineSync_Post_Type::get_boat_field('status', $post->ID);
+						if ($status) {
+							$boat->addAttribute('status', $status);
+						}
 
-            // Vessel lying
-            $vessel_lying = $advert_features->addChild('vessel_lying', MarineSync_Post_Type::get_boat_field('vessel_lying', $post->ID));
-            $vessel_lying->addAttribute('country', MarineSync_Post_Type::get_boat_field('vessel_lying_country', $post->ID));
+						$boat->addAttribute('last_modified', get_the_modified_date('Y-m-d\TH:i:s', $post->ID));
 
-            // Add asking price
-            $asking_price = $advert_features->addChild('asking_price', MarineSync_Post_Type::get_boat_field('asking_price', $post->ID));
-            $asking_price->addAttribute('hide_price', MarineSync_Post_Type::get_boat_field('hide_price', $post->ID));
-            $asking_price->addAttribute('currency', MarineSync_Post_Type::get_boat_field('currency', $post->ID));
-            $asking_price->addAttribute('vat_included', MarineSync_Post_Type::get_boat_field('vat_included', $post->ID));
-            $asking_price->addAttribute('vat_type', MarineSync_Post_Type::get_boat_field('vat_type', $post->ID));
-            $asking_price->addAttribute('vat_country', MarineSync_Post_Type::get_boat_field('vat_country', $post->ID));
+						$office_id = MarineSync_Post_Type::get_boat_field('office_id', $post->ID);
+						if ($office_id) {
+							$boat->addAttribute('office_id', $office_id);
+						}
 
-            // Add marketing desc
-            $marketing_descs = $boat->addChild('marketing_descs');
-            $marketing_desc = $marketing_descs->addChild('marketing_desc', MarineSync_Post_Type::get_boat_field('marketing_desc', $post->ID));
-            $marketing_desc->addAttribute('language', MarineSync_Post_Type::get_boat_field('marketing_desc_language', $post->ID));
-            $marketing_short_desc = $marketing_descs->addChild('marketing_short_desc', MarineSync_Post_Type::get_boat_field('marketing_short_desc', $post->ID));
-            $marketing_short_desc->addAttribute('language', MarineSync_Post_Type::get_boat_field('marketing_short_desc_language', $post->ID));
+						// Add advert_media
+						$advert_media = $boat->addChild('advert_media');
+						if (function_exists('get_field')) {
+							$images = get_field('images', $post->ID);
+							if (!empty($images)) {
+								foreach ($images as $image) {
+									$media = $advert_media->addChild('media', isset($image['url']) ? $image['url'] : '');
+									$media->addAttribute('type', 'image/' . (isset($image['type']) ? $image['type'] : 'jpeg'));
+									$media->addAttribute('caption', isset($image['caption']) ? $image['caption'] : '');
+									$media->addAttribute('primary', isset($image['primary']) ? $image['primary'] : '0');
+									$media->addAttribute('file_mtime', isset($image['file_mtime']) ? $image['file_mtime'] : '');
+								}
+							}
+						}
 
-            // Add manufacturer and model
-            $manufacturer = $advert_features->addChild('manufacturer', MarineSync_Post_Type::get_boat_field('manufacturer', $post->ID));
-            $model = $advert_features->addChild('model', MarineSync_Post_Type::get_boat_field('model', $post->ID));
+						// Add advert features
+						$advert_features = $boat->addChild('advert_features');
 
-            // Add boat features
-            $boat_features = $advert_features->addChild('boat_features');
+						// Safely add child elements - check each field
+						$this->safe_add_child($advert_features, 'title', MarineSync_Post_Type::get_boat_field('title', $post->ID));
+						$this->safe_add_child($advert_features, 'boat_type', MarineSync_Post_Type::get_boat_field('boat_type', $post->ID));
+						$this->safe_add_child($advert_features, 'boat_category', MarineSync_Post_Type::get_boat_field('boat_category', $post->ID));
+						$this->safe_add_child($advert_features, 'new_or_used', MarineSync_Post_Type::get_boat_field('new_or_used', $post->ID));
 
-            // Add dimensions
-            $dimensions = $boat_features->addChild('dimensions');
+						// Vessel lying
+						$vessel_lying = $this->safe_add_child($advert_features, 'vessel_lying',
+							MarineSync_Post_Type::get_boat_field('vessel_lying', $post->ID));
 
-            // Add beam, draft, loa and engine_power
-			$dimensions->addChild('item', MarineSync_Post_Type::get_boat_field('beam', $post->ID))->addAttribute('name', 'beam');
-			$dimensions->addChild('item', MarineSync_Post_Type::get_boat_field('draft', $post->ID))->addAttribute('name', 'draft');
-			$dimensions->addChild('item', MarineSync_Post_Type::get_boat_field('loa', $post->ID))->addAttribute('name', 'loa');
-			$dimensions->addChild('item', MarineSync_Post_Type::get_boat_field('engine_power', $post->ID))->addAttribute('name', 'engine_power');
+						if ($vessel_lying) {
+							$country = MarineSync_Post_Type::get_boat_field('vessel_lying_country', $post->ID);
+							if ($country) {
+								$vessel_lying->addAttribute('country', $country);
+							}
+						}
 
-            // Add build
-			$build = $boat_features->addChild('build');
+						// Add asking price
+						$price = MarineSync_Post_Type::get_boat_field('asking_price', $post->ID);
+						$asking_price = $this->safe_add_child($advert_features, 'asking_price', $price);
 
-            // Add year, keel_type, hin
-			$build->addChild('item', MarineSync_Post_Type::get_boat_field('year', $post->ID))->addAttribute('name', 'year');
-			$build->addChild('item', MarineSync_Post_Type::get_boat_field('keel_type', $post->ID))->addAttribute('name', 'keel_type');
-			$build->addChild('item', MarineSync_Post_Type::get_boat_field('hin', $post->ID))->addAttribute('name', 'hin');
+						if ($asking_price) {
+							$this->safe_add_attribute($asking_price, 'hide_price',
+								MarineSync_Post_Type::get_boat_field('hide_price', $post->ID));
+							$this->safe_add_attribute($asking_price, 'currency',
+								MarineSync_Post_Type::get_boat_field('currency', $post->ID));
+							$this->safe_add_attribute($asking_price, 'vat_included',
+								MarineSync_Post_Type::get_boat_field('vat_included', $post->ID));
+							$this->safe_add_attribute($asking_price, 'vat_type',
+								MarineSync_Post_Type::get_boat_field('vat_type', $post->ID));
+							$this->safe_add_attribute($asking_price, 'vat_country',
+								MarineSync_Post_Type::get_boat_field('vat_country', $post->ID));
+						}
 
-            // Add engine
-            $engine = $boat_features->addChild('engine');
+						// Add marketing desc
+						$marketing_descs = $boat->addChild('marketing_descs');
 
-            // Add engine_manufacturer, engine_model, horse_power, fuel, hours
-            $engine->addChild('item', MarineSync_Post_Type::get_boat_field('engine_manufacturer', $post->ID))->addAttribute('name', 'engine_manufacturer');
-            $engine->addChild('item', MarineSync_Post_Type::get_boat_field('engine_model', $post->ID))->addAttribute('name', 'engine_model');
-            $engine->addChild('item', MarineSync_Post_Type::get_boat_field('horse_power', $post->ID))->addAttribute('name', 'horse_power');
-            $engine->addChild('item', MarineSync_Post_Type::get_boat_field('fuel', $post->ID))->addAttribute('name', 'fuel');
-            $engine->addChild('item', MarineSync_Post_Type::get_boat_field('hours', $post->ID))->addAttribute('name', 'hours');
+						$desc = MarineSync_Post_Type::get_boat_field('marketing_desc', $post->ID);
+						$marketing_desc = $this->safe_add_child($marketing_descs, 'marketing_desc', $desc);
 
-            // Add additional
-            $additional = $boat_features->addChild('additional');
+						if ($marketing_desc) {
+							$lang = MarineSync_Post_Type::get_boat_field('marketing_desc_language', $post->ID);
+							if ($lang) {
+								$marketing_desc->addAttribute('language', $lang);
+							}
+						}
 
-            // Add dry_weight, fuel_tanks_capacity, hull_material, water_tanks_capacity
-            $additional->addChild('item', MarineSync_Post_Type::get_boat_field('dry_weight', $post->ID))->addAttribute('name', 'dry_weight');
-            $additional->addChild('item', MarineSync_Post_Type::get_boat_field('fuel_tanks_capacity', $post->ID))->addAttribute('name', 'fuel_tanks_capacity');
-            $additional->addChild('item', MarineSync_Post_Type::get_boat_field('hull_material', $post->ID))->addAttribute('name', 'hull_material');
-            $additional->addChild('item', MarineSync_Post_Type::get_boat_field('water_tanks_capacity', $post->ID))->addAttribute('name', 'water_tanks_capacity');
+						$short_desc = MarineSync_Post_Type::get_boat_field('marketing_short_desc', $post->ID);
+						$marketing_short_desc = $this->safe_add_child($marketing_descs, 'marketing_short_desc', $short_desc);
+
+						if ($marketing_short_desc) {
+							$lang = MarineSync_Post_Type::get_boat_field('marketing_short_desc_language', $post->ID);
+							if ($lang) {
+								$marketing_short_desc->addAttribute('language', $lang);
+							}
+						}
+
+						// Add manufacturer and model
+						$this->safe_add_child($advert_features, 'manufacturer',
+							MarineSync_Post_Type::get_boat_field('manufacturer', $post->ID));
+						$this->safe_add_child($advert_features, 'model',
+							MarineSync_Post_Type::get_boat_field('model', $post->ID));
+
+						// Add boat features
+						$boat_features = $advert_features->addChild('boat_features');
+
+						// Add dimensions
+						$dimensions = $boat_features->addChild('dimensions');
+
+						// Add dimension items
+						$this->safe_add_item($dimensions, 'beam', MarineSync_Post_Type::get_boat_field('beam', $post->ID));
+						$this->safe_add_item($dimensions, 'draft', MarineSync_Post_Type::get_boat_field('draft', $post->ID));
+						$this->safe_add_item($dimensions, 'loa', MarineSync_Post_Type::get_boat_field('loa', $post->ID));
+						$this->safe_add_item($dimensions, 'engine_power', MarineSync_Post_Type::get_boat_field('engine_power', $post->ID));
+
+						// Add build
+						$build = $boat_features->addChild('build');
+
+						// Add build items
+						$this->safe_add_item($build, 'year', MarineSync_Post_Type::get_boat_field('year', $post->ID));
+						$this->safe_add_item($build, 'keel_type', MarineSync_Post_Type::get_boat_field('keel_type', $post->ID));
+						$this->safe_add_item($build, 'hin', MarineSync_Post_Type::get_boat_field('hin', $post->ID));
+
+						// Add engine
+						$engine = $boat_features->addChild('engine');
+
+						// Add engine items
+						$this->safe_add_item($engine, 'engine_manufacturer',
+							MarineSync_Post_Type::get_boat_field('engine_manufacturer', $post->ID));
+						$this->safe_add_item($engine, 'engine_model',
+							MarineSync_Post_Type::get_boat_field('engine_model', $post->ID));
+						$this->safe_add_item($engine, 'horse_power',
+							MarineSync_Post_Type::get_boat_field('horse_power', $post->ID));
+						$this->safe_add_item($engine, 'fuel',
+							MarineSync_Post_Type::get_boat_field('fuel', $post->ID));
+						$this->safe_add_item($engine, 'hours',
+							MarineSync_Post_Type::get_boat_field('hours', $post->ID));
+
+						// Add additional
+						$additional = $boat_features->addChild('additional');
+
+						// Add additional items
+						$this->safe_add_item($additional, 'dry_weight',
+							MarineSync_Post_Type::get_boat_field('dry_weight', $post->ID));
+						$this->safe_add_item($additional, 'fuel_tanks_capacity',
+							MarineSync_Post_Type::get_boat_field('fuel_tanks_capacity', $post->ID));
+						$this->safe_add_item($additional, 'hull_material',
+							MarineSync_Post_Type::get_boat_field('hull_material', $post->ID));
+						$this->safe_add_item($additional, 'water_tanks_capacity',
+							MarineSync_Post_Type::get_boat_field('water_tanks_capacity', $post->ID));
+					} else {
+						error_log('MS039: MarineSync_Post_Type class or method not found');
+					}
+				} catch (\Exception $e) {
+					error_log('MS040: Error processing boat ID ' . $post->ID . ': ' . $e->getMessage());
+				}
+			}
+
+			// Create the uploads directory if it doesn't exist
+			$upload_dir = wp_upload_dir();
+			$export_dir = $upload_dir['basedir'] . '/marinesync-exports/';
+
+			if (!file_exists($export_dir)) {
+				wp_mkdir_p($export_dir);
+				error_log('MS041: Created export directory: ' . $export_dir);
+			}
+
+			// Create an .htaccess file to ensure the directory is publicly accessible
+			$htaccess_file = $export_dir . '.htaccess';
+			if (!file_exists($htaccess_file)) {
+				file_put_contents($htaccess_file, "Allow from all\n");
+				error_log('MS042: Created .htaccess in export directory');
+			}
+
+			// Fixed filename for consistent access
+			$filename = 'marinesync-export-' . sanitize_title(get_bloginfo('name')) . '-' . uniqid() . '.xml';
+			$filepath = $export_dir . $filename;
+			$public_url = $upload_dir['baseurl'] . '/marinesync-exports/' . $filename;
+
+			// Save the XML file
+			$dom = new \DOMDocument('1.0');
+			$dom->preserveWhiteSpace = false;
+			$dom->formatOutput = true;
+			$dom->loadXML($xml->asXML());
+
+			$result = file_put_contents($filepath, $dom->saveXML());
+
+			if ($result === false) {
+				error_log('MS043: Error writing XML file to: ' . $filepath);
+				throw new \Exception('Could not write to file: ' . $filepath);
+			}
+
+			error_log('MS044: Generated XML file at: ' . $filepath);
+
+			// Store the public URL in an option for easy access
+			update_option('marinesync_export_url', $public_url);
+			update_option('marinesync_last_export', current_time('mysql'));
+
+			// If accessed via AJAX, return success with the URL
+			if (wp_doing_ajax()) {
+				wp_send_json_success(array(
+					'message' => __('Export completed successfully', 'marinesync'),
+					'url' => $public_url
+				));
+			}
+
+			// Check if we should deactivate after export
+			if (isset($_GET['then']) && $_GET['then'] === 'deactivate' && isset($_GET['redirect'])) {
+				error_log('MS045: Export completed, proceeding with deactivation');
+				?>
+                <script type="text/javascript">
+                    window.location.href = <?php echo json_encode(esc_url_raw($_GET['redirect'])); ?>;
+                </script>
+				<?php
+			} else {
+				// Redirect to admin page with success message
+				wp_redirect(admin_url('admin.php?page=marinesync-export&export=success&url=' . urlencode($public_url)));
+			}
+
+			error_log('MS046: Export process completed');
+			exit;
+
+		} catch (\Exception $e) {
+			error_log('MS047: Critical error in export process: ' . $e->getMessage());
+
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array(
+					'message' => __('Export failed: ', 'marinesync') . $e->getMessage()
+				));
+			} else {
+				wp_die('Export Error: ' . $e->getMessage());
+			}
 		}
-
-		// Create the uploads directory if it doesn't exist
-		$upload_dir = wp_upload_dir();
-		$export_dir = $upload_dir['basedir'] . '/marinesync-exports/';
-
-		if (!file_exists($export_dir)) {
-			wp_mkdir_p($export_dir);
-		}
-
-		// Create an .htaccess file to ensure the directory is publicly accessible
-		$htaccess_file = $export_dir . '.htaccess';
-		if (!file_exists($htaccess_file)) {
-			file_put_contents($htaccess_file, "Allow from all\n");
-		}
-
-		// Fixed filename for consistent access
-		$filename = 'marinesync-export-'.str_replace(' ', '-', get_bloginfo('name')).uniqid().'.xml';
-		$filepath = $export_dir . $filename;
-		$public_url = $upload_dir['baseurl'] . '/marinesync-exports/' . $filename;
-
-		// Save the XML file
-		$dom = new \DOMDocument('1.0');
-		$dom->preserveWhiteSpace = false;
-		$dom->formatOutput = true;
-		$dom->loadXML($xml->asXML());
-		file_put_contents($filepath, $dom->saveXML());
-
-		error_log('MS029: Generated XML file at: ' . $filepath);
-
-		// Store the public URL in an option for easy access
-		update_option('marinesync_export_url', $public_url);
-		update_option('marinesync_last_export', current_time('mysql'));
-
-		// If accessed via AJAX, return success with the URL
-		if (wp_doing_ajax()) {
-			wp_send_json_success(array(
-				'message' => __('Export completed successfully', 'marinesync'),
-				'url' => $public_url
-			));
-		}
-
-		// Check if we should deactivate after export
-		if (isset($_GET['then']) && $_GET['then'] === 'deactivate' && isset($_GET['redirect'])) {
-			error_log('MS030: Export completed, proceeding with deactivation');
-			?>
-            <script type="text/javascript">
-                window.location.href = <?php echo json_encode(esc_url_raw($_GET['redirect'])); ?>;
-            </script>
-			<?php
-		} else {
-			// Redirect to admin page with success message
-			wp_redirect(admin_url('admin.php?page=marinesync-export&export=success&url=' . urlencode($public_url)));
-		}
-
-		error_log('MS031: Export process completed');
-		exit;
 	}
 
 	public function ajax_run_feed() {
