@@ -25,8 +25,8 @@ if (!defined('ABSPATH')) {
 
 // Define plugin constants
 define('MARINESYNC_PLUGIN_VERSION', '1.0.1');
-define('MARINESYNC_PLUGIN_DIR', \plugin_dir_path(__FILE__));
-define('MARINESYNC_PLUGIN_URL', \plugin_dir_url(__FILE__));
+define('MARINESYNC_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('MARINESYNC_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Autoloader for plugin classes
 spl_autoload_register(function ($class) {
@@ -361,7 +361,7 @@ function enqueue_admin_scripts($hook) {
 	wp_enqueue_style('marinesync-admin-css',
 		MARINESYNC_PLUGIN_URL . 'assets/css/admin.css',
 		array(),
-		MARINESYNC_PLUGIN_VERSION . '-' . filemtime(MARINESYNC_PLUGIN_DIR . 'assets/css/admin.css')
+		MARINESYNC_PLUGIN_VERSION
 	);
 	error_log('MS311: Is style enqueued? ' . (wp_style_is('marinesync-admin-css', 'enqueued') ? 'Yes' : 'No'));
 	wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), time(), true);
