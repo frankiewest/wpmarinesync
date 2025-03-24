@@ -59,10 +59,10 @@ class MarineSync_Admin_Page {
             return;
         }
 
-        wp_enqueue_style('marinesync-admin', MARINESYNC_PLUGIN_URL . 'assets/css/admin.css', array(), MARINESYNC_PLUGIN_VERSION);
-        wp_enqueue_script('marinesync-admin', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), MARINESYNC_PLUGIN_VERSION, true);
+        wp_enqueue_style('marinesync-admin-css', MARINESYNC_PLUGIN_URL . 'assets/css/admin.css', array(), MARINESYNC_PLUGIN_VERSION);
+        wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), MARINESYNC_PLUGIN_VERSION, true);
 
-        wp_localize_script('marinesync-admin', 'marinesyncAdmin', array(
+        wp_localize_script('marinesync-admin-js', 'marinesyncAdmin', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('marinesync_admin_nonce'),
             'feedRunning' => get_transient('marinesync_feed_running'),
