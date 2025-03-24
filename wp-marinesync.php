@@ -209,66 +209,119 @@ add_action('admin_footer', 'MarineSync\\marinesync_add_deactivation_dialog');
 
 // Handle AJAX actions for export and delete
 function marinesync_handle_export_boats() {
-    error_log('MS025: Starting boat export process');
-    
-    // Check for admin capabilities
-    if (!current_user_can('manage_options')) {
-        error_log('MS026: Unauthorized access attempt to export boats');
-        wp_die('Unauthorized access');
-    }
-    
-    global $wpdb;
-    
-    // Get all boat posts
-    $boat_posts = get_posts(array(
-        'post_type' => 'marinesync-boats',
-        'posts_per_page' => -1,
-        'post_status' => 'any',
-    ));
-    error_log('MS027: Found ' . count($boat_posts) . ' boat posts to export');
-    
-    $export_data = array();
-    
-    foreach ($boat_posts as $post) {
-        error_log('MS028: Processing boat post ID: ' . $post->ID);
-        // Get all meta for each post
-        $meta = get_post_meta($post->ID);
-        
-        // Format the data
-        $boat_data = array(
-            'title' => $post->post_title,
-            'content' => $post->post_content,
-            'excerpt' => $post->post_excerpt,
-            'date' => $post->post_date,
-            'status' => $post->post_status,
-            'meta' => $meta
-        );
-        
-        $export_data[] = $boat_data;
-    }
-    
-    // Generate JSON file
-    $filename = 'marinesync-export-' . date('Y-m-d') . '.json';
-    error_log('MS029: Generating export file: ' . $filename);
-    
-    header('Content-Type: application/json');
-    header('Content-Disposition: attachment; filename=' . $filename);
-    header('Pragma: no-cache');
-    
-    echo json_encode($export_data, JSON_PRETTY_PRINT);
-    
-    // Check if we should deactivate after export
-    if (isset($_GET['then']) && $_GET['then'] === 'deactivate' && isset($_GET['redirect'])) {
-        error_log('MS030: Export completed, proceeding with deactivation');
-        ?>
+	error_log('MS025: Starting boat export process');
+
+	// Check for admin capabilities
+	if (!current_user_can('manage_options')) {
+		error_log('MS026: Unauthorized access attempt to export boats');
+		wp_die('Unauthorized access');
+	}
+
+	global $wpdb;
+
+	// Get all boat posts
+	$boat_posts = get_posts(array(
+		'post_type' => 'marinesync-boats',
+		'posts_per_page' => -1,
+		'post_status' => 'any',
+	));
+	error_log('MS027: Found ' . count($boat_posts) . ' boat posts to export');
+
+	// Create XML document
+	$xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><openMarine></openMarine>');
+
+	// Add metadata
+	$metadata = $xml->addChild('metadata');
+	$metadata->addChild('provider', get_bloginfo('name'));
+	$metadata->addChild('exportDate', date('Y-m-d\TH:i:s'));
+	$metadata->addChild('version', '1.0');
+
+	// Add boats container
+	$boats = $xml->addChild('boats');
+
+	foreach ($boat_posts as $post) {
+		error_log('MS028: Processing boat post ID: ' . $post->ID);
+
+		// Add boat element
+		$boat = $boats->addChild('boat');
+		$boat->addAttribute('id', $post->ID);
+
+		// Add basic fields
+		$boat->addChild('title', htmlspecialchars($post->post_title));
+		$boat->addChild('description', htmlspecialchars($post->post_content));
+		$boat->addChild('status', $post->post_status);
+		$boat->addChild('dateAdded', $post->post_date);
+
+		// Add metadata
+		$meta_values = get_post_meta($post->ID);
+		$metadata = $boat->addChild('metadata');
+
+		foreach ($meta_values as $key => $values) {
+			if (is_array($values)) {
+				foreach ($values as $value) {
+					$meta_item = $metadata->addChild('meta');
+					$meta_item->addAttribute('key', htmlspecialchars($key));
+					$meta_item->addChild('value', htmlspecialchars($value));
+				}
+			}
+		}
+	}
+
+	// Create the uploads directory if it doesn't exist
+	$upload_dir = wp_upload_dir();
+	$export_dir = $upload_dir['basedir'] . '/marinesync-exports/';
+
+	if (!file_exists($export_dir)) {
+		wp_mkdir_p($export_dir);
+	}
+
+	// Create an .htaccess file to ensure the directory is publicly accessible
+	$htaccess_file = $export_dir . '.htaccess';
+	if (!file_exists($htaccess_file)) {
+		file_put_contents($htaccess_file, "Allow from all\n");
+	}
+
+	// Fixed filename for consistent access
+	$filename = 'marinesync-export-'.str_replace(' ', '-', get_bloginfo('name')).uniqid().'.xml';
+	$filepath = $export_dir . $filename;
+	$public_url = $upload_dir['baseurl'] . '/marinesync-exports/' . $filename;
+
+	// Save the XML file
+	$dom = new \DOMDocument('1.0');
+	$dom->preserveWhiteSpace = false;
+	$dom->formatOutput = true;
+	$dom->loadXML($xml->asXML());
+	file_put_contents($filepath, $dom->saveXML());
+
+	error_log('MS029: Generated XML file at: ' . $filepath);
+
+	// Store the public URL in an option for easy access
+	update_option('marinesync_export_url', $public_url);
+	update_option('marinesync_last_export', current_time('mysql'));
+
+	// If accessed via AJAX, return success with the URL
+	if (wp_doing_ajax()) {
+		wp_send_json_success(array(
+			'message' => __('Export completed successfully', 'marinesync'),
+			'url' => $public_url
+		));
+	}
+
+	// Check if we should deactivate after export
+	if (isset($_GET['then']) && $_GET['then'] === 'deactivate' && isset($_GET['redirect'])) {
+		error_log('MS030: Export completed, proceeding with deactivation');
+		?>
         <script type="text/javascript">
             window.location.href = <?php echo json_encode(esc_url_raw($_GET['redirect'])); ?>;
         </script>
-        <?php
-    }
-    
-    error_log('MS031: Export process completed');
-    exit;
+		<?php
+	} else {
+		// Redirect to admin page with success message
+		wp_redirect(admin_url('admin.php?page=marinesync-export&export=success&url=' . urlencode($public_url)));
+	}
+
+	error_log('MS031: Export process completed');
+	exit;
 }
 add_action('wp_ajax_marinesync_export_boats', 'MarineSync\\marinesync_handle_export_boats');
 
