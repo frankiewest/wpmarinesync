@@ -80,6 +80,14 @@ class MarineSync_Admin_Page {
 	    wp_enqueue_style('marinesync-admin-css', MARINESYNC_PLUGIN_URL . 'assets/css/admin.css', array(), time());
 	    wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), time(), true);
 
+	    wp_add_inline_style('marinesync-test-inline', '
+            .wrap.marinesync-admin { 
+                border: 5px solid red !important; 
+                padding: 20px !important;
+                background-color: lightyellow !important;
+            }
+        ');
+
         wp_localize_script('marinesync-admin-js', 'marinesyncAdmin', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('marinesync_admin_nonce'),
