@@ -572,7 +572,7 @@ class MarineSync_Admin_Page {
 
                         // Get primary image
                         $post_thumbnail = get_post_thumbnail_id($post->ID);
-						$primary_image = $advert_media->addAttribute('media', get_the_post_thumbnail_url($post->ID, 'full'));
+						$primary_image = $advert_media->addChild('media', get_the_post_thumbnail_url($post->ID, 'full'));
 						$primary_image->addAttribute('type', 'image/' . (isset($image['type']) ? $image['type'] : 'jpeg'));
 						$primary_image->addAttribute('primary', 'true');
 						$primary_image->addAttribute('caption', isset($image['caption']) ? $image['caption'] : '');
