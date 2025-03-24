@@ -570,17 +570,32 @@ class MarineSync_Admin_Page {
 						// Add advert_media
 						$advert_media = $boat->addChild('advert_media');
 
-                        // Get primary image
-                        $post_thumbnail = get_post_thumbnail_id($post->ID);
-						$primary_image = $advert_media->addChild('media', get_the_post_thumbnail_url($post->ID, 'full'));
-						$primary_image->addAttribute('type', 'image/' . (isset($image['type']) ? $image['type'] : 'jpeg'));
-						$primary_image->addAttribute('primary', 'true');
-						$primary_image->addAttribute('caption', isset($image['caption']) ? $image['caption'] : '');
-						$primary_image->addAttribute('file_mtime', isset($image['file_mtime']) ? $image['file_mtime'] : '');
+						// Get primary image
+						$post_thumbnail = get_post_thumbnail_id($post->ID);
+						if ($post_thumbnail) {
+							// Get the full image URL
+							$primary_url = get_the_post_thumbnail_url($post->ID, 'full');
 
-                        $primary_path = get_the_post_thumbnail_url($post->ID, 'full');
-						$primary_mtime = $primary_path && file_exists($primary_path) ? filemtime($primary_path) : time();
-						$primary_image->addAttribute('file_mtime', date('Y-m-d\TH:i:s', $primary_mtime));
+							// Add the primary image to XML
+							$primary_image = $advert_media->addChild('media', $primary_url);
+
+							// Get file extension for MIME type
+							$file_ext = pathinfo($primary_url, PATHINFO_EXTENSION);
+							$mime_type = 'image/' . ($file_ext ? $file_ext : 'jpeg');
+
+							$primary_image->addAttribute('type', $mime_type);
+							$primary_image->addAttribute('primary', 'true');
+
+							// Get attachment metadata for caption
+							$attachment = get_post($post_thumbnail);
+							$caption = $attachment ? $attachment->post_excerpt : '';
+							$primary_image->addAttribute('caption', $caption);
+
+							// Get file modified time
+							$file_path = get_attached_file($post_thumbnail);
+							$primary_mtime = $file_path && file_exists($file_path) ? filemtime($file_path) : time();
+							$primary_image->addAttribute('file_mtime', date('Y-m-d\TH:i:s', $primary_mtime));
+						}
 
 						if (function_exists('get_field')) {
 							$images = get_field('boat_media', $post->ID);
