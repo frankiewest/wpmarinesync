@@ -27,7 +27,7 @@ class MarineSync_Admin_Page {
         add_action('wp_ajax_marinesync_run_feed', array($this, 'ajax_run_feed'));
         add_action('wp_ajax_marinesync_check_feed_status', array($this, 'ajax_check_feed_status'));
     }
-
+// comment
     public function add_admin_menu() {
         add_menu_page(
             __('MarineSync', 'marinesync'),
