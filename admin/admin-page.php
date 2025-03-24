@@ -573,68 +573,73 @@ class MarineSync_Admin_Page {
 						// Add advert features
 						$advert_features = $boat->addChild('advert_features');
 
-						// Safely add child elements - check each field
-						$this->safe_add_child($advert_features, 'title', MarineSync_Post_Type::get_boat_field('title', $post->ID));
-						$this->safe_add_child($advert_features, 'boat_type', MarineSync_Post_Type::get_boat_field('boat_type', $post->ID));
-						$this->safe_add_child($advert_features, 'boat_category', MarineSync_Post_Type::get_boat_field('boat_category', $post->ID));
-						$this->safe_add_child($advert_features, 'new_or_used', MarineSync_Post_Type::get_boat_field('new_or_used', $post->ID));
+						// Add child elements directly
+						$advert_features->addChild('title', htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('title', $post->ID)));
+						$advert_features->addChild('boat_type', htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('boat_type', $post->ID)));
+						$advert_features->addChild('boat_category', htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('boat_category', $post->ID)));
+						$advert_features->addChild('new_or_used', htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('new_or_used', $post->ID)));
 
 						// Vessel lying
-						$vessel_lying = $this->safe_add_child($advert_features, 'vessel_lying',
-							MarineSync_Post_Type::get_boat_field('vessel_lying', $post->ID));
-
-						if ($vessel_lying) {
-							$country = MarineSync_Post_Type::get_boat_field('vessel_lying_country', $post->ID);
-							if ($country) {
-								$vessel_lying->addAttribute('country', $country);
-							}
+						$vessel_lying = $advert_features->addChild('vessel_lying',
+							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('vessel_lying', $post->ID)));
+						$country = MarineSync_Post_Type::get_boat_field('vessel_lying_country', $post->ID);
+						if ($country) {
+							$vessel_lying->addAttribute('country', $country);
 						}
 
 						// Add asking price
-						$price = MarineSync_Post_Type::get_boat_field('asking_price', $post->ID);
-						$asking_price = $this->safe_add_child($advert_features, 'asking_price', $price);
+						$asking_price = $advert_features->addChild('asking_price',
+							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('asking_price', $post->ID)));
 
-						if ($asking_price) {
-							$this->safe_add_attribute($asking_price, 'hide_price',
-								MarineSync_Post_Type::get_boat_field('hide_price', $post->ID));
-							$this->safe_add_attribute($asking_price, 'currency',
-								MarineSync_Post_Type::get_boat_field('currency', $post->ID));
-							$this->safe_add_attribute($asking_price, 'vat_included',
-								MarineSync_Post_Type::get_boat_field('vat_included', $post->ID));
-							$this->safe_add_attribute($asking_price, 'vat_type',
-								MarineSync_Post_Type::get_boat_field('vat_type', $post->ID));
-							$this->safe_add_attribute($asking_price, 'vat_country',
-								MarineSync_Post_Type::get_boat_field('vat_country', $post->ID));
+						$hide_price = MarineSync_Post_Type::get_boat_field('hide_price', $post->ID);
+						if ($hide_price) {
+							$asking_price->addAttribute('hide_price', $hide_price);
+						}
+
+						$currency = MarineSync_Post_Type::get_boat_field('currency', $post->ID);
+						if ($currency) {
+							$asking_price->addAttribute('currency', $currency);
+						}
+
+						$vat_included = MarineSync_Post_Type::get_boat_field('vat_included', $post->ID);
+						if ($vat_included) {
+							$asking_price->addAttribute('vat_included', $vat_included);
+						}
+
+						$vat_type = MarineSync_Post_Type::get_boat_field('vat_type', $post->ID);
+						if ($vat_type) {
+							$asking_price->addAttribute('vat_type', $vat_type);
+						}
+
+						$vat_country = MarineSync_Post_Type::get_boat_field('vat_country', $post->ID);
+						if ($vat_country) {
+							$asking_price->addAttribute('vat_country', $vat_country);
 						}
 
 						// Add marketing desc
 						$marketing_descs = $boat->addChild('marketing_descs');
 
 						$desc = MarineSync_Post_Type::get_boat_field('marketing_desc', $post->ID);
-						$marketing_desc = $this->safe_add_child($marketing_descs, 'marketing_desc', $desc);
+						$marketing_desc = $marketing_descs->addChild('marketing_desc', htmlspecialchars((string)$desc));
 
-						if ($marketing_desc) {
-							$lang = MarineSync_Post_Type::get_boat_field('marketing_desc_language', $post->ID);
-							if ($lang) {
-								$marketing_desc->addAttribute('language', $lang);
-							}
+						$lang = MarineSync_Post_Type::get_boat_field('marketing_desc_language', $post->ID);
+						if ($lang) {
+							$marketing_desc->addAttribute('language', $lang);
 						}
 
 						$short_desc = MarineSync_Post_Type::get_boat_field('marketing_short_desc', $post->ID);
-						$marketing_short_desc = $this->safe_add_child($marketing_descs, 'marketing_short_desc', $short_desc);
+						$marketing_short_desc = $marketing_descs->addChild('marketing_short_desc', htmlspecialchars((string)$short_desc));
 
-						if ($marketing_short_desc) {
-							$lang = MarineSync_Post_Type::get_boat_field('marketing_short_desc_language', $post->ID);
-							if ($lang) {
-								$marketing_short_desc->addAttribute('language', $lang);
-							}
+						$short_lang = MarineSync_Post_Type::get_boat_field('marketing_short_desc_language', $post->ID);
+						if ($short_lang) {
+							$marketing_short_desc->addAttribute('language', $short_lang);
 						}
 
 						// Add manufacturer and model
-						$this->safe_add_child($advert_features, 'manufacturer',
-							MarineSync_Post_Type::get_boat_field('manufacturer', $post->ID));
-						$this->safe_add_child($advert_features, 'model',
-							MarineSync_Post_Type::get_boat_field('model', $post->ID));
+						$advert_features->addChild('manufacturer',
+							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('manufacturer', $post->ID)));
+						$advert_features->addChild('model',
+							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('model', $post->ID)));
 
 						// Add boat features
 						$boat_features = $advert_features->addChild('boat_features');
@@ -642,47 +647,82 @@ class MarineSync_Admin_Page {
 						// Add dimensions
 						$dimensions = $boat_features->addChild('dimensions');
 
-						// Add dimension items
-						$this->safe_add_item($dimensions, 'beam', MarineSync_Post_Type::get_boat_field('beam', $post->ID));
-						$this->safe_add_item($dimensions, 'draft', MarineSync_Post_Type::get_boat_field('draft', $post->ID));
-						$this->safe_add_item($dimensions, 'loa', MarineSync_Post_Type::get_boat_field('loa', $post->ID));
-						$this->safe_add_item($dimensions, 'engine_power', MarineSync_Post_Type::get_boat_field('engine_power', $post->ID));
+						// Add dimension items directly
+						$beam_item = $dimensions->addChild('item');
+						$beam_item->addAttribute('name', 'beam');
+						$beam_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('beam', $post->ID));
+
+						$draft_item = $dimensions->addChild('item');
+						$draft_item->addAttribute('name', 'draft');
+						$draft_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('draft', $post->ID));
+
+						$loa_item = $dimensions->addChild('item');
+						$loa_item->addAttribute('name', 'loa');
+						$loa_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('loa', $post->ID));
+
+						$engine_power_item = $dimensions->addChild('item');
+						$engine_power_item->addAttribute('name', 'engine_power');
+						$engine_power_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('engine_power', $post->ID));
 
 						// Add build
 						$build = $boat_features->addChild('build');
 
 						// Add build items
-						$this->safe_add_item($build, 'year', MarineSync_Post_Type::get_boat_field('year', $post->ID));
-						$this->safe_add_item($build, 'keel_type', MarineSync_Post_Type::get_boat_field('keel_type', $post->ID));
-						$this->safe_add_item($build, 'hin', MarineSync_Post_Type::get_boat_field('hin', $post->ID));
+						$year_item = $build->addChild('item');
+						$year_item->addAttribute('name', 'year');
+						$year_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('year', $post->ID));
+
+						$keel_type_item = $build->addChild('item');
+						$keel_type_item->addAttribute('name', 'keel_type');
+						$keel_type_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('keel_type', $post->ID));
+
+						$hin_item = $build->addChild('item');
+						$hin_item->addAttribute('name', 'hin');
+						$hin_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('hin', $post->ID));
 
 						// Add engine
 						$engine = $boat_features->addChild('engine');
 
 						// Add engine items
-						$this->safe_add_item($engine, 'engine_manufacturer',
-							MarineSync_Post_Type::get_boat_field('engine_manufacturer', $post->ID));
-						$this->safe_add_item($engine, 'engine_model',
-							MarineSync_Post_Type::get_boat_field('engine_model', $post->ID));
-						$this->safe_add_item($engine, 'horse_power',
-							MarineSync_Post_Type::get_boat_field('horse_power', $post->ID));
-						$this->safe_add_item($engine, 'fuel',
-							MarineSync_Post_Type::get_boat_field('fuel', $post->ID));
-						$this->safe_add_item($engine, 'hours',
-							MarineSync_Post_Type::get_boat_field('hours', $post->ID));
+						$engine_manufacturer_item = $engine->addChild('item');
+						$engine_manufacturer_item->addAttribute('name', 'engine_manufacturer');
+						$engine_manufacturer_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('engine_manufacturer', $post->ID));
+
+						$engine_model_item = $engine->addChild('item');
+						$engine_model_item->addAttribute('name', 'engine_model');
+						$engine_model_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('engine_model', $post->ID));
+
+						$horse_power_item = $engine->addChild('item');
+						$horse_power_item->addAttribute('name', 'horse_power');
+						$horse_power_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('horse_power', $post->ID));
+
+						$fuel_item = $engine->addChild('item');
+						$fuel_item->addAttribute('name', 'fuel');
+						$fuel_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('fuel', $post->ID));
+
+						$hours_item = $engine->addChild('item');
+						$hours_item->addAttribute('name', 'hours');
+						$hours_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('hours', $post->ID));
 
 						// Add additional
 						$additional = $boat_features->addChild('additional');
 
 						// Add additional items
-						$this->safe_add_item($additional, 'dry_weight',
-							MarineSync_Post_Type::get_boat_field('dry_weight', $post->ID));
-						$this->safe_add_item($additional, 'fuel_tanks_capacity',
-							MarineSync_Post_Type::get_boat_field('fuel_tanks_capacity', $post->ID));
-						$this->safe_add_item($additional, 'hull_material',
-							MarineSync_Post_Type::get_boat_field('hull_material', $post->ID));
-						$this->safe_add_item($additional, 'water_tanks_capacity',
-							MarineSync_Post_Type::get_boat_field('water_tanks_capacity', $post->ID));
+						$dry_weight_item = $additional->addChild('item');
+						$dry_weight_item->addAttribute('name', 'dry_weight');
+						$dry_weight_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('dry_weight', $post->ID));
+
+						$fuel_tanks_item = $additional->addChild('item');
+						$fuel_tanks_item->addAttribute('name', 'fuel_tanks_capacity');
+						$fuel_tanks_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('fuel_tanks_capacity', $post->ID));
+
+						$hull_material_item = $additional->addChild('item');
+						$hull_material_item->addAttribute('name', 'hull_material');
+						$hull_material_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('hull_material', $post->ID));
+
+						$water_tanks_item = $additional->addChild('item');
+						$water_tanks_item->addAttribute('name', 'water_tanks_capacity');
+						$water_tanks_item->addAttribute('value', (string)MarineSync_Post_Type::get_boat_field('water_tanks_capacity', $post->ID));
 					} else {
 						error_log('MS039: MarineSync_Post_Type class or method not found');
 					}
@@ -708,7 +748,7 @@ class MarineSync_Admin_Page {
 			}
 
 			// Fixed filename for consistent access
-			$filename = 'marinesync-export-' . sanitize_title(get_bloginfo('name')) . '-' . uniqid() . '.xml';
+			$filename = 'marinesync-export-' . sanitize_title(get_bloginfo('name')) . '.xml';
 			$filepath = $export_dir . $filename;
 			$public_url = $upload_dir['baseurl'] . '/marinesync-exports/' . $filename;
 
