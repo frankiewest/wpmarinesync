@@ -1,3 +1,13 @@
+body.wp-admin .marinesync-admin {
+    margin: 20px;
+}
+
+body.wp-admin .marinesync-admin-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
 .marinesync-admin {
     margin: 20px;
 }
