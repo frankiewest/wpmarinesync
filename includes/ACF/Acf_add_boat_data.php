@@ -13,7 +13,7 @@ class Acf_add_boat_data {
 	    error_log('MS023: Function exists check: ' . (function_exists('acf_add_local_field_group') ? 'Yes' : 'No'));
 	    error_log('MS024: Class exists check: ' . (class_exists('ACF') ? 'Yes' : 'No'));
 
-	    acf_add_local_field_group(array(
+	    $result = acf_add_local_field_group(array(
             'key' => 'group_67addc1021662',
             'title' => 'Boat Data',
             'fields' => array(
@@ -2425,8 +2425,8 @@ class Acf_add_boat_data {
                 ),
                 array(
                     'key' => 'field_67ae02538e670',
-                    'label' => 'Blige Pump',
-                    'name' => 'blige_pump',
+                    'label' => 'Bilge Pump',
+                    'name' => 'bilge_pump',
                     'aria-label' => '',
                     'type' => 'text',
                     'instructions' => '',
@@ -2779,7 +2779,11 @@ class Acf_add_boat_data {
             'description' => '',
             'show_in_rest' => 0
         ));
-        
-        error_log('MS022: ACF field group created successfully');
+
+		if($result) {
+			error_log('MS022: ACF field group created successfully');
+		} else {
+			error_log('MS022E: ACF field group creation failed');
+		}
     }
 }
