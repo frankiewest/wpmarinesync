@@ -82,6 +82,7 @@ class MarineSync_Admin_Page {
 		    array(),
 		    MARINESYNC_PLUGIN_VERSION . '-' . filemtime(MARINESYNC_PLUGIN_DIR . 'assets/css/admin.css')
 	    );
+	    error_log('MS311: Is style enqueued? ' . (wp_style_is('marinesync-admin-css', 'enqueued') ? 'Yes' : 'No'));
         wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), time(), true);
 
         wp_localize_script('marinesync-admin-js', 'marinesyncAdmin', array(
