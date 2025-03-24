@@ -90,7 +90,7 @@ function marinesync_activate() {
     PostType\MarineSync_Post_Type::register();
     error_log('MS004: Post type registered');
 
-	add_action('acf/init', [ACF\Acf_add_boat_data::class, 'add_boat_data']);
+	add_action('acf/init', ['\MarineSync\ACF\Acf_add_boat_data', 'add_boat_data']);
 	error_log('MS005: ACF fields added directly');
     
     // Flush rewrite rules
@@ -350,6 +350,14 @@ function marinesync_enqueue_admin_assets($hook) {
     ));
 }
 add_action('admin_enqueue_scripts', 'MarineSync\\marinesync_enqueue_admin_assets');
+
+function marinesync_register_acf_fields() {
+	if (function_exists('acf_add_local_field_group')) {
+		error_log('MS200: Registering ACF fields via global hook');
+		\MarineSync\ACF\Acf_add_boat_data::add_boat_data();
+	}
+}
+add_action('acf/init', 'MarineSync\\marinesync_register_acf_fields');
 
 // Initialize admin interface
 require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
