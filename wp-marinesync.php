@@ -154,9 +154,18 @@ function marinesync_add_acf_fields() {
         return;
     }
     
-    MarineSync\ACF\Acf_add_boat_data::add_boat_data();
+    ACF\Acf_add_boat_data::add_boat_data();
 }
-add_action('acf/include_fields', 'marinesync_add_acf_fields');
+
+// Fix: Use the fully qualified function name with namespace
+\add_action('acf/include_fields', __NAMESPACE__ . '\marinesync_add_acf_fields');
+
+// Alternatively, you could use a closure:
+/*
+\add_action('acf/include_fields', function() {
+    marinesync_add_acf_fields();
+});
+*/
 
 // Add deactivation confirmation
 function marinesync_add_deactivation_dialog() {
