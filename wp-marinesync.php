@@ -91,22 +91,15 @@ function marinesync_activate() {
     error_log('MS004: Post type registered');
     
     // Add ACF fields
-    if (function_exists('acf_add_local_field_group')) {
-        \add_action('acf/include_fields', function(){
-	        try {
-		        ACF\Acf_add_boat_data::add_boat_data();
-                error_log('MS005a: ACF fields added');
-            } catch (\Exception $e) {
-                error_log('MS005b: Error adding ACF fields: ' . $e->getMessage());
-            }
-        });
-        error_log('MS005: ACF fields added');
-    } else {
-        \add_action('acf/init', function() {
-            ACF\Acf_add_boat_data::add_boat_data();
-            error_log('MS006: ACF fields added via acf/init hook');
-        });
-    }
+	if (function_exists('acf_add_local_field_group')) {
+		ACF\Acf_add_boat_data::add_boat_data();
+		error_log('MS005: ACF fields added directly');
+	} else {
+		add_action('acf/init', function() {
+			ACF\Acf_add_boat_data::add_boat_data();
+			error_log('MS006: ACF fields scheduled via acf/init hook');
+		});
+	}
     
     // Flush rewrite rules
     \flush_rewrite_rules();
@@ -146,33 +139,6 @@ function marinesync_init() {
 
 // Initialize plugin
 \add_action('init', __NAMESPACE__ . '\marinesync_init');
-
-// Add ACF field group when ACF is fully loaded
-function marinesync_add_acf_fields() {
-    error_log('MS020: Starting ACF field group creation');
-    
-    if (!function_exists('acf_add_local_field_group')) {
-        error_log('MS021: ACF functions not available');
-        return;
-    }
-    
-    if (!class_exists('MarineSync\\ACF\\Acf_add_boat_data')) {
-        error_log('MS022: Acf_add_boat_data class not found');
-        return;
-    }
-    
-    ACF\Acf_add_boat_data::add_boat_data();
-}
-
-// Fix: Use the fully qualified function name with namespace
-\add_action('acf/include_fields', __NAMESPACE__ . '\marinesync_add_acf_fields');
-
-// Alternatively, you could use a closure:
-/*
-\add_action('acf/include_fields', function() {
-    marinesync_add_acf_fields();
-});
-*/
 
 // Add deactivation confirmation
 function marinesync_add_deactivation_dialog() {
