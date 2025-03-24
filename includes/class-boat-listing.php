@@ -21,16 +21,16 @@ class Boat_Listing {
 	 */
 	public function initialize_theme_integrations() {
 		// Load the base module first
-		require_once MARINESYNC_PLUGIN_DIR . 'includes/theme-modules/class-base-module.php';
+		require_once MARINESYNC_PLUGIN_DIR . 'includes/Theme_Modules/class-base-module.php';
 
 		// Check which theme/builder is active and load appropriate modules
 		if ($this->is_gutenberg_active()) {
-			require_once MARINESYNC_PLUGIN_DIR . 'includes/theme-modules/class-gutenberg-module.php';
+			require_once MARINESYNC_PLUGIN_DIR . 'includes/Theme_Modules/class-gutenberg-module.php';
 			new Theme_Modules\Gutenberg_Module();
 		}
 
 		if ($this->is_wpbakery_active()) {
-			require_once MARINESYNC_PLUGIN_DIR . 'includes/theme-modules/class-wpbakery-module.php';
+			require_once MARINESYNC_PLUGIN_DIR . 'includes/Theme_Modules/class-wpbakery-module.php';
 			new Theme_Modules\WPBakery_Module();
 		}
 	}
