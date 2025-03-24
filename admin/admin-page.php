@@ -582,10 +582,28 @@ class MarineSync_Admin_Page {
 							$images = get_field('boat_media', $post->ID);
 							if (!empty($images)) {
 								foreach ($images as $image) {
-									$media = $advert_media->addChild('media', isset($image['url']) ? $image['url'] : '');
-									$media->addAttribute('type', 'image/' . (isset($image['type']) ? $image['type'] : 'jpeg'));
+									// Skip if the image is the same as the primary image
+									if (isset($image['ID']) && $image['ID'] == $post_thumbnail) {
+										continue;
+									}
+
+									// Get image URL
+									$url = isset($image['url']) ? $image['url'] : '';
+
+									// Extract file extension for the correct MIME type
+									$file_ext = pathinfo($url, PATHINFO_EXTENSION);
+									$mime_type = 'image/' . ($file_ext ? $file_ext : 'jpeg');
+
+									// Create media element
+									$media = $advert_media->addChild('media', $url);
+									$media->addAttribute('type', $mime_type);
+									$media->addAttribute('primary', 'false'); // Explicitly mark as not primary
 									$media->addAttribute('caption', isset($image['caption']) ? $image['caption'] : '');
-									$media->addAttribute('file_mtime', isset($image['file_mtime']) ? $image['file_mtime'] : '');
+
+									// Get file modified time if available, or use current time
+									$file_path = isset($image['path']) ? $image['path'] : '';
+									$mtime = $file_path && file_exists($file_path) ? filemtime($file_path) : time();
+									$media->addAttribute('file_mtime', date('Y-m-d\TH:i:s', $mtime));
 								}
 							}
 						}
