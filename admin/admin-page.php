@@ -569,14 +569,22 @@ class MarineSync_Admin_Page {
 
 						// Add advert_media
 						$advert_media = $boat->addChild('advert_media');
+
+                        // Get primary image
+                        $post_thumbnail = get_post_thumbnail_id($post->ID);
+						$primary_image = $advert_media->addAttribute('media', get_the_post_thumbnail_url($post->ID, 'full'));
+						$primary_image->addAttribute('type', 'image/' . (isset($image['type']) ? $image['type'] : 'jpeg'));
+						$primary_image->addAttribute('primary', 'true');
+						$primary_image->addAttribute('caption', isset($image['caption']) ? $image['caption'] : '');
+						$primary_image->addAttribute('file_mtime', isset($image['file_mtime']) ? $image['file_mtime'] : '');
+
 						if (function_exists('get_field')) {
-							$images = get_field('images', $post->ID);
+							$images = get_field('boat_media', $post->ID);
 							if (!empty($images)) {
 								foreach ($images as $image) {
 									$media = $advert_media->addChild('media', isset($image['url']) ? $image['url'] : '');
 									$media->addAttribute('type', 'image/' . (isset($image['type']) ? $image['type'] : 'jpeg'));
 									$media->addAttribute('caption', isset($image['caption']) ? $image['caption'] : '');
-									$media->addAttribute('primary', isset($image['primary']) ? $image['primary'] : '0');
 									$media->addAttribute('file_mtime', isset($image['file_mtime']) ? $image['file_mtime'] : '');
 								}
 							}
