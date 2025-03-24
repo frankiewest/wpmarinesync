@@ -256,6 +256,3 @@ class MarineSync_Admin_Page {
         wp_send_json_success($response);
     }
 }
-
-// Initialize the admin page
-\MarineSync\MarineSync_Admin_Page::get_instance();
