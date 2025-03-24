@@ -836,7 +836,7 @@ class Acf_add_boat_data {
 			            'callback' => function() {
 				            $choices = array();
 				            if (function_exists('get_field')) {
-					            $offices = get_field('offices', 'option');
+					            $offices = get_field('offices', 'ms-global-options');
 					            if (is_array($offices) && !empty($offices)) {
 						            foreach ($offices as $office) {
 							            if (!empty($office['id']) && !empty($office['office_name'])) {
