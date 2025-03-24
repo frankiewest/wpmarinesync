@@ -92,7 +92,14 @@ function marinesync_activate() {
     
     // Add ACF fields
     if (function_exists('acf_add_local_field_group')) {
-        ACF\Acf_add_boat_data::add_boat_data();
+        \add_action('acf/include_fields', function(){
+	        try {
+		        ACF\Acf_add_boat_data::add_boat_data();
+                error_log('MS005a: ACF fields added');
+            } catch (\Exception $e) {
+                error_log('MS005b: Error adding ACF fields: ' . $e->getMessage());
+            }
+        });
         error_log('MS005: ACF fields added');
     } else {
         \add_action('acf/init', function() {
