@@ -91,6 +91,7 @@ function marinesync_activate() {
     error_log('MS004: Post type registered');
 
 	add_action('acf/init', ['\MarineSync\ACF\Acf_add_boat_data', 'add_boat_data']);
+	add_action('acf/init', ['\MarineSync\ACF\Acf_add_boat_data', 'add_options_page']);
 	error_log('MS005: ACF fields added directly');
     
     // Flush rewrite rules
@@ -262,6 +263,7 @@ function marinesync_register_acf_fields() {
 	if (function_exists('acf_add_local_field_group')) {
 		error_log('MS200: Registering ACF fields via global hook');
 		\MarineSync\ACF\Acf_add_boat_data::add_boat_data();
+		\MarineSync\ACF\Acf_add_boat_data::add_options_page();
 	}
 }
 add_action('acf/init', 'MarineSync\\marinesync_register_acf_fields');

@@ -505,7 +505,7 @@ class MarineSync_Admin_Page {
 							$office->addChild('email', isset($item['office_email']) ? $item['office_email'] : '');
 
 							// Add name information
-							$name = $office->addChild('name', isset($item['name']) ? $item['name'] : '');
+							$name = $office->addChild('name');
 							$name->addChild('title', isset($item['title']) ? $item['title'] : '');
 							$name->addChild('forename', isset($item['forename']) ? $item['forename'] : '');
 							$name->addChild('surname', isset($item['surname']) ? $item['surname'] : '');
