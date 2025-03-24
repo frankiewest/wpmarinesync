@@ -331,10 +331,6 @@ function marinesync_register_acf_fields() {
 }
 add_action('acf/init', 'MarineSync\\marinesync_register_acf_fields');
 
-// Initialize admin interface
-require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
-\MarineSync\MarineSync_Admin_Page::get_instance();
-
 function enqueue_admin_scripts($hook) {
 	error_log('MS300: Admin scripts hook: ' . $hook);
 
@@ -379,3 +375,7 @@ function enqueue_admin_scripts($hook) {
 	));
 }
 add_action('admin_enqueue_scripts', 'MarineSync\\enqueue_admin_scripts');
+
+// Initialize admin interface
+require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
+MarineSync_Admin_Page::get_instance();
