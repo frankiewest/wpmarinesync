@@ -77,16 +77,12 @@ class MarineSync_Admin_Page {
 		    error_log('MS305: CSS file exists at: ' . $file_path);
 	    }
 
-	    wp_enqueue_style('marinesync-admin-css', MARINESYNC_PLUGIN_URL . 'assets/css/admin.css', array(), time());
-	    wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), time(), true);
-
-	    wp_add_inline_style('marinesync-admin-css', '
-            .wrap.marinesync-admin { 
-                border: 5px solid red !important; 
-                padding: 20px !important;
-                background-color: lightyellow !important;
-            }
-        ');
+	    wp_enqueue_style('marinesync-admin-css',
+		    MARINESYNC_PLUGIN_URL . 'assets/css/admin.css',
+		    array(),
+		    MARINESYNC_PLUGIN_VERSION . '-' . filemtime(MARINESYNC_PLUGIN_DIR . 'assets/css/admin.css')
+	    );
+        wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), time(), true);
 
         wp_localize_script('marinesync-admin-js', 'marinesyncAdmin', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
