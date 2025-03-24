@@ -89,17 +89,9 @@ function marinesync_activate() {
     // Register post type
     PostType\MarineSync_Post_Type::register();
     error_log('MS004: Post type registered');
-    
-    // Add ACF fields
-	if (function_exists('acf_add_local_field_group')) {
-		ACF\Acf_add_boat_data::add_boat_data();
-		error_log('MS005: ACF fields added directly');
-	} else {
-		add_action('acf/init', function() {
-			ACF\Acf_add_boat_data::add_boat_data();
-			error_log('MS006: ACF fields scheduled via acf/init hook');
-		});
-	}
+
+	add_action('acf/include_fields', ['\MarineSync\ACF\Acf_add_boat_data', 'add_boat_data']);
+	error_log('MS005: ACF fields added directly');
     
     // Flush rewrite rules
     \flush_rewrite_rules();
