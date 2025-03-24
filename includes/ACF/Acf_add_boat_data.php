@@ -9,6 +9,9 @@ class Acf_add_boat_data {
             error_log('MS021: ACF functions not available');
             return;
         }
+
+	    error_log('MS023: Function exists check: ' . (function_exists('acf_add_local_field_group') ? 'Yes' : 'No'));
+	    error_log('MS024: Class exists check: ' . (class_exists('ACF') ? 'Yes' : 'No'));
         
         $fields = array(
             'key' => 'group_67addc1021662',
@@ -2772,7 +2775,7 @@ class Acf_add_boat_data {
 	    $args = array(
 		    'key' => 'group_67addc1021662',
 		    'title' => 'Boat Data',
-		    'fields' => $fields['fields'],
+		    'fields' => $fields,
 		    'location' => $location,
 		    'menu_order' => 0,
 		    'position' => 'normal',
