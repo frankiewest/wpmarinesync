@@ -8,16 +8,6 @@ body.wp-admin .marinesync-admin-container {
     margin-top: 20px;
 }
 
-.marinesync-admin {
-    margin: 20px;
-}
-
-.marinesync-admin-container {
-    display: flex;
-    gap: 30px;
-    margin-top: 20px;
-}
-
 .marinesync-admin-main {
     flex: 2;
     background: #fff;

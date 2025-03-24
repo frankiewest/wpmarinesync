@@ -24,7 +24,6 @@ class MarineSync_Admin_Page {
     private function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         add_action('wp_ajax_marinesync_run_feed', array($this, 'ajax_run_feed'));
         add_action('wp_ajax_marinesync_check_feed_status', array($this, 'ajax_check_feed_status'));
     }
@@ -52,50 +51,6 @@ class MarineSync_Admin_Page {
         $sanitized['feed_provider'] = sanitize_text_field($input['feed_provider']);
         $sanitized['feed_frequency'] = absint($input['feed_frequency']);
         return $sanitized;
-    }
-
-    public function enqueue_admin_scripts($hook) {
-	    error_log('MS300: Admin scripts hook: ' . $hook);
-
-	    if ('toplevel_page_marinesync' !== $hook) {
-		    error_log('MS301: Not loading scripts - wrong hook');
-		    return;
-	    }
-
-	    error_log('MS302: Enqueuing admin styles from: ' . MARINESYNC_PLUGIN_URL . 'assets/css/admin.css');
-
-	    // Check if constant is defined
-	    if (!defined('MARINESYNC_PLUGIN_URL')) {
-		    error_log('MS303: MARINESYNC_PLUGIN_URL constant not defined!');
-	    }
-
-	    // Check if file exists
-	    $file_path = MARINESYNC_PLUGIN_DIR . 'assets/css/admin.css';
-	    if (!file_exists($file_path)) {
-		    error_log('MS304: CSS file not found at: ' . $file_path);
-	    } else {
-		    error_log('MS305: CSS file exists at: ' . $file_path);
-	    }
-
-	    wp_enqueue_style('marinesync-admin-css',
-		    MARINESYNC_PLUGIN_URL . 'assets/css/admin.css',
-		    array(),
-		    MARINESYNC_PLUGIN_VERSION . '-' . filemtime(MARINESYNC_PLUGIN_DIR . 'assets/css/admin.css')
-	    );
-	    error_log('MS311: Is style enqueued? ' . (wp_style_is('marinesync-admin-css', 'enqueued') ? 'Yes' : 'No'));
-        wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), time(), true);
-
-        wp_localize_script('marinesync-admin-js', 'marinesyncAdmin', array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('marinesync_admin_nonce'),
-            'feedRunning' => get_transient('marinesync_feed_running'),
-            'i18n' => array(
-                'feedRunning' => __('Feed is currently running. Please wait...', 'marinesync'),
-                'feedComplete' => __('Feed completed successfully!', 'marinesync'),
-                'feedError' => __('Error running feed. Please check the logs.', 'marinesync'),
-                'confirmRun' => __('Are you sure you want to run the feed manually?', 'marinesync')
-            )
-        ));
     }
 
     public function render_admin_page() {
