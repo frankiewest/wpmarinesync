@@ -578,7 +578,7 @@ class MarineSync_Admin_Page {
 						$primary_image->addAttribute('caption', isset($image['caption']) ? $image['caption'] : '');
 						$primary_image->addAttribute('file_mtime', isset($image['file_mtime']) ? $image['file_mtime'] : '');
 
-                        $primary_path = get_attached_file($post_thumbnail);
+                        $primary_path = get_the_post_thumbnail_url($post->ID, 'full');
 						$primary_mtime = $primary_path && file_exists($primary_path) ? filemtime($primary_path) : time();
 						$primary_image->addAttribute('file_mtime', date('Y-m-d\TH:i:s', $primary_mtime));
 
