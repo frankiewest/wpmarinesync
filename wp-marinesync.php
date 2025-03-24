@@ -24,7 +24,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('MARINESYNC_PLUGIN_VERSION', '1.0.0');
+define('MARINESYNC_PLUGIN_VERSION', '1.0.1');
 define('MARINESYNC_PLUGIN_DIR', \plugin_dir_path(__FILE__));
 define('MARINESYNC_PLUGIN_URL', \plugin_dir_url(__FILE__));
 
