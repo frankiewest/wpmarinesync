@@ -126,11 +126,11 @@ function marinesync_init() {
 }
 
 // Register activation and deactivation hooks
-\register_activation_hook(__FILE__, __NAMESPACE__ . '\marinesync_activate');
-\register_deactivation_hook(__FILE__, __NAMESPACE__ . '\marinesync_deactivate');
+register_activation_hook(__FILE__, __NAMESPACE__ . 'marinesync_activate');
+register_deactivation_hook(__FILE__, __NAMESPACE__ . 'marinesync_deactivate');
 
 // Initialize plugin
-\add_action('init', __NAMESPACE__ . '\marinesync_init');
+add_action('init', __NAMESPACE__ . 'marinesync_init');
 
 // Add deactivation confirmation
 function marinesync_add_deactivation_dialog() {
