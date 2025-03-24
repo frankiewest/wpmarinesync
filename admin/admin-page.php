@@ -356,11 +356,13 @@ class MarineSync_Admin_Page {
                         <h2><?php _e('Export Options', 'marinesync'); ?></h2>
                         <p><?php _e('Export your boat listings as an Open Marine compliant XML file.', 'marinesync'); ?></p>
 
-                        <form method="post" action="<?php echo esc_url(admin_url('admin-ajax.php?action=marinesync_export_boats')); ?>">
-							<?php wp_nonce_field('marinesync_export_nonce', 'export_nonce'); ?>
+                        <div id="export-message"></div>
+
+                        <form id="export-form" method="post">
+							<?php wp_nonce_field('marinesync_admin_nonce', 'nonce'); ?>
 
                             <p>
-                                <button type="submit" class="button button-primary">
+                                <button type="button" id="export-boats" class="button button-primary">
 									<?php _e('Export All Boats', 'marinesync'); ?>
                                 </button>
                             </p>
@@ -382,6 +384,44 @@ class MarineSync_Admin_Page {
                 </div>
             </div>
         </div>
+
+        <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                $('#export-boats').on('click', function() {
+                    var $button = $(this);
+                    var $message = $('#export-message');
+
+                    $button.prop('disabled', true);
+                    $message.html('<div class="notice notice-info"><p><?php _e('Generating export file, please wait...', 'marinesync'); ?></p></div>');
+
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'marinesync_export_boats',
+                            nonce: $('#nonce').val()
+                        },
+                        success: function(response) {
+                            if(response.success) {
+                                $message.html('<div class="notice notice-success"><p>' + response.data.message + '</p></div>');
+                                // Create download link
+                                if(response.data.url) {
+                                    $message.append('<p><a href="' + response.data.url + '" class="button" target="_blank"><?php _e('Download Export File', 'marinesync'); ?></a></p>');
+                                }
+                            } else {
+                                $message.html('<div class="notice notice-error"><p>' + response.data.message + '</p></div>');
+                            }
+                        },
+                        error: function() {
+                            $message.html('<div class="notice notice-error"><p><?php _e('Export failed. Please try again.', 'marinesync'); ?></p></div>');
+                        },
+                        complete: function() {
+                            $button.prop('disabled', false);
+                        }
+                    });
+                });
+            });
+        </script>
 		<?php
 	}
 
