@@ -35,34 +35,6 @@ class Acf_add_boat_data {
                     'endpoint' => 0,
                     'selected' => 0,
                 ),
-	            array(
-		            'key' => 'field_674eea588a88f',
-		            'label' => 'Boat Media',
-		            'name' => 'boat_media',
-		            'aria-label' => '',
-		            'type' => 'gallery',
-		            'instructions' => '',
-		            'required' => 0,
-		            'conditional_logic' => 0,
-		            'wrapper' => array(
-			            'width' => '',
-			            'class' => '',
-			            'id' => '',
-		            ),
-		            'return_format' => 'array',
-		            'library' => 'all',
-		            'min' => '',
-		            'max' => '',
-		            'min_width' => '',
-		            'min_height' => '',
-		            'min_size' => '',
-		            'max_width' => '',
-		            'max_height' => '',
-		            'max_size' => '',
-		            'mime_types' => '',
-		            'insert' => 'append',
-		            'preview_size' => 'medium',
-	            ),
                 array(
                     'key' => 'field_67adf96e1b186',
                     'label' => 'Air Draft',
@@ -810,6 +782,73 @@ class Acf_add_boat_data {
                     'endpoint' => 0,
                     'selected' => 0,
                 ),
+	            array(
+		            'key' => 'field_674eea588a88f',
+		            'label' => 'Boat Media',
+		            'name' => 'boat_media',
+		            'aria-label' => '',
+		            'type' => 'gallery',
+		            'instructions' => '',
+		            'required' => 0,
+		            'conditional_logic' => 0,
+		            'wrapper' => array(
+			            'width' => '',
+			            'class' => '',
+			            'id' => '',
+		            ),
+		            'return_format' => 'array',
+		            'library' => 'all',
+		            'min' => '',
+		            'max' => '',
+		            'min_width' => '',
+		            'min_height' => '',
+		            'min_size' => '',
+		            'max_width' => '',
+		            'max_height' => '',
+		            'max_size' => '',
+		            'mime_types' => '',
+		            'insert' => 'append',
+		            'preview_size' => 'medium',
+	            ),
+	            array(
+		            'key' => 'field_68fb3c7ee9a41',
+		            'label' => 'Office ID',
+		            'name' => 'office_id',
+		            'aria-label' => '',
+		            'type' => 'select',
+		            'instructions' => 'Select the office this boat belongs to',
+		            'required' => 0,
+		            'conditional_logic' => 0,
+		            'wrapper' => array(
+			            'width' => '',
+			            'class' => '',
+			            'id' => '',
+		            ),
+		            'choices' => array(),
+		            'default_value' => false,
+		            'return_format' => 'value',
+		            'multiple' => 0,
+		            'allow_null' => 1,
+		            'ui' => 1,
+		            'ajax' => 0,
+		            'placeholder' => '',
+		            'load_choices' => array(
+			            'callback' => function() {
+				            $choices = array();
+				            if (function_exists('get_field')) {
+					            $offices = get_field('offices', 'option');
+					            if (is_array($offices) && !empty($offices)) {
+						            foreach ($offices as $office) {
+							            if (!empty($office['id']) && !empty($office['office_name'])) {
+								            $choices[$office['id']] = $office['office_name'] . ' (ID: ' . $office['id'] . ')';
+							            }
+						            }
+					            }
+				            }
+				            return $choices;
+			            }
+		            ),
+	            ),
                 array(
                     'key' => 'field_67ae177aa6f3a',
                     'label' => 'Boat Type',
