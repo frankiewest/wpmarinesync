@@ -346,6 +346,15 @@ class MarineSync_Admin_Page {
 
 	// Export page
 	public function render_export_page() {
+		// Make sure options are loaded
+		if (empty($this->options)) {
+			$this->options = get_option('marinesync_feed_settings', array(
+				'feed_format' => 'auto',
+				'feed_url' => '',
+				'feed_provider' => '',
+				'feed_frequency' => 24
+			));
+		}
 		?>
         <div class="wrap marinesync-admin">
             <h1><?php _e('Export Boats', 'marinesync'); ?></h1>
