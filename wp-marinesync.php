@@ -90,7 +90,7 @@ function marinesync_activate() {
     PostType\MarineSync_Post_Type::register();
     error_log('MS004: Post type registered');
 
-	add_action('acf/include_fields', ['\MarineSync\ACF\Acf_add_boat_data', 'add_boat_data']);
+	add_action('acf/include_fields', [ACF\Acf_add_boat_data::class, 'add_boat_data']);
 	error_log('MS005: ACF fields added directly');
     
     // Flush rewrite rules
