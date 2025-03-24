@@ -77,7 +77,7 @@ class MarineSync_Admin_Page {
 		    error_log('MS305: CSS file exists at: ' . $file_path);
 	    }
 
-        wp_enqueue_style('marinesync-admin-css', MARINESYNC_PLUGIN_URL . 'assets/css/admin.css', array(), MARINESYNC_PLUGIN_VERSION);
+	    wp_enqueue_style('marinesync-admin-css', MARINESYNC_PLUGIN_URL . 'assets/css/admin.css', array(), MARINESYNC_PLUGIN_VERSION . '-' . time());
         wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), MARINESYNC_PLUGIN_VERSION, true);
 
         wp_localize_script('marinesync-admin-js', 'marinesyncAdmin', array(
