@@ -32,6 +32,9 @@ class MarineSync_Admin_Page {
 		add_action('wp_ajax_marinesync_run_feed', array($this, 'ajax_run_feed'));
 		add_action('wp_ajax_marinesync_check_feed_status', array($this, 'ajax_check_feed_status'));
 		add_action('wp_ajax_marinesync_export_boats', array($this, 'ajax_export_boats'));
+        
+        // Register scheduled export hook
+        add_action('marinesync_scheduled_export', array($this, 'handle_scheduled_export'));
 
 		// Initialize options
 		$this->options = get_option('marinesync_feed_settings', array(
@@ -41,6 +44,9 @@ class MarineSync_Admin_Page {
 			'feed_frequency' => 24,
 			'export_feed_frequency' => 24
 		));
+        
+        // Setup scheduled events if needed
+        $this->setup_scheduled_exports();
 	}
 
     /**
@@ -354,9 +360,43 @@ class MarineSync_Admin_Page {
 				'export_feed_frequency' => 24
 			));
 		}
+
+		$export_schedule_updated = false;
+		
+		// Handle form submission for export frequency
+		if (isset($_POST['update_export_frequency']) && isset($_POST['export_feed_frequency'])) {
+		    check_admin_referer('marinesync_export_frequency', 'export_frequency_nonce');
+		    
+		    $frequency = absint($_POST['export_feed_frequency']);
+		    if ($frequency >= 1 && $frequency <= 24) {
+		        // Update the options
+		        $this->options['export_feed_frequency'] = $frequency;
+		        update_option('marinesync_feed_settings', $this->options);
+		        
+		        // Clear any existing scheduled export events
+		        $timestamp = wp_next_scheduled('marinesync_scheduled_export');
+		        if ($timestamp) {
+		            wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
+		        }
+		        
+		        // Calculate how many seconds based on frequency (in hours)
+		        $interval = $frequency * HOUR_IN_SECONDS;
+		        
+		        // Schedule the new event
+		        wp_schedule_event(time(), $frequency . 'hours', 'marinesync_scheduled_export');
+		        
+		        $export_schedule_updated = true;
+		    }
+		}
 		?>
         <div class="wrap marinesync-admin">
             <h1><?php _e('Export Boats', 'marinesync'); ?></h1>
+            
+            <?php if ($export_schedule_updated): ?>
+            <div class="notice notice-success">
+                <p><?php _e('Export schedule has been updated successfully.', 'marinesync'); ?></p>
+            </div>
+            <?php endif; ?>
 
             <div class="marinesync-admin-container">
                 <div class="marinesync-admin-main">
@@ -391,22 +431,39 @@ class MarineSync_Admin_Page {
 
                     <div class="marinesync-card">
                         <h2><?php _e('Export Frequency', 'marinesync'); ?></h2>
-                        <p><?php _e('Please select the frequency at which you wish ', 'marinesync'); ?></p>
+                        <p><?php _e('Set how often the export file should be automatically updated:', 'marinesync'); ?></p>
 
-                        <div class="form-field">
-                            <label for="export_feed_frequency"><?php _e('Feed Run Frequency', 'marinesync'); ?></label>
-                            <select name="marinesync_feed_settings[export_feed_frequency]" id="export_feed_frequency">
-                                <option value="1" <?php selected($this->options['export_feed_frequency'], 1); ?>><?php _e('Every Hour', 'marinesync'); ?></option>
-                                <option value="2" <?php selected($this->options['export_feed_frequency'], 2); ?>><?php _e('Every 2 Hours', 'marinesync'); ?></option>
-                                <option value="4" <?php selected($this->options['export_feed_frequency'], 4); ?>><?php _e('Every 4 Hours', 'marinesync'); ?></option>
-                                <option value="8" <?php selected($this->options['export_feed_frequency'], 8); ?>><?php _e('Every 8 Hours', 'marinesync'); ?></option>
-                                <option value="12" <?php selected($this->options['export_feed_frequency'], 12); ?>><?php _e('Every 12 Hours', 'marinesync'); ?></option>
-                                <option value="18" <?php selected($this->options['export_feed_frequency'], 18); ?>><?php _e('Every 18 Hours', 'marinesync'); ?></option>
-                                <option value="24" <?php selected($this->options['export_feed_frequency'], 24); ?>><?php _e('Every 24 Hours', 'marinesync'); ?></option>
-                            </select>
-                        </div>
-
-                        <p class="description"><?php _e('This URL can be used in third-party systems that need to access your boat data.', 'marinesync'); ?></p>
+                        <form method="post" action="">
+                            <?php wp_nonce_field('marinesync_export_frequency', 'export_frequency_nonce'); ?>
+                            <div class="form-field">
+                                <label for="export_feed_frequency"><?php _e('Update Frequency', 'marinesync'); ?></label>
+                                <select name="export_feed_frequency" id="export_feed_frequency">
+                                    <option value="1" <?php selected($this->options['export_feed_frequency'], 1); ?>><?php _e('Every Hour', 'marinesync'); ?></option>
+                                    <option value="2" <?php selected($this->options['export_feed_frequency'], 2); ?>><?php _e('Every 2 Hours', 'marinesync'); ?></option>
+                                    <option value="4" <?php selected($this->options['export_feed_frequency'], 4); ?>><?php _e('Every 4 Hours', 'marinesync'); ?></option>
+                                    <option value="8" <?php selected($this->options['export_feed_frequency'], 8); ?>><?php _e('Every 8 Hours', 'marinesync'); ?></option>
+                                    <option value="12" <?php selected($this->options['export_feed_frequency'], 12); ?>><?php _e('Every 12 Hours', 'marinesync'); ?></option>
+                                    <option value="18" <?php selected($this->options['export_feed_frequency'], 18); ?>><?php _e('Every 18 Hours', 'marinesync'); ?></option>
+                                    <option value="24" <?php selected($this->options['export_feed_frequency'], 24); ?>><?php _e('Every 24 Hours', 'marinesync'); ?></option>
+                                </select>
+                                <p class="description"><?php _e('Choose how frequently the XML export should be regenerated.', 'marinesync'); ?></p>
+                            </div>
+                            
+                            <p>
+                                <input type="submit" name="update_export_frequency" class="button button-primary" value="<?php _e('Save Schedule', 'marinesync'); ?>">
+                            </p>
+                        </form>
+                        
+                        <p>
+                            <?php 
+                            $timestamp = wp_next_scheduled('marinesync_scheduled_export');
+                            if ($timestamp) {
+                                echo __('Next scheduled export: ', 'marinesync') . date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $timestamp);
+                            } else {
+                                echo __('No scheduled exports found. Save the schedule to enable automatic exports.', 'marinesync');
+                            }
+                            ?>
+                        </p>
                     </div>
                 </div>
 
@@ -418,6 +475,10 @@ class MarineSync_Admin_Page {
                             <li>
                                 <strong><?php _e('Total Boats:', 'marinesync'); ?></strong>
                                 <span><?php echo esc_html($this->get_total_boats()); ?></span>
+                            </li>
+                            <li>
+                                <strong><?php _e('Last Export:', 'marinesync'); ?></strong>
+                                <span><?php echo esc_html(get_option('marinesync_last_export', __('Never', 'marinesync'))); ?></span>
                             </li>
                         </ul>
                     </div>
@@ -483,13 +544,16 @@ class MarineSync_Admin_Page {
 	}
 
 	// Handle AJAX actions for export and delete
-	public function ajax_export_boats() {
-		check_ajax_referer('marinesync_admin_nonce', 'nonce');
+	public function ajax_export_boats($ajax_request = true) {
+		// Only verify nonce for AJAX requests
+		if ($ajax_request) {
+			check_ajax_referer('marinesync_admin_nonce', 'nonce');
+		}
 
-		error_log('MS025: Starting boat export process');
+		error_log('MS025: Starting boat export process' . ($ajax_request ? ' via AJAX' : ' via cron'));
 
-		// Check for admin capabilities
-		if (!current_user_can('manage_options')) {
+		// Check for admin capabilities if called from AJAX
+		if ($ajax_request && !current_user_can('manage_options')) {
 			error_log('MS026: Unauthorized access attempt to export boats');
 			wp_die('Unauthorized access');
 		}
@@ -918,4 +982,95 @@ class MarineSync_Admin_Page {
 
 		wp_send_json_success($response);
 	}
+
+	/**
+     * Sets up scheduled exports based on settings
+     */
+    private function setup_scheduled_exports() {
+        // Check if we already have a scheduled export
+        $timestamp = wp_next_scheduled('marinesync_scheduled_export');
+        
+        // If not scheduled but we should have one, schedule it
+        if (!$timestamp && isset($this->options['export_feed_frequency'])) {
+            $frequency = absint($this->options['export_feed_frequency']);
+            if ($frequency >= 1) {
+                // Register the custom interval if not already exists
+                add_filter('cron_schedules', array($this, 'add_custom_cron_intervals'));
+                
+                // Schedule the event
+                wp_schedule_event(time(), $frequency . 'hours', 'marinesync_scheduled_export');
+            }
+        }
+    }
+    
+    /**
+     * Adds custom intervals for WP Cron
+     *
+     * @param array $schedules Existing schedules
+     * @return array Modified schedules
+     */
+    public function add_custom_cron_intervals($schedules) {
+        // Add custom intervals based on options
+        if (isset($this->options['export_feed_frequency'])) {
+            $frequency = absint($this->options['export_feed_frequency']);
+            $seconds = $frequency * HOUR_IN_SECONDS;
+            
+            // Only add if it's a valid interval
+            if ($frequency >= 1 && $frequency <= 24) {
+                $schedules[$frequency . 'hours'] = array(
+                    'interval' => $seconds,
+                    'display' => sprintf(__('Every %d Hours', 'marinesync'), $frequency)
+                );
+            }
+        }
+        
+        return $schedules;
+    }
+    
+    /**
+     * Handles the scheduled export process
+     * Called by WordPress cron
+     */
+    public function handle_scheduled_export() {
+        error_log('MS060: Starting scheduled export from cron job');
+        
+        // Run the export without requiring AJAX
+        $this->ajax_export_boats(false);
+    }
+    
+    /**
+     * Register plugin activation hooks
+     */
+    public static function register_activation() {
+        // Get options
+        $options = get_option('marinesync_feed_settings', array(
+            'export_feed_frequency' => 24
+        ));
+        
+        // Clear any existing scheduled events
+        $timestamp = wp_next_scheduled('marinesync_scheduled_export');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
+        }
+        
+        // Schedule the event if we have a frequency
+        if (isset($options['export_feed_frequency'])) {
+            $frequency = absint($options['export_feed_frequency']);
+            if ($frequency >= 1) {
+                // Schedule the new event
+                wp_schedule_event(time(), $frequency . 'hours', 'marinesync_scheduled_export');
+            }
+        }
+    }
+    
+    /**
+     * Register plugin deactivation hooks to clean up
+     */
+    public static function register_deactivation() {
+        // Clear scheduled events
+        $timestamp = wp_next_scheduled('marinesync_scheduled_export');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
+        }
+    }
 }
