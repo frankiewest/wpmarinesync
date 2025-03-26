@@ -32,6 +32,7 @@ class MarineSync_Admin_Page {
 		add_action('wp_ajax_marinesync_run_feed', array($this, 'ajax_run_feed'));
 		add_action('wp_ajax_marinesync_check_feed_status', array($this, 'ajax_check_feed_status'));
 		add_action('wp_ajax_marinesync_export_boats', array($this, 'ajax_export_boats'));
+		add_action('wp_ajax_marinesync_save_settings', array($this, 'ajax_save_settings'));
         
         // Register scheduled export hook
         add_action('marinesync_scheduled_export', array($this, 'handle_scheduled_export'));
@@ -524,6 +525,57 @@ class MarineSync_Admin_Page {
             });
         </script>
 		<?php
+	}
+
+	/**
+	 * Handle AJAX settings save
+	 */
+	public function ajax_save_settings() {
+		check_ajax_referer('marinesync_admin_nonce', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(__('Unauthorized access', 'marinesync'));
+		}
+
+		// Parse settings from serialized form data
+		parse_str($_POST['settings'], $settings);
+
+		// Handle export frequency settings
+		if (isset($settings['export_feed_frequency'])) {
+			$frequency = absint($settings['export_feed_frequency']);
+			if ($frequency >= 1 && $frequency <= 24) {
+				// Update options
+				$this->options['export_feed_frequency'] = $frequency;
+				update_option('marinesync_feed_settings', $this->options);
+
+				// Update cron schedule
+				$timestamp = wp_next_scheduled('marinesync_scheduled_export');
+				if ($timestamp) {
+					wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
+				}
+
+				// Add the custom interval
+				add_filter('cron_schedules', array($this, 'add_custom_cron_intervals'));
+
+				// Schedule the event
+				wp_schedule_event(time(), $frequency . 'hours', 'marinesync_scheduled_export');
+
+				wp_send_json_success(__('Export schedule updated successfully', 'marinesync'));
+			} else {
+				wp_send_json_error(__('Invalid frequency value', 'marinesync'));
+			}
+		}
+
+		// Handle other settings
+		if (isset($settings['marinesync_feed_settings'])) {
+			$new_settings = $this->sanitize_settings($settings['marinesync_feed_settings']);
+			update_option('marinesync_feed_settings', $new_settings);
+			$this->options = $new_settings;
+
+			wp_send_json_success(__('Settings saved successfully', 'marinesync'));
+		}
+
+		wp_send_json_error(__('No valid settings found', 'marinesync'));
 	}
 
 	private function get_next_run_time() {
