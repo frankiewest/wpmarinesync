@@ -554,18 +554,9 @@ class MarineSync_Admin_Page {
 					wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
 				}
 
-				// IMPORTANT: First register the custom schedule interval
-				$interval_name = $frequency . ' hours';
-				add_filter('cron_schedules', function($schedules) use ($frequency, $interval_name) {
-					$schedules[$interval_name] = array(
-						'interval' => $frequency * HOUR_IN_SECONDS,
-						'display' => sprintf(__('Every %d Hours', 'marinesync'), $frequency)
-					);
-					return $schedules;
-				});
-
-				// Then schedule the event with the now-registered interval
-				wp_schedule_event(time(), $interval_name, 'marinesync_scheduled_export');
+				// Schedule using standard WordPress schedules
+				$recurrence = $this->get_wp_schedule_for_frequency($frequency);
+				wp_schedule_event(time(), $recurrence, 'marinesync_scheduled_export');
 
 				wp_send_json_success(__('Export schedule updated successfully', 'marinesync'));
 			} else {
@@ -1052,24 +1043,46 @@ class MarineSync_Admin_Page {
 	}
 
 	/**
-     * Sets up scheduled exports based on settings
-     */
-    private function setup_scheduled_exports() {
-        // Check if we already have a scheduled export
-        $timestamp = wp_next_scheduled('marinesync_scheduled_export');
-        
-        // If not scheduled but we should have one, schedule it
-        if (!$timestamp && isset($this->options['export_feed_frequency'])) {
-            $frequency = absint($this->options['export_feed_frequency']);
-            if ($frequency >= 1) {
-                // Register the custom interval if not already exists
-                add_filter('cron_schedules', array($this, 'add_custom_cron_intervals'));
-                
-                // Schedule the event
-                wp_schedule_event(time(), $frequency . 'hours', 'marinesync_scheduled_export');
-            }
-        }
-    }
+	 * Maps hour frequency to WordPress standard schedules
+	 *
+	 * @param int $hours Frequency in hours
+	 * @return string WordPress schedule name
+	 */
+	private function get_wp_schedule_for_frequency($hours) {
+		// Map to standard WordPress schedules
+		if ($hours <= 1) {
+			return 'hourly';
+		} else if ($hours <= 12) {
+			return 'twicedaily';
+		} else {
+			return 'daily';
+		}
+	}
+
+	/**
+	 * Sets up scheduled exports based on settings
+	 */
+	private function setup_scheduled_exports() {
+		// Check if we already have a scheduled export
+		$timestamp = wp_next_scheduled('marinesync_scheduled_export');
+
+		// If already scheduled, clear it to prevent duplicates
+		if ($timestamp) {
+			wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
+		}
+
+		// Schedule using standard WordPress schedules
+		if (isset($this->options['export_feed_frequency'])) {
+			$frequency = absint($this->options['export_feed_frequency']);
+
+			// Map our frequency to WordPress standard schedules
+			$recurrence = $this->get_wp_schedule_for_frequency($frequency);
+
+			// Schedule the event
+			wp_schedule_event(time(), $recurrence, 'marinesync_scheduled_export');
+			error_log('MS050: Scheduled export using WP schedule: ' . $recurrence);
+		}
+	}
     
     /**
      * Adds custom intervals for WP Cron
@@ -1105,31 +1118,36 @@ class MarineSync_Admin_Page {
         // Run the export without requiring AJAX
         $this->ajax_export_boats(false);
     }
-    
-    /**
-     * Register plugin activation hooks
-     */
-    public static function register_activation() {
-        // Get options
-        $options = get_option('marinesync_feed_settings', array(
-            'export_feed_frequency' => 24
-        ));
-        
-        // Clear any existing scheduled events
-        $timestamp = wp_next_scheduled('marinesync_scheduled_export');
-        if ($timestamp) {
-            wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
-        }
-        
-        // Schedule the event if we have a frequency
-        if (isset($options['export_feed_frequency'])) {
-            $frequency = absint($options['export_feed_frequency']);
-            if ($frequency >= 1) {
-                // Schedule the new event
-                wp_schedule_event(time(), $frequency . 'hours', 'marinesync_scheduled_export');
-            }
-        }
-    }
+
+	/**
+	 * Register plugin activation hooks
+	 */
+	public static function register_activation() {
+		// Get instance to use methods
+		$instance = self::get_instance();
+
+		// Get options
+		$options = get_option('marinesync_feed_settings', array(
+			'export_feed_frequency' => 24
+		));
+
+		// Clear any existing scheduled events
+		$timestamp = wp_next_scheduled('marinesync_scheduled_export');
+		if ($timestamp) {
+			wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
+		}
+
+		// Schedule the event if we have a frequency
+		if (isset($options['export_feed_frequency'])) {
+			$frequency = absint($options['export_feed_frequency']);
+			if ($frequency >= 1) {
+				// Schedule using standard WordPress schedules
+				$recurrence = $instance->get_wp_schedule_for_frequency($frequency);
+				wp_schedule_event(time(), $recurrence, 'marinesync_scheduled_export');
+				error_log('MS051: Scheduled export on activation using WP schedule: ' . $recurrence);
+			}
+		}
+	}
     
     /**
      * Register plugin deactivation hooks to clean up
