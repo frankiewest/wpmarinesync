@@ -1182,7 +1182,7 @@ class MarineSync_Admin_Page {
 	/**
 	 * Improved setup of scheduled exports
 	 */
-	private function setup_scheduled_exports() {
+	public function setup_scheduled_exports() {
 		// Check if we need to handle cron control actions
 		if (isset($_POST['clear_all_cron']) && isset($_POST['cron_control_nonce']) &&
 		    wp_verify_nonce($_POST['cron_control_nonce'], 'marinesync_cron_control')) {
