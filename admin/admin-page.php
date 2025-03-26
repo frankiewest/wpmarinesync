@@ -551,7 +551,7 @@ class MarineSync_Admin_Page {
             </div>
         </div>
 
-        <?php $this->display_cron_debug_info(); ?>
+        <?php // $this->display_cron_debug_info(); ?>
 
         <script type="text/javascript">
             jQuery(document).ready(function($) {
