@@ -554,11 +554,18 @@ class MarineSync_Admin_Page {
 					wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
 				}
 
-				// Add the custom interval
-				add_filter('cron_schedules', array($this, 'add_custom_cron_intervals'));
+				// IMPORTANT: First register the custom schedule interval
+				$interval_name = $frequency . 'hours';
+				add_filter('cron_schedules', function($schedules) use ($frequency, $interval_name) {
+					$schedules[$interval_name] = array(
+						'interval' => $frequency * HOUR_IN_SECONDS,
+						'display' => sprintf(__('Every %d Hours', 'marinesync'), $frequency)
+					);
+					return $schedules;
+				});
 
-				// Schedule the event
-				wp_schedule_event(time(), $frequency . 'hours', 'marinesync_scheduled_export');
+				// Then schedule the event with the now-registered interval
+				wp_schedule_event(time(), $interval_name, 'marinesync_scheduled_export');
 
 				wp_send_json_success(__('Export schedule updated successfully', 'marinesync'));
 			} else {
