@@ -33,9 +33,12 @@ class MarineSync_Admin_Page {
 		add_action('wp_ajax_marinesync_check_feed_status', array($this, 'ajax_check_feed_status'));
 		add_action('wp_ajax_marinesync_export_boats', array($this, 'ajax_export_boats'));
 		add_action('wp_ajax_marinesync_save_settings', array($this, 'ajax_save_settings'));
-        
-        // Register scheduled export hook
-        add_action('marinesync_scheduled_export', array($this, 'handle_scheduled_export'));
+
+		// Always register the hook handler
+		add_action('marinesync_scheduled_export', array($this, 'handle_scheduled_export'));
+
+		// Explicitly call setup on init after everything is loaded
+		add_action('init', array($this, 'setup_scheduled_exports'));
 
 		// Initialize options
 		$this->options = get_option('marinesync_feed_settings', array(
@@ -48,6 +51,71 @@ class MarineSync_Admin_Page {
         
         // Setup scheduled events if needed
         $this->setup_scheduled_exports();
+	}
+
+	/**
+	 * Debug function to display all scheduled cron jobs
+	 * Add this to your admin page for troubleshooting
+	 */
+	public function display_cron_debug_info() {
+		$crons = _get_cron_array();
+		$schedules = wp_get_schedules();
+		$date_format = get_option('date_format') . ' ' . get_option('time_format');
+
+		echo '<div class="marinesync-card">';
+		echo '<h3>' . __('Cron Debug Information', 'marinesync') . '</h3>';
+
+		if (empty($crons)) {
+			echo '<p>' . __('No cron events scheduled.', 'marinesync') . '</p>';
+		} else {
+			echo '<table class="widefat">';
+			echo '<thead><tr><th>Hook</th><th>Arguments</th><th>Schedule</th><th>Next Run</th></tr></thead>';
+			echo '<tbody>';
+
+			foreach ($crons as $timestamp => $cronhooks) {
+				foreach ($cronhooks as $hook => $events) {
+					foreach ($events as $key => $event) {
+						$schedule = isset($event['schedule']) ? $event['schedule'] : 'once';
+						$schedule_display = isset($schedules[$schedule]['display']) ? $schedules[$schedule]['display'] : $schedule;
+
+						echo '<tr>';
+						echo '<td>' . esc_html($hook) . '</td>';
+						echo '<td>' . (empty($event['args']) ? 'None' : print_r($event['args'], true)) . '</td>';
+						echo '<td>' . esc_html($schedule_display) . '</td>';
+						echo '<td>' . date_i18n($date_format, $timestamp) . '</td>';
+						echo '</tr>';
+					}
+				}
+			}
+
+			echo '</tbody></table>';
+		}
+
+		// Show registered schedules
+		echo '<h4>' . __('Registered Schedules', 'marinesync') . '</h4>';
+		echo '<table class="widefat">';
+		echo '<thead><tr><th>Name</th><th>Display</th><th>Interval (seconds)</th></tr></thead>';
+		echo '<tbody>';
+
+		foreach ($schedules as $name => $schedule) {
+			echo '<tr>';
+			echo '<td>' . esc_html($name) . '</td>';
+			echo '<td>' . esc_html($schedule['display']) . '</td>';
+			echo '<td>' . esc_html($schedule['interval']) . '</td>';
+			echo '</tr>';
+		}
+
+		echo '</tbody></table>';
+
+		// Add a manual control for the cron
+		echo '<h4>' . __('Cron Controls', 'marinesync') . '</h4>';
+		echo '<form method="post" action="">';
+		wp_nonce_field('marinesync_cron_control', 'cron_control_nonce');
+		echo '<button type="submit" name="clear_all_cron" class="button button-secondary">' . __('Clear All MarineSync Cron Events', 'marinesync') . '</button> ';
+		echo '<button type="submit" name="reschedule_cron" class="button button-primary">' . __('Reschedule Export Cron', 'marinesync') . '</button>';
+		echo '</form>';
+
+		echo '</div>';
 	}
 
     /**
@@ -486,6 +554,8 @@ class MarineSync_Admin_Page {
                 </div>
             </div>
         </div>
+
+        <?php $this->display_cron_debug_info(); ?>
 
         <script type="text/javascript">
             jQuery(document).ready(function($) {
@@ -1060,27 +1130,83 @@ class MarineSync_Admin_Page {
 	}
 
 	/**
-	 * Sets up scheduled exports based on settings
+	 * Clear all MarineSync cron events
 	 */
-	private function setup_scheduled_exports() {
-		// Check if we already have a scheduled export
-		$timestamp = wp_next_scheduled('marinesync_scheduled_export');
+	private function clear_all_cron_events() {
+		$crons = _get_cron_array();
+		$marinesync_hooks = ['marinesync_scheduled_export'];
 
-		// If already scheduled, clear it to prevent duplicates
-		if ($timestamp) {
-			wp_unschedule_event($timestamp, 'marinesync_scheduled_export');
+		foreach ($crons as $timestamp => $cronhooks) {
+			foreach ($marinesync_hooks as $hook) {
+				if (isset($cronhooks[$hook])) {
+					foreach ($cronhooks[$hook] as $key => $event) {
+						wp_unschedule_event($timestamp, $hook, $event['args']);
+						error_log("MS100: Unscheduled cron event: $hook at timestamp $timestamp");
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Schedule the export cron with standard schedules
+	 */
+	private function schedule_export_cron() {
+		// Get frequency from options
+		$frequency = isset($this->options['export_feed_frequency']) ?
+			absint($this->options['export_feed_frequency']) : 24;
+
+		// Make sure we have a valid frequency
+		if ($frequency < 1) $frequency = 24;
+
+		// Map to WP standard schedules
+		if ($frequency <= 1) {
+			$recurrence = 'hourly';
+		} else if ($frequency <= 12) {
+			$recurrence = 'twicedaily';
+		} else {
+			$recurrence = 'daily';
 		}
 
-		// Schedule using standard WordPress schedules
-		if (isset($this->options['export_feed_frequency'])) {
-			$frequency = absint($this->options['export_feed_frequency']);
+		// Schedule the event
+		$timestamp = time() + 120; // Start in 2 minutes, not immediately
+		$scheduled = wp_schedule_event($timestamp, $recurrence, 'marinesync_scheduled_export');
 
-			// Map our frequency to WordPress standard schedules
-			$recurrence = $this->get_wp_schedule_for_frequency($frequency);
+		if ($scheduled) {
+			error_log("MS101: Successfully scheduled export cron using $recurrence schedule starting at " . date('Y-m-d H:i:s', $timestamp));
+		} else {
+			error_log("MS102: Failed to schedule export cron");
+		}
+	}
 
-			// Schedule the event
-			wp_schedule_event(time(), $recurrence, 'marinesync_scheduled_export');
-			error_log('MS050: Scheduled export using WP schedule: ' . $recurrence);
+	/**
+	 * Improved setup of scheduled exports
+	 */
+	private function setup_scheduled_exports() {
+		// Check if we need to handle cron control actions
+		if (isset($_POST['clear_all_cron']) && isset($_POST['cron_control_nonce']) &&
+		    wp_verify_nonce($_POST['cron_control_nonce'], 'marinesync_cron_control')) {
+
+			$this->clear_all_cron_events();
+			add_action('admin_notices', function() {
+				echo '<div class="notice notice-success"><p>' . __('All MarineSync cron events cleared.', 'marinesync') . '</p></div>';
+			});
+		}
+
+		if (isset($_POST['reschedule_cron']) && isset($_POST['cron_control_nonce']) &&
+		    wp_verify_nonce($_POST['cron_control_nonce'], 'marinesync_cron_control')) {
+
+			$this->clear_all_cron_events();
+			$this->schedule_export_cron();
+			add_action('admin_notices', function() {
+				echo '<div class="notice notice-success"><p>' . __('Export cron rescheduled.', 'marinesync') . '</p></div>';
+			});
+		}
+
+		// Only set up scheduled exports if they don't already exist
+		$timestamp = wp_next_scheduled('marinesync_scheduled_export');
+		if (!$timestamp) {
+			$this->schedule_export_cron();
 		}
 	}
     
