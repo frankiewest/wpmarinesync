@@ -38,7 +38,8 @@ class MarineSync_Admin_Page {
 			'feed_format' => 'auto',
 			'feed_url' => '',
 			'feed_provider' => '',
-			'feed_frequency' => 24
+			'feed_frequency' => 24,
+			'export_feed_frequency' => 24
 		));
 	}
 
@@ -180,6 +181,7 @@ class MarineSync_Admin_Page {
 		$sanitized['feed_url'] = esc_url_raw($input['feed_url']);
 		$sanitized['feed_provider'] = sanitize_text_field($input['feed_provider']);
 		$sanitized['feed_frequency'] = absint($input['feed_frequency']);
+		$sanitized['export_feed_frequency'] = absint($input['export_feed_frequency']);
 		return $sanitized;
 	}
 
@@ -349,10 +351,7 @@ class MarineSync_Admin_Page {
 		// Make sure options are loaded
 		if (empty($this->options)) {
 			$this->options = get_option('marinesync_feed_settings', array(
-				'feed_format' => 'auto',
-				'feed_url' => '',
-				'feed_provider' => '',
-				'feed_frequency' => 24
+				'export_feed_frequency' => 24
 			));
 		}
 		?>
@@ -372,7 +371,7 @@ class MarineSync_Admin_Page {
 
                             <p>
                                 <button type="button" id="export-boats" class="button button-primary">
-					                <?php _e('Export All Boats', 'marinesync'); ?>
+					                <?php _e('Run Boat Export', 'marinesync'); ?>
                                 </button>
                             </p>
                         </form>
@@ -385,6 +384,26 @@ class MarineSync_Admin_Page {
                         <div class="form-field">
                             <input type="text" readonly value="<?php echo esc_url(site_url('/wp-content/uploads/marinesync-exports/marinesync-export-' . sanitize_title(get_bloginfo('name')) . '.xml')); ?>" class="regular-text"
                                    onclick="this.select();" style="width: 100%;">
+                        </div>
+
+                        <p class="description"><?php _e('This URL can be used in third-party systems that need to access your boat data.', 'marinesync'); ?></p>
+                    </div>
+
+                    <div class="marinesync-card">
+                        <h2><?php _e('Export Frequency', 'marinesync'); ?></h2>
+                        <p><?php _e('Please select the frequency at which you wish ', 'marinesync'); ?></p>
+
+                        <div class="form-field">
+                            <label for="export_feed_frequency"><?php _e('Feed Run Frequency', 'marinesync'); ?></label>
+                            <select name="marinesync_feed_settings[export_feed_frequency]" id="export_feed_frequency">
+                                <option value="1" <?php selected($this->options['export_feed_frequency'], 1); ?>><?php _e('Every Hour', 'marinesync'); ?></option>
+                                <option value="2" <?php selected($this->options['export_feed_frequency'], 2); ?>><?php _e('Every 2 Hours', 'marinesync'); ?></option>
+                                <option value="4" <?php selected($this->options['export_feed_frequency'], 4); ?>><?php _e('Every 4 Hours', 'marinesync'); ?></option>
+                                <option value="8" <?php selected($this->options['export_feed_frequency'], 8); ?>><?php _e('Every 8 Hours', 'marinesync'); ?></option>
+                                <option value="12" <?php selected($this->options['export_feed_frequency'], 12); ?>><?php _e('Every 12 Hours', 'marinesync'); ?></option>
+                                <option value="18" <?php selected($this->options['export_feed_frequency'], 18); ?>><?php _e('Every 18 Hours', 'marinesync'); ?></option>
+                                <option value="24" <?php selected($this->options['export_feed_frequency'], 24); ?>><?php _e('Every 24 Hours', 'marinesync'); ?></option>
+                            </select>
                         </div>
 
                         <p class="description"><?php _e('This URL can be used in third-party systems that need to access your boat data.', 'marinesync'); ?></p>
