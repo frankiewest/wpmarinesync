@@ -38,9 +38,9 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 updateStatusDisplay(response);
             },
-            error: function() {
+            error: function(xhr, status, error) {
                 $feedStatus.removeClass('notice-success').addClass('notice-error');
-                $feedStatus.html('Error checking feed status. Please try again.');
+                $feedStatus.html('Error checking feed status. Please try again. Error: (' + error + '). XHR: (' + xhr + '). Status: (' + status + ')');
             }
         });
     }
