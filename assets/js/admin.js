@@ -67,9 +67,9 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 updateStatusDisplay(response);
             },
-            error: function() {
-                $feedStatus.removeClass('notice-success notice-info').addClass('notice-error');
-                $feedStatus.html('Error running feed. Please try again.');
+            error: function(xhr, status, error) {
+                $feedStatus.removeClass('notice-success').addClass('notice-error');
+                $feedStatus.html('Error checking feed status. Please try again. Error: (' + error + '). XHR: (' + xhr + '). Status: (' + status + ')');
             },
             complete: function() {
                 $runFeedButton.prop('disabled', false).removeClass('marinesync-loading');
@@ -112,8 +112,8 @@ jQuery(document).ready(function($) {
                     $form.before('<div class="notice notice-error"><p>' + response.message + '</p></div>');
                 }
             },
-            error: function() {
-                $form.before('<div class="notice notice-error"><p>Error saving settings. Please try again.</p></div>');
+            error: function(xhr, status, error) {
+                $form.before('<div class="notice notice-error"><p>Error saving settings. Please try again.</p></div> Error: (' + error + '). XHR: (' + xhr + '). Status: (' + status + ')');
             },
             complete: function() {
                 $submitButton.prop('disabled', false).removeClass('marinesync-loading');
