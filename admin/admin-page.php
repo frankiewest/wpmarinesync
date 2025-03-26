@@ -508,11 +508,7 @@ class MarineSync_Admin_Page {
                                 <label for="export_feed_frequency"><?php _e('Update Frequency', 'marinesync'); ?></label>
                                 <select name="export_feed_frequency" id="export_feed_frequency">
                                     <option value="1" <?php selected($this->options['export_feed_frequency'], 1); ?>><?php _e('Every Hour', 'marinesync'); ?></option>
-                                    <option value="2" <?php selected($this->options['export_feed_frequency'], 2); ?>><?php _e('Every 2 Hours', 'marinesync'); ?></option>
-                                    <option value="4" <?php selected($this->options['export_feed_frequency'], 4); ?>><?php _e('Every 4 Hours', 'marinesync'); ?></option>
-                                    <option value="8" <?php selected($this->options['export_feed_frequency'], 8); ?>><?php _e('Every 8 Hours', 'marinesync'); ?></option>
                                     <option value="12" <?php selected($this->options['export_feed_frequency'], 12); ?>><?php _e('Every 12 Hours', 'marinesync'); ?></option>
-                                    <option value="18" <?php selected($this->options['export_feed_frequency'], 18); ?>><?php _e('Every 18 Hours', 'marinesync'); ?></option>
                                     <option value="24" <?php selected($this->options['export_feed_frequency'], 24); ?>><?php _e('Every 24 Hours', 'marinesync'); ?></option>
                                 </select>
                                 <p class="description"><?php _e('Choose how frequently the XML export should be regenerated.', 'marinesync'); ?></p>
