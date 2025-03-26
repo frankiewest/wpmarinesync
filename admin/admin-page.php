@@ -195,7 +195,7 @@ class MarineSync_Admin_Page {
 	public function render_overview_page() {
         // Make sure options are loaded
 		if (empty($this->options)) {
-			$this->options = get_option('marinesync_feed_settings', array(
+			$this->options = \get_option('marinesync_feed_settings', array(
 				'feed_format' => 'auto',
 				'feed_url' => '',
 				'feed_provider' => '',
@@ -912,25 +912,28 @@ class MarineSync_Admin_Page {
 			update_option('marinesync_export_url', $public_url);
 			update_option('marinesync_last_export', current_time('mysql'));
 
-			// If accessed via AJAX, return success with the URL
-			if (wp_doing_ajax()) {
-				wp_send_json_success(array(
-					'message' => __('Export completed successfully', 'marinesync'),
-					'url' => $public_url
-				));
-			}
-
-			// Check if we should deactivate after export
-			if (isset($_GET['then']) && $_GET['then'] === 'deactivate' && isset($_GET['redirect'])) {
-				error_log('MS045: Export completed, proceeding with deactivation');
-				?>
-                <script type="text/javascript">
-                    window.location.href = <?php echo json_encode(esc_url_raw($_GET['redirect'])); ?>;
-                </script>
-				<?php
+			// Handle response based on request source
+			if ($ajax_request) {
+				// This is a regular AJAX call from the admin interface
+				if (wp_doing_ajax()) {
+					wp_send_json_success(array(
+						'message' => __('Export completed successfully', 'marinesync'),
+						'url' => $public_url
+					));
+				} elseif (isset($_GET['then']) && $_GET['then'] == 'deactivate' && isset($_GET['redirect'])) {
+					?>
+					<script type="text/javascript">
+						window.location.href = <?php echo json_encode(esc_url_raw($_GET['redirect'])); ?>;
+					</script>
+					<?php
+				} else {
+					// Redirect to admin page with success message
+					wp_redirect(admin_url('admin.php?page=marinesync-export&export=success&url=' . urlencode($public_url)));
+				}
 			} else {
-				// Redirect to admin page with success message
-				wp_redirect(admin_url('admin.php?page=marinesync-export&export=success&url=' . urlencode($public_url)));
+				// This is a cron job - just log the success
+				error_log('MS046: Cron export process completed successfully. File saved to: ' . $filepath);
+				return true;
 			}
 
 			error_log('MS046: Export process completed');
@@ -939,12 +942,18 @@ class MarineSync_Admin_Page {
 		} catch (\Exception $e) {
 			error_log('MS047: Critical error in export process: ' . $e->getMessage());
 
-			if (wp_doing_ajax()) {
-				wp_send_json_error(array(
-					'message' => __('Export failed: ', 'marinesync') . $e->getMessage()
-				));
+			if ($ajax_request) {
+				if (wp_doing_ajax()) {
+					wp_send_json_error(array(
+						'message' => __('Export failed: ', 'marinesync') . $e->getMessage()
+					));
+				} else {
+					wp_die('Export Error: ' . $e->getMessage());
+				}
 			} else {
-				wp_die('Export Error: ' . $e->getMessage());
+				// Cron job failed
+				error_log('MS048: Cron export failed with error: ' . $e->getMessage());
+				return false;
 			}
 		}
 	}

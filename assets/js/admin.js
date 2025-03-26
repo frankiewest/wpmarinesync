@@ -6,6 +6,10 @@ jQuery(document).ready(function($) {
     const $nextRunTime = $('#next-run-time');
     const $totalBoats = $('#total-boats');
     const $lastUpdateTime = $('#last-update-time');
+    
+    // Add export boats button handler
+    const $exportBoatsButton = $('#export-boats');
+    const $exportMessage = $('#export-message');
 
     // Function to update the status display
     function updateStatusDisplay(data) {
@@ -76,6 +80,46 @@ jQuery(document).ready(function($) {
             }
         });
     });
+    
+    // Handle export boats button
+    if ($exportBoatsButton.length > 0) {
+        $exportBoatsButton.on('click', function(e) {
+            e.preventDefault();
+            const $button = $(this);
+            
+            // Disable button and show loading message
+            $button.prop('disabled', true);
+            $exportMessage.html('<div class="notice notice-info"><p>Generating export file, please wait...</p></div>');
+            
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'marinesync_export_boats',
+                    nonce: marinesyncAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Show success message
+                        $exportMessage.html('<div class="notice notice-success"><p>' + response.data.message + '</p></div>');
+                        
+                        // Create download link
+                        if(response.data.url) {
+                            $exportMessage.append('<p><a href="' + response.data.url + '" class="button" target="_blank">Download Export File</a></p>');
+                        }
+                    } else {
+                        $exportMessage.html('<div class="notice notice-error"><p>' + response.data.message + '</p></div>');
+                    }
+                },
+                error: function() {
+                    $exportMessage.html('<div class="notice notice-error"><p>Export failed. Please try again.</p></div>');
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                }
+            });
+        });
+    }
 
     // Check feed status on page load
     checkFeedStatus();
