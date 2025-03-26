@@ -555,7 +555,7 @@ class MarineSync_Admin_Page {
 				}
 
 				// IMPORTANT: First register the custom schedule interval
-				$interval_name = $frequency . 'hours';
+				$interval_name = $frequency . ' hours';
 				add_filter('cron_schedules', function($schedules) use ($frequency, $interval_name) {
 					$schedules[$interval_name] = array(
 						'interval' => $frequency * HOUR_IN_SECONDS,
