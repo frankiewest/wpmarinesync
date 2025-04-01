@@ -6,6 +6,7 @@
 namespace MarineSync;
 
 use MarineSync\PostType\MarineSync_Post_Type;
+use MarineSync\Importers\MarineSync_Boat_Importer;
 
 if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
@@ -32,6 +33,7 @@ class MarineSync_Admin_Page {
 		add_action('wp_ajax_marinesync_run_feed', array($this, 'ajax_run_feed'));
 		add_action('wp_ajax_marinesync_check_feed_status', array($this, 'ajax_check_feed_status'));
 		add_action('wp_ajax_marinesync_export_boats', array($this, 'ajax_export_boats'));
+        add_action('wp_ajax_marinesync_import_boats', array($this, 'ajax_import_boats'));
 		add_action('wp_ajax_marinesync_save_settings', array($this, 'ajax_save_settings'));
 
 		// Always register the hook handler
@@ -1090,6 +1092,24 @@ class MarineSync_Admin_Page {
 
 		// Trigger feed process
 		do_action('marinesync_process_feed');
+
+		// Get instance
+		$importer = MarineSync_Boat_Importer::getInstance();
+
+		// Import boats
+		$importedData = $importer->importBoatData($this->options['feed_url']);
+
+		// Process boats
+		$result = $importer->processBoatData($importedData);
+
+        // Check result
+        if (is_wp_error($result)) {
+            wp_send_json_error(__('Error processing feed: ', 'marinesync') . $result->get_error_message());
+        } else {
+            // Update last run time
+            update_option('marinesync_last_run', current_time('mysql'));
+            delete_transient('marinesync_feed_running');
+        }
 
 		wp_send_json_success(__('Feed process started', 'marinesync'));
 	}
