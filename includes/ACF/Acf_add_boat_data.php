@@ -17,6 +17,27 @@ class Acf_add_boat_data {
             'key' => 'group_67addc1021662',
             'title' => 'Boat Data',
             'fields' => array(
+				array(
+					'key' => 'field_67addc1021663',
+					'label' => 'Boat REF',
+					'name' => 'boat_ref',
+					'aria-label' => '',
+					'type' => 'text',
+					'instructions' => '',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'default_value' => '',
+					'maxlength' => '',
+					'allow_in_bindings' => 0,
+					'placeholder' => '',
+					'prepend' => '',
+					'append' => ''
+				),
                 array(
                     'key' => 'field_67ae2987a5398',
                     'label' => 'Dimensions',
