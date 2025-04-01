@@ -510,4 +510,31 @@ class MarineSync_Post_Type {
 
 		return true;
 	}
+
+	/**
+	 * Get a boat by its reference ID.
+	 *
+	 * @param string $ref The reference ID of the boat.
+	 * @return int|\WP_Post|null The boat post object or null if not found.
+	 */
+	public static function get_boat_by_ref($ref): int|\WP_Post|null {
+		$args = array(
+			'post_type' => 'marinesync-boats',
+			'meta_query' => array(
+				array(
+					'key' => 'boat_id',
+					'value' => $ref,
+					'compare' => '='
+				)
+			)
+		);
+
+		$query = new \WP_Query($args);
+
+		if ($query->have_posts()) {
+			return $query->posts[0];
+		}
+
+		return null;
+	}
 }

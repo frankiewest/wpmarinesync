@@ -2,7 +2,7 @@
 
 namespace MarineSync\Importers;
 
-use AllowDynamicProperties;
+use MarineSync\PostType\MarineSync_Post_Type;
 
 /**
  * Class BoatImporter
@@ -63,9 +63,11 @@ class MarineSync_Boat_Importer implements BoatImporter {
 		// Check if it looks like XML
 		if ( str_starts_with( $trimmed_body, '<' ) && str_contains( $trimmed_body, '>' ) ) {
 			// Parse XML
+			$format = 'xml';
 			$data = $this->parseXML( $body );
 		} elseif ( str_starts_with( $trimmed_body, '{' ) && str_contains( $trimmed_body, '}' ) ) {
 			// Parse JSON
+			$format = 'json';
 			$data = $this->parseJSON( $body );
 		} else {
 			// Handle error
@@ -81,7 +83,10 @@ class MarineSync_Boat_Importer implements BoatImporter {
 		}
 
 		// Return data
-		return $data;
+		return [
+			'data' => $data,
+			'format' => $format
+		];
 	}
 
 	/**
@@ -131,18 +136,19 @@ class MarineSync_Boat_Importer implements BoatImporter {
 	public function processBoatData( $data ): void {
 		// Process boat data
 		$boatData = $this->importBoatData($this->options['feed_url']);
+		$format = $boatData['format'] ?? 'xml';
 
 		// Check if boat data is empty as a safety check
-		if ( empty( $boatData ) ) {
+		if ( empty( $boatData['data'] ) ) {
 			// Handle error
 			error_log('MarineSync_Boat_Importer->processBoatData :=: Empty boat data');
 			return;
 		}
 
 		// Process each boat
-		foreach ( $boatData as $boat ) {
+		foreach ( $boatData['data'] as $boat ) {
 			// Process each boat
-			$this->processSingleBoat( $boat );
+			$this->processSingleBoat( $boat, $format );
 		}
 	}
 
@@ -153,8 +159,48 @@ class MarineSync_Boat_Importer implements BoatImporter {
 	 *
 	 * @return void
 	 */
-	private function processSingleBoat( array $boat ): void {
+	private function processSingleBoat( array $boat, string $format ): void {
 		// Check if boat exists in the database
+		$ref = $boat['ref'] ?? null;
+		if ( $ref ) {
+			$existingBoat = MarineSync_Post_Type::get_boat_by_ref( $ref );
 
+			if ( $existingBoat ) {
+				// Update existing boat
+				$this->updateBoat( $existingBoat, $boat );
+			} else {
+				// Insert new boat
+				$this->createBoat( $boat, $format );
+			}
+		} else {
+			error_log('MarineSync_Boat_Importer->processSingleBoat :=: Boat reference not found');
+		}
+	}
+
+	/**
+	 * Create a new boat.
+	 *
+	 * @param array $boat The new boat data.
+	 *
+	 * @return void
+	 */
+	private function createBoat(array $boat, string $format): void {
+		// Create a new boat post
+		$post_data = array(
+			'post_title'   => $boat['name'],
+			'post_content' => $boat['description'],
+			'post_status'  => 'publish',
+			'post_type'    => 'boat',
+		);
+
+		// Insert the post into the database
+		$post_id = wp_insert_post( $post_data );
+
+		if ( ! is_wp_error( $post_id ) ) {
+			update_post_meta( $post_id, 'boat_ref', $boat['ref'] );
+			update_post_meta( $post_id, 'boat_data', $boat );
+		} else {
+			error_log('MarineSync_Boat_Importer->createBoat :=: Error creating boat post');
+		}
 	}
 }
