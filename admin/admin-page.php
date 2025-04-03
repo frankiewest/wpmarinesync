@@ -6,7 +6,6 @@
 namespace MarineSync;
 
 use MarineSync\PostType\MarineSync_Post_Type;
-use MarineSync\Importers\MarineSync_Boat_Importer;
 
 if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
@@ -30,10 +29,8 @@ class MarineSync_Admin_Page {
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
 
 		// Register AJAX handlers
-		add_action('wp_ajax_marinesync_run_feed', array($this, 'ajax_run_feed'));
 		add_action('wp_ajax_marinesync_check_feed_status', array($this, 'ajax_check_feed_status'));
 		add_action('wp_ajax_marinesync_export_boats', array($this, 'ajax_export_boats'));
-        add_action('wp_ajax_marinesync_import_boats', array($this, 'ajax_import_boats'));
 		add_action('wp_ajax_marinesync_save_settings', array($this, 'ajax_save_settings'));
 
 		// Always register the hook handler
@@ -227,16 +224,6 @@ class MarineSync_Admin_Page {
 			30
 		);
 
-		// Add Import subpage (previously the main admin page)
-		add_submenu_page(
-			'marinesync',
-			__('Import Boats', 'marinesync'),
-			__('Import', 'marinesync'),
-			'manage_options',
-			'marinesync-import',
-			array($this, 'render_import_page')
-		);
-
 		// Add Export subpage
 		add_submenu_page(
 			'marinesync',
@@ -304,119 +291,6 @@ class MarineSync_Admin_Page {
                             <span id="total-boats"><?php echo esc_html($this->get_total_boats()); ?></span>
                         </li>
                     </ul>
-                </div>
-            </div>
-        </div>
-		<?php
-	}
-
-	// Import page (previously the main admin page)
-	public function render_import_page() {
-		$this->options = get_option('marinesync_feed_settings', array(
-			'feed_format' => 'auto',
-			'feed_url' => '',
-			'feed_provider' => '',
-			'feed_frequency' => 24
-		));
-
-		$this->feed_running = get_transient('marinesync_feed_running');
-		?>
-        <div class="wrap marinesync-admin">
-            <h1><?php _e('Import Boats', 'marinesync'); ?></h1>
-
-			<?php settings_errors(); ?>
-
-            <div class="marinesync-admin-container">
-                <div class="marinesync-admin-main">
-                    <form method="post" action="options.php" class="marinesync-settings-form">
-						<?php settings_fields('marinesync_options'); ?>
-
-                        <div class="marinesync-form-section">
-                            <h2><?php _e('Feed Settings', 'marinesync'); ?></h2>
-
-                            <div class="form-field">
-                                <label for="feed_format"><?php _e('Feed Format', 'marinesync'); ?></label>
-                                <select name="marinesync_feed_settings[feed_format]" id="feed_format">
-                                    <option value="auto" <?php selected($this->options['feed_format'], 'auto'); ?>><?php _e('Auto Detect', 'marinesync'); ?></option>
-                                    <option value="xml" <?php selected($this->options['feed_format'], 'xml'); ?>><?php _e('XML', 'marinesync'); ?></option>
-                                    <option value="json" <?php selected($this->options['feed_format'], 'json'); ?>><?php _e('JSON', 'marinesync'); ?></option>
-                                </select>
-                                <p class="description"><?php _e('Select the feed format or let the system auto-detect it.', 'marinesync'); ?></p>
-                            </div>
-
-                            <div class="form-field">
-                                <label for="feed_url"><?php _e('Feed URL', 'marinesync'); ?></label>
-                                <input type="url" name="marinesync_feed_settings[feed_url]" id="feed_url"
-                                       value="<?php echo esc_attr($this->options['feed_url']); ?>" class="regular-text">
-                                <p class="description"><?php _e('Enter the URL of your boat feed.', 'marinesync'); ?></p>
-                            </div>
-
-                            <div class="form-field">
-                                <label for="feed_provider"><?php _e('Feed Provider', 'marinesync'); ?></label>
-                                <select name="marinesync_feed_settings[feed_provider]" id="feed_provider">
-                                    <option value=""><?php _e('Select Provider', 'marinesync'); ?></option>
-                                    <option value="boats" <?php selected($this->options['feed_provider'], 'boats'); ?>><?php _e('Boats.com', 'marinesync'); ?></option>
-                                    <option value="yachtworld" <?php selected($this->options['feed_provider'], 'yachtworld'); ?>><?php _e('YachtWorld', 'marinesync'); ?></option>
-                                    <option value="boatshop" <?php selected($this->options['feed_provider'], 'boatshop'); ?>><?php _e('BoatShop', 'marinesync'); ?></option>
-                                    <option value="rightboat" <?php selected($this->options['feed_provider'], 'rightboat'); ?>><?php _e('Rightboat', 'marinesync'); ?></option>
-                                </select>
-                                <p class="description"><?php _e('Select the provider of your boat feed.', 'marinesync'); ?></p>
-                            </div>
-
-                            <div class="form-field">
-                                <label for="feed_frequency"><?php _e('Feed Run Frequency', 'marinesync'); ?></label>
-                                <select name="marinesync_feed_settings[feed_frequency]" id="feed_frequency">
-                                    <option value="1" <?php selected($this->options['feed_frequency'], 1); ?>><?php _e('Every Hour', 'marinesync'); ?></option>
-                                    <option value="2" <?php selected($this->options['feed_frequency'], 2); ?>><?php _e('Every 2 Hours', 'marinesync'); ?></option>
-                                    <option value="4" <?php selected($this->options['feed_frequency'], 4); ?>><?php _e('Every 4 Hours', 'marinesync'); ?></option>
-                                    <option value="8" <?php selected($this->options['feed_frequency'], 8); ?>><?php _e('Every 8 Hours', 'marinesync'); ?></option>
-                                    <option value="12" <?php selected($this->options['feed_frequency'], 12); ?>><?php _e('Every 12 Hours', 'marinesync'); ?></option>
-                                    <option value="18" <?php selected($this->options['feed_frequency'], 18); ?>><?php _e('Every 18 Hours', 'marinesync'); ?></option>
-                                    <option value="24" <?php selected($this->options['feed_frequency'], 24); ?>><?php _e('Every 24 Hours', 'marinesync'); ?></option>
-                                </select>
-                                <p class="description"><?php _e('How often should the feed be processed?', 'marinesync'); ?></p>
-                            </div>
-
-							<?php submit_button(__('Save Settings', 'marinesync')); ?>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="marinesync-admin-sidebar">
-                    <div class="marinesync-card">
-                        <h3><?php _e('Manual Feed Run', 'marinesync'); ?></h3>
-                        <p><?php _e('Click the button below to manually trigger the feed import process.', 'marinesync'); ?></p>
-
-                        <div class="marinesync-feed-status">
-							<?php if ($this->feed_running): ?>
-                                <div class="notice notice-warning">
-                                    <p><?php _e('Feed is currently running. Please wait...', 'marinesync'); ?></p>
-                                </div>
-							<?php endif; ?>
-                        </div>
-
-                        <button type="button" id="run-feed" class="button button-primary" <?php disabled($this->feed_running); ?>>
-							<?php _e('Run Feed Now', 'marinesync'); ?>
-                        </button>
-                    </div>
-
-                    <div class="marinesync-card">
-                        <h3><?php _e('Feed Status', 'marinesync'); ?></h3>
-                        <ul class="marinesync-status-list">
-                            <li>
-                                <strong><?php _e('Last Run:', 'marinesync'); ?></strong>
-                                <span id="last-run"><?php echo esc_html(get_option('marinesync_last_run', __('Never', 'marinesync'))); ?></span>
-                            </li>
-                            <li>
-                                <strong><?php _e('Next Run:', 'marinesync'); ?></strong>
-                                <span id="next-run"><?php echo esc_html($this->get_next_run_time()); ?></span>
-                            </li>
-                            <li>
-                                <strong><?php _e('Total Boats:', 'marinesync'); ?></strong>
-                                <span id="total-boats"><?php echo esc_html($this->get_total_boats()); ?></span>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1076,43 +950,6 @@ class MarineSync_Admin_Page {
 		}
 	}
 
-	public function ajax_run_feed() {
-		check_ajax_referer('marinesync_admin_nonce', 'nonce');
-
-		if (!current_user_can('manage_options')) {
-			wp_send_json_error(__('Unauthorized access', 'marinesync'));
-		}
-
-		if (get_transient('marinesync_feed_running')) {
-			wp_send_json_error(__('Feed is already running', 'marinesync'));
-		}
-
-		// Set transient to prevent multiple runs
-		set_transient('marinesync_feed_running', true, 10 * MINUTE_IN_SECONDS);
-
-		// Trigger feed process
-		do_action('marinesync_process_feed');
-
-		// Get instance
-		$importer = MarineSync_Boat_Importer::getInstance();
-
-		// Import boats
-		$importedData = $importer->importBoatData($this->options['feed_url']);
-
-		// Process boats
-		$result = $importer->processBoatData($importedData);
-
-        // Check result
-        if (is_wp_error($result)) {
-            wp_send_json_error(__('Error processing feed: ', 'marinesync') . $result->get_error_message());
-        } else {
-            // Update last run time
-            update_option('marinesync_last_run', current_time('mysql'));
-            delete_transient('marinesync_feed_running');
-        }
-
-		wp_send_json_success(__('Feed process started', 'marinesync'));
-	}
 
 	public function ajax_check_feed_status() {
 		check_ajax_referer('marinesync_admin_nonce', 'nonce');
