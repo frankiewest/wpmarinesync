@@ -12,10 +12,20 @@ if (!defined('ABSPATH')) {
 }
 
 class MarineSync_Admin_Page {
+    /**
+	 * Singleton instance
+	 *
+	 * @var MarineSync_Admin_Page
+	 */
 	private static $instance = null;
 	private $options;
 	private $feed_running = false;
 
+    /**
+	 * Get the singleton instance of the class
+	 *
+	 * @return MarineSync_Admin_Page
+	 */
 	public static function get_instance() {
 		if (null === self::$instance) {
 			self::$instance = new self();
@@ -23,6 +33,9 @@ class MarineSync_Admin_Page {
 		return self::$instance;
 	}
 
+    /**
+	 * Constructor
+	 */
 	private function __construct() {
 		add_action('admin_menu', array($this, 'add_admin_menu'));
 		add_action('admin_init', array($this, 'register_settings'));
@@ -41,10 +54,6 @@ class MarineSync_Admin_Page {
 
 		// Initialize options
 		$this->options = get_option('marinesync_feed_settings', array(
-			'feed_format' => 'auto',
-			'feed_url' => '',
-			'feed_provider' => '',
-			'feed_frequency' => 24,
 			'export_feed_frequency' => 24
 		));
         
@@ -199,6 +208,7 @@ class MarineSync_Admin_Page {
 		error_log('MS311: Is style enqueued? ' . (wp_style_is('marinesync-admin-css', 'enqueued') ? 'Yes' : 'No'));
 		wp_enqueue_script('marinesync-admin-js', MARINESYNC_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), MARINESYNC_PLUGIN_VERSION, true);
 
+        // Localize script with data
 		wp_localize_script('marinesync-admin-js', 'marinesyncAdmin', array(
 			'ajaxurl' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('marinesync_admin_nonce'),
@@ -212,6 +222,9 @@ class MarineSync_Admin_Page {
 		));
 	}
 
+    /**
+	 * Setup scheduled exports
+	 */
 	public function add_admin_menu() {
 		// Add main menu page
 		add_menu_page(
@@ -235,10 +248,16 @@ class MarineSync_Admin_Page {
 		);
 	}
 
+    /**
+	 * Setup scheduled exports
+	 */
 	public function register_settings() {
 		register_setting('marinesync_options', 'marinesync_feed_settings', array($this, 'sanitize_settings'));
 	}
 
+    /**
+	 * Setup scheduled exports
+	 */
 	public function sanitize_settings($input) {
 		$sanitized = array();
 		$sanitized['feed_format'] = sanitize_text_field($input['feed_format']);
