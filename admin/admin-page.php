@@ -224,6 +224,16 @@ class MarineSync_Admin_Page {
 			30
 		);
 
+        // Add Import subpage
+        add_submenu_page(
+                'marinesync',
+                __('Import Boats', 'marinesync'),
+            __('Import', 'marinesync'),
+            'manage_options',
+            'marinesync-import',
+            array($this, 'render_import_page')
+        );
+
 		// Add Export subpage
 		add_submenu_page(
 			'marinesync',
@@ -293,6 +303,31 @@ class MarineSync_Admin_Page {
                     </ul>
                 </div>
             </div>
+        </div>
+		<?php
+	}
+
+    // Import page
+	public function render_import_page() {
+		?>
+        <div class="wrap">
+            <h1>MarineSync Boat Importer</h1>
+
+			<?php settings_errors('marinesync_importer'); ?>
+
+            <h2>Download Template</h2>
+            <p><a href="<?php echo admin_url('admin.php?page=marinesync&marinesync_download_template=1'); ?>" class="button button-secondary">Download CSV Template</a></p>
+
+            <h2>Import Boats</h2>
+            <form method="post" enctype="multipart/form-data">
+				<?php wp_nonce_field('marinesync_import_action', 'marinesync_import_nonce'); ?>
+                <p>
+                    <input type="file" name="marinesync_csv_import" accept=".csv" required>
+                </p>
+                <p>
+                    <input type="submit" value="Import CSV" class="button button-primary">
+                </p>
+            </form>
         </div>
 		<?php
 	}
