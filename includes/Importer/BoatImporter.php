@@ -1,5 +1,4 @@
 <?php
-
 namespace MarineSync\Importer;
 
 final class BoatImporter {
@@ -12,7 +11,7 @@ final class BoatImporter {
 		$headers = [
 			'title',                // Post title (boat name/model)
 			'featured_image',       // Featured image URL
-			'boat_media',              // Gallery images (comma-separated URLs)
+			'boat_media',           // Gallery images (comma-separated URLs)
 			'content',             // Main description
 			'boat_ref',            // Reference number
 			'boat_type',           // Power/Sail
@@ -148,14 +147,15 @@ final class BoatImporter {
 			// Write CSV headers
 			fputcsv($handle, $headers);
 
-			// Add an example row (optional)
+			// Add an example row with Pixabay image URLs
 			$example_row = array_fill(0, count($headers), '');
-			// Fill some example values
 			$example_row[array_search('title', $headers)] = 'Example Boat';
 			$example_row[array_search('manufacturer', $headers)] = 'Bavaria';
 			$example_row[array_search('model', $headers)] = 'E 40 Sedan';
 			$example_row[array_search('year', $headers)] = '2016';
 			$example_row[array_search('asking_price', $headers)] = '219950';
+			$example_row[array_search('featured_image', $headers)] = 'https://cdn.pixabay.com/photo/2023/05/10/1234567_1280.jpg';
+			$example_row[array_search('boat_media', $headers)] = 'https://cdn.pixabay.com/photo/2022/08/15/2345678_1280.jpg,https://cdn.pixabay.com/photo/2021/11/20/3456789_1280.jpg,https://cdn.pixabay.com/photo/2023/01/05/4567890_1280.jpg';
 			fputcsv($handle, $example_row);
 
 			fclose($handle);
@@ -164,6 +164,7 @@ final class BoatImporter {
 
 		return '';
 	}
+
 	public static function process_csv($csv): void {
 		if (!file_exists($csv) || !is_readable($csv)) {
 			error_log('MS100: Cannot read CSV file: ' . $csv);
@@ -226,8 +227,8 @@ final class BoatImporter {
 		}
 
 		// Handle gallery images
-		if (!empty($row['gallery'])) {
-			$gallery_urls = array_filter(array_map('trim', explode(',', $row['gallery'])));
+		if (!empty($row['boat_media'])) {
+			$gallery_urls = array_filter(array_map('trim', explode(',', $row['boat_media'])));
 			$gallery_image_ids = [];
 
 			foreach ($gallery_urls as $index => $url) {
@@ -247,7 +248,7 @@ final class BoatImporter {
 
 		// Store all other meta fields
 		foreach ($row as $key => $value) {
-			if (!empty($value) && $key !== 'title' && $key !== 'content' && $key !== 'featured_image' && $key !== 'gallery') {
+			if (!empty($value) && $key !== 'title' && $key !== 'content' && $key !== 'featured_image' && $key !== 'boat_media') {
 				update_post_meta($post_id, $key, sanitize_text_field($value));
 			}
 		}
