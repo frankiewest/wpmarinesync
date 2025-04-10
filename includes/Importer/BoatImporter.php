@@ -213,11 +213,88 @@ final class BoatImporter {
 			throw new \Exception('Failed to create boat post: ' . $post_id->get_error_message());
 		}
 
-		// Store all available meta fields
+		// Handle featured image
+		if (!empty($row['featured_image'])) {
+			$featured_image_id = self::download_and_attach_image($row['featured_image'], $post_id, $row['title'] . ' Featured Image');
+			if ($featured_image_id && !is_wp_error($featured_image_id)) {
+				set_post_thumbnail($post_id, $featured_image_id);
+			} else {
+				error_log('MS102: Failed to set featured image for post ID ' . $post_id);
+			}
+		}
+
+		// Handle gallery images
+		if (!empty($row['gallery'])) {
+			$gallery_urls = array_filter(array_map('trim', explode(',', $row['gallery'])));
+			$gallery_image_ids = [];
+
+			foreach ($gallery_urls as $index => $url) {
+				$image_id = self::download_and_attach_image($url, $post_id, $row['title'] . ' Gallery Image ' . ($index + 1));
+				if ($image_id && !is_wp_error($image_id)) {
+					$gallery_image_ids[] = $image_id;
+				} else {
+					error_log('MS103: Failed to add gallery image ' . $url . ' for post ID ' . $post_id);
+				}
+			}
+
+			// Update ACF field 'boat_media' with array of image IDs
+			if (!empty($gallery_image_ids) && function_exists('update_field')) {
+				update_field('boat_media', $gallery_image_ids, $post_id);
+			}
+		}
+
+		// Store all other meta fields
 		foreach ($row as $key => $value) {
-			if (!empty($value) && $key !== 'title' && $key !== 'content') {
+			if (!empty($value) && $key !== 'title' && $key !== 'content' && $key !== 'featured_image' && $key !== 'gallery') {
 				update_post_meta($post_id, $key, sanitize_text_field($value));
 			}
 		}
+	}
+
+	/**
+	 * Downloads an image from a URL and attaches it to a post
+	 *
+	 * @param string $url Image URL
+	 * @param int $post_id Post ID to attach the image to
+	 * @param string $description Image description
+	 * @return int|WP_Error Image attachment ID or WP_Error on failure
+	 */
+	private static function download_and_attach_image(string $url, int $post_id, string $description) {
+		// Ensure WordPress media handling functions are available
+		require_once(ABSPATH . 'wp-admin/includes/media.php');
+		require_once(ABSPATH . 'wp-admin/includes/file.php');
+		require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+		// Download the image
+		$temp_file = download_url($url);
+		if (is_wp_error($temp_file)) {
+			error_log('MS104: Failed to download image from ' . $url . ': ' . $temp_file->get_error_message());
+			return $temp_file;
+		}
+
+		// Prepare file array for upload
+		$file_array = [
+			'name' => basename($url),
+			'tmp_name' => $temp_file
+		];
+
+		// Determine file type
+		$file_type = wp_check_filetype($file_array['name']);
+		if (empty($file_type['type'])) {
+			$file_array['name'] .= '.jpg'; // Fallback to .jpg if type can't be determined
+		}
+
+		// Upload the image to the media library
+		$attachment_id = media_handle_sideload($file_array, $post_id, $description);
+
+		// Clean up temporary file
+		@unlink($temp_file);
+
+		if (is_wp_error($attachment_id)) {
+			error_log('MS105: Failed to upload image from ' . $url . ': ' . $attachment_id->get_error_message());
+			return $attachment_id;
+		}
+
+		return $attachment_id;
 	}
 }
