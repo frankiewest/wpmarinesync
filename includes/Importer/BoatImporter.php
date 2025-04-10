@@ -9,130 +9,19 @@ final class BoatImporter {
 	public static function generate_csv_template(): string {
 		// Define all fields from your XML export
 		$headers = [
-			'title',                // Post title (boat name/model)
-			'featured_image',       // Featured image URL
-			'boat_media',           // Gallery images (comma-separated URLs)
-			'content',             // Main description
-			'boat_ref',            // Reference number
-			'boat_type',           // Power/Sail
-			'new_or_used',         // New/Used
-			'manufacturer',        // Brand
-			'model',              // Model
-			'year',               // Build year
-			'asking_price',       // Price
-			'vessel_lying',       // Location
-			'boat_category',      // Category (Sports Cruiser Boats, etc.)
-			'loa',                // Length Overall
-			'lwl',                // Length Waterline
-			'beam',              // Width
-			'draft',             // Draft
-			'air_draft',         // Air draft
-			'displacement',      // Displacement
-			'ballast',           // Ballast
-			'hull_type',         // Hull type
-			'hull_colour',       // Hull color
-			'hull_construction', // Hull construction
-			'super_structure_colour',      // Superstructure color
-			'super_structure_construction', // Superstructure construction
-			'deck_colour',         // Deck color
-			'deck_construction',   // Deck construction
-			'keel_type',           // Keel type
-			'flybridge',           // Yes/No
-			'control_type',        // Control type
-			'where',              // Additional location info
-			'fuel',               // Fuel type
-			'cruising_speed',     // Knots
-			'max_speed',          // Knots
-			'horse_power',        // Engine HP
-			'engine_manufacturer', // Engine brand
-			'engine_location',     // Engine location
-			'gear_box',           // Gearbox type
-			'cylinders',          // Number of cylinders
-			'propeller_type',     // Propeller type
-			'starting_type',      // Starting type
-			'drive_type',         // Drive type
-			'cooling_system',     // Cooling system
-			'bow_thruster',       // On/Off
-			'stern_thruster',     // On/Off
-			'hours',              // Engine hours
-			'engine_quality',     // Engine condition
-			'tankage',            // Number of tanks
-			'litres_per_hour',    // Fuel consumption
-			'gallons_per_hour',   // Fuel consumption
-			'range',              // Range
-			'last_serviced',      // Last service date
-			'passenger_capacity', // Passenger capacity
-			'cabins',            // Yes/No or count
-			'berths',            // Number of berths
-			'bath',              // Yes/No
-			'shower',            // Yes/No
-			'toilet',            // Yes/No
-			'fridge',            // Yes/No
-			'freezer',           // Yes/No
-			'oven',              // Yes/No
-			'microwave',         // Yes/No
-			'heating',           // Yes/No
-			'air_conditioning',  // Yes/No
-			'television',        // Yes/No
-			'cd_player',         // Yes/No
-			'dvd_player',        // Yes/No
-			'cockpit_type',      // Cockpit type
-			'generator',         // Yes/No
-			'inverter',          // Yes/No
-			'battery',           // Yes/No
-			'battery_charger',   // Yes/No
-			'navigation_lights', // Yes/No
-			'compass',           // Yes/No
-			'depth_instrument',  // Yes/No
-			'wind_instrument',   // Yes/No
-			'autopilot',         // Yes/No
-			'gps',              // Yes/No
-			'vhf',              // Yes/No
-			'plotter',           // Yes/No
-			'speed_instrument',  // Yes/No
-			'radar',            // Yes/No
-			'life_raft',         // Yes/No
-			'epirb',             // Yes/No
-			'bilge_pump',        // Yes/No
-			'fire_extinguisher', // Yes/No
-			'mob_system',        // Yes/No
-			'genoa',             // Yes/No
-			'spinnaker',         // Yes/No
-			'tri_sail',          // Yes/No
-			'storm_jib',         // Yes/No
-			'main_sail',         // Yes/No
-			'winches',           // Yes/No
-			'anchor',            // Yes/No
-			'spray_hood',        // Yes/No
-			'bimimi',            // Yes/No (probably meant to be "bimini")
-			'fenders',           // Yes/No
-			'designer',          // Designer name
-			'known_defects',     // Known issues
-			'reg_details',       // Registration details
-			'advert',            // Advertisement info
-			'open_marine',       // Open marine info
-			'broker',            // Broker info
-			'owners_comments',   // Owner comments
-			'external_url',      // External URL
-			// Contact/office fields
-			'company_name',
-			'office',
-			'office_name',
-			'office_id',
-			'title_person',      // Using "title" as title_person to avoid conflict
-			'forename',
-			'surname',
-			'address',
-			'town',
-			'county',
-			'country',
-			'postcode',
-			'daytime_phone',
-			'evening_phone',
-			'fax',
-			'mobile',
-			'website',
-			'email'
+			'title', 'featured_image', 'boat_media', 'content', 'boat_ref', 'boat_type', 'new_or_used', 'manufacturer', 'model', 'year', 'asking_price',
+			'vessel_lying', 'boat_category', 'loa', 'lwl', 'beam', 'draft', 'air_draft', 'displacement', 'ballast', 'hull_type', 'hull_colour',
+			'hull_construction', 'super_structure_colour', 'super_structure_construction', 'deck_colour', 'deck_construction', 'keel_type', 'flybridge',
+			'control_type', 'where', 'fuel', 'cruising_speed', 'max_speed', 'horse_power', 'engine_manufacturer', 'engine_location', 'gear_box',
+			'cylinders', 'propeller_type', 'starting_type', 'drive_type', 'cooling_system', 'bow_thruster', 'stern_thruster', 'hours', 'engine_quality',
+			'tankage', 'litres_per_hour', 'gallons_per_hour', 'range', 'last_serviced', 'passenger_capacity', 'cabins', 'berths', 'bath', 'shower',
+			'toilet', 'fridge', 'freezer', 'oven', 'microwave', 'heating', 'air_conditioning', 'television', 'cd_player', 'dvd_player', 'cockpit_type',
+			'generator', 'inverter', 'battery', 'battery_charger', 'navigation_lights', 'compass', 'depth_instrument', 'wind_instrument', 'autopilot',
+			'gps', 'vhf', 'plotter', 'speed_instrument', 'radar', 'life_raft', 'epirb', 'bilge_pump', 'fire_extinguisher', 'mob_system', 'genoa',
+			'spinnaker', 'tri_sail', 'storm_jib', 'main_sail', 'winches', 'anchor', 'spray_hood', 'bimimi', 'fenders', 'designer', 'known_defects',
+			'reg_details', 'advert', 'open_marine', 'broker', 'owners_comments', 'external_url', 'company_name', 'office', 'office_name', 'office_id',
+			'title_person', 'forename', 'surname', 'address', 'town', 'county', 'country', 'postcode', 'daytime_phone', 'evening_phone', 'fax', 'mobile',
+			'website', 'email'
 		];
 
 		// Create temporary file
@@ -147,15 +36,15 @@ final class BoatImporter {
 			// Write CSV headers
 			fputcsv($handle, $headers);
 
-			// Add an example row with Pixabay image URLs
+			// Add an example row with updated image URLs
 			$example_row = array_fill(0, count($headers), '');
 			$example_row[array_search('title', $headers)] = 'Example Boat';
 			$example_row[array_search('manufacturer', $headers)] = 'Bavaria';
 			$example_row[array_search('model', $headers)] = 'E 40 Sedan';
 			$example_row[array_search('year', $headers)] = '2016';
 			$example_row[array_search('asking_price', $headers)] = '219950';
-			$example_row[array_search('featured_image', $headers)] = 'https://cdn.pixabay.com/photo/2023/05/10/1234567_1280.jpg';
-			$example_row[array_search('boat_media', $headers)] = 'https://cdn.pixabay.com/photo/2022/08/15/2345678_1280.jpg,https://cdn.pixabay.com/photo/2021/11/20/3456789_1280.jpg,https://cdn.pixabay.com/photo/2023/01/05/4567890_1280.jpg';
+			$example_row[array_search('featured_image', $headers)] = 'https://cdn.pixabay.com/photo/2023/08/29/18/46/yacht-8221925_1280.jpg';
+			$example_row[array_search('boat_media', $headers)] = 'https://cdn.pixabay.com/photo/2023/08/29/18/46/yacht-8221926_1280.jpg,https://cdn.pixabay.com/photo/2023/08/29/18/46/yacht-8221927_1280.jpg,https://cdn.pixabay.com/photo/2023/08/29/18/46/yacht-8221928_1280.jpg';
 			fputcsv($handle, $example_row);
 
 			fclose($handle);
@@ -174,19 +63,42 @@ final class BoatImporter {
 
 		if (($handle = fopen($csv, 'r')) !== false) {
 			$headers = fgetcsv($handle);
+			if ($headers === false) {
+				error_log('MS106: Failed to read CSV headers from file: ' . $csv);
+				add_settings_error('marinesync_importer', 'header_error', 'Failed to read CSV headers', 'error');
+				fclose($handle);
+				return;
+			}
+
 			$row_count = 0;
 
 			while (($data = fgetcsv($handle)) !== false) {
+				// Ensure the row has the same number of columns as the headers
+				if (count($data) !== count($headers)) {
+					error_log('MS107: Row ' . ($row_count + 2) . ' has ' . count($data) . ' columns, expected ' . count($headers));
+					add_settings_error(
+						'marinesync_importer',
+						'row_column_mismatch',
+						'Row ' . ($row_count + 2) . ' has an incorrect number of columns (' . count($data) . ', expected ' . count($headers) . ')',
+						'warning'
+					);
+					// Pad or trim the data array to match the headers
+					$data = array_pad($data, count($headers), '');
+					if (count($data) > count($headers)) {
+						$data = array_slice($data, 0, count($headers));
+					}
+				}
+
 				try {
 					$row = array_combine($headers, $data);
 					self::process_row($row);
 					$row_count++;
 				} catch (\Exception $e) {
-					error_log('MS101: Error processing row ' . $row_count . ': ' . $e->getMessage());
+					error_log('MS101: Error processing row ' . ($row_count + 2) . ': ' . $e->getMessage());
 					add_settings_error(
 						'marinesync_importer',
 						'row_error',
-						'Error in row ' . $row_count . ': ' . $e->getMessage(),
+						'Error in row ' . ($row_count + 2) . ': ' . $e->getMessage(),
 						'warning'
 					);
 				}
@@ -222,7 +134,14 @@ final class BoatImporter {
 			if ($featured_image_id && !is_wp_error($featured_image_id)) {
 				set_post_thumbnail($post_id, $featured_image_id);
 			} else {
-				error_log('MS102: Failed to set featured image for post ID ' . $post_id);
+				$error_message = is_wp_error($featured_image_id) ? $featured_image_id->get_error_message() : 'Unknown error';
+				error_log('MS102: Failed to set featured image for post ID ' . $post_id . ': ' . $error_message);
+				add_settings_error(
+					'marinesync_importer',
+					'featured_image_error_' . $post_id,
+					"Failed to set featured image for '{$row['title']}' (Post ID: $post_id): $error_message",
+					'warning'
+				);
 			}
 		}
 
@@ -236,7 +155,14 @@ final class BoatImporter {
 				if ($image_id && !is_wp_error($image_id)) {
 					$gallery_image_ids[] = $image_id;
 				} else {
-					error_log('MS103: Failed to add gallery image ' . $url . ' for post ID ' . $post_id);
+					$error_message = is_wp_error($image_id) ? $image_id->get_error_message() : 'Unknown error';
+					error_log('MS103: Failed to add gallery image ' . $url . ' for post ID ' . $post_id . ': ' . $error_message);
+					add_settings_error(
+						'marinesync_importer',
+						'gallery_image_error_' . $post_id . '_' . $index,
+						"Failed to add gallery image '$url' for '{$row['title']}' (Post ID: $post_id): $error_message",
+						'warning'
+					);
 				}
 			}
 
@@ -268,11 +194,34 @@ final class BoatImporter {
 		require_once(ABSPATH . 'wp-admin/includes/file.php');
 		require_once(ABSPATH . 'wp-admin/includes/image.php');
 
-		// Download the image
-		$temp_file = download_url($url);
-		if (is_wp_error($temp_file)) {
-			error_log('MS104: Failed to download image from ' . $url . ': ' . $temp_file->get_error_message());
-			return $temp_file;
+		// Set a custom user-agent to avoid being blocked by servers
+		$args = [
+			'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+			'timeout' => 30,
+		];
+
+		// Download the image with additional debugging
+		$response = wp_remote_get($url, $args);
+		if (is_wp_error($response)) {
+			$error_message = $response->get_error_message();
+			error_log('MS104: Failed to download image from ' . $url . ': ' . $error_message);
+			return new \WP_Error('download_failed', $error_message);
+		}
+
+		$http_code = wp_remote_retrieve_response_code($response);
+		if ($http_code !== 200) {
+			$error_message = "HTTP $http_code - " . wp_remote_retrieve_response_message($response);
+			$headers = wp_remote_retrieve_headers($response);
+			$headers_str = print_r($headers, true);
+			error_log('MS104: Failed to download image from ' . $url . ': ' . $error_message . ' Headers: ' . $headers_str);
+			return new \WP_Error('download_failed', "Failed to download image (HTTP $http_code): $error_message");
+		}
+
+		$body = wp_remote_retrieve_body($response);
+		$temp_file = wp_tempnam(basename($url));
+		if (!file_put_contents($temp_file, $body)) {
+			error_log('MS104: Failed to write image to temp file: ' . $temp_file);
+			return new \WP_Error('download_failed', 'Failed to write image to temporary file');
 		}
 
 		// Prepare file array for upload
