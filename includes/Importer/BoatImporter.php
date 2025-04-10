@@ -11,6 +11,8 @@ final class BoatImporter {
 		// Define all fields from your XML export
 		$headers = [
 			'title',                // Post title (boat name/model)
+			'featured_image',       // Featured image URL
+			'boat_media',              // Gallery images (comma-separated URLs)
 			'content',             // Main description
 			'boat_ref',            // Reference number
 			'boat_type',           // Power/Sail
