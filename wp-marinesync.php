@@ -289,7 +289,7 @@ function marinesync_handle_csv_import() {
 		}
 	}
 }
-add_action('admin_init', __NAMESPACE__ . '\\marinesync_handle_csv_import');
+add_action('admin_init', 'MarineSync\\marinesync_handle_csv_import');
 
 function marinesync_handle_csv_template_download() {
 	if (!current_user_can('manage_options') || !isset($_GET['marinesync_download_template'])) {
@@ -307,4 +307,4 @@ function marinesync_handle_csv_template_download() {
 		exit;
 	}
 }
-add_action('admin_init', __NAMESPACE__ . '\\marinesync_handle_csv_template_download');
+add_action('admin_init', 'MarineSync\\marinesync_handle_csv_template_download');
