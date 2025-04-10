@@ -275,3 +275,36 @@ MarineSync_Admin_Page::get_instance();
 // Initialise functions.php
 require_once plugin_dir_path(__FILE__) . 'includes/functions.php';
 Functions_MarineSync::get_instance();
+
+// CSV Import/Export handlers
+function marinesync_handle_csv_import() {
+	if (!current_user_can('manage_options')) {
+		return;
+	}
+
+	if (isset($_FILES['marinesync_csv_import']) && isset($_POST['marinesync_import_nonce'])) {
+		if (wp_verify_nonce($_POST['marinesync_import_nonce'], 'marinesync_import_action')) {
+			$uploaded_file = $_FILES['marinesync_csv_import']['tmp_name'];
+			BoatImporter::process_csv($uploaded_file);
+		}
+	}
+}
+add_action('admin_init', __NAMESPACE__ . '\\marinesync_handle_csv_import');
+
+function marinesync_handle_csv_template_download() {
+	if (!current_user_can('manage_options') || !isset($_GET['marinesync_download_template'])) {
+		return;
+	}
+
+	$template_path = BoatImporter::generate_csv_template();
+	if ($template_path && file_exists($template_path)) {
+		header('Content-Type: text/csv');
+		header('Content-Disposition: attachment; filename="boat_import_template.csv"');
+		header('Pragma: no-cache');
+		header('Expires: 0');
+		readfile($template_path);
+		unlink($template_path);
+		exit;
+	}
+}
+add_action('admin_init', __NAMESPACE__ . '\\marinesync_handle_csv_template_download');
