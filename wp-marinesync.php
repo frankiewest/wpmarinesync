@@ -285,7 +285,7 @@ function marinesync_handle_csv_import() {
 	if (isset($_FILES['marinesync_csv_import']) && isset($_POST['marinesync_import_nonce'])) {
 		if (wp_verify_nonce($_POST['marinesync_import_nonce'], 'marinesync_import_action')) {
 			$uploaded_file = $_FILES['marinesync_csv_import']['tmp_name'];
-			BoatImporter::process_csv($uploaded_file);
+			Importer\BoatImporter::process_csv($uploaded_file);
 		}
 	}
 }
@@ -296,7 +296,7 @@ function marinesync_handle_csv_template_download() {
 		return;
 	}
 
-	$template_path = BoatImporter::generate_csv_template();
+	$template_path = Importer\BoatImporter::generate_csv_template();
 	if ($template_path && file_exists($template_path)) {
 		header('Content-Type: text/csv');
 		header('Content-Disposition: attachment; filename="boat_import_template.csv"');
