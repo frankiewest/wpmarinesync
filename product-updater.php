@@ -87,7 +87,7 @@ function update_woocommerce_products_from_xml() {
 		$poa = (string) $advert_features->asking_price['poa'];
 
 		// Check if a product with the same SKU already exists
-		$boat_id = MarineSync_Post_Type::get_boat_by_ref($sku);
+		$boat_id = MarineSync_Post_Type::get_boat_by_ref($sku)->ID;
 
 		// Initialize all attributes
 		$all_attributes = array();
