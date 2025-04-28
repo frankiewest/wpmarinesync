@@ -14,8 +14,6 @@ require_once(ABSPATH . 'wp-admin/includes/media.php');
 require_once(ABSPATH . 'wp-admin/includes/file.php');
 require_once(ABSPATH . 'wp-admin/includes/image.php');
 
-require_once(SP_RIGHTBOAT_PATH . 'vendor/autoload.php');
-
 // Get global marinesync post type
 use \MarineSync\PostType\MarineSync_Post_Type;
 
