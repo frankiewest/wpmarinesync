@@ -28,6 +28,11 @@ define('MARINESYNC_PLUGIN_VERSION', '1.0.1');
 define('MARINESYNC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('MARINESYNC_PLUGIN_URL', plugin_dir_url(__FILE__));
 
+// Load product updater
+if (file_exists(MARINESYNC_PLUGIN_DIR . 'product-updater.php')) {
+    require_once MARINESYNC_PLUGIN_DIR . 'product-updater.php';
+}
+
 // Autoloader for plugin classes
 spl_autoload_register(function ($class) {
     // Project-specific namespace prefix
