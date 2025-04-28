@@ -599,7 +599,7 @@ function update_woocommerce_products_from_xml() {
 		$all_attributes = array_merge($all_attributes, $equipment_attributes);
 		error_log(print_r($equipment_attributes) . " added to all attributes.");
 
-		$boat_id->save();
+		MarineSync_Post_Type::save_boat($boat_id);
 		error_log("Product completed.");
 	}
 
