@@ -16,9 +16,6 @@ require_once(ABSPATH . 'wp-admin/includes/image.php');
 
 require_once(SP_RIGHTBOAT_PATH . 'vendor/autoload.php');
 
-require_once(SP_RIGHTBOAT_PATH . 'Libraries/Media/MediaImporter.php');
-use \Libraries\Media\MediaImporter;
-
 // Get global marinesync post type
 use \MarineSync\PostType\MarineSync_Post_Type;
 
@@ -152,7 +149,254 @@ function update_woocommerce_products_from_xml() {
 		}
 
 		// Image processing
-		$media_importer = new MediaImporter($boat_images, $boat, 'marinesync-media-importer');
+		$media_importer = new class($boat_images, $boat, 'marinesync-media-importer') {
+			private $images, $product_id, $term;
+
+			function __construct($images, $product_id, $term){
+				$this->images = $images;
+				$this->product_id = $product_id;
+				$this->term = $term;
+			}
+
+			private function getAttachmentIdByFilename($url) {
+				global $wpdb;
+
+				// Path parts
+				$filename_path_parts = pathinfo($url);
+
+				$filename_dirname = $filename_path_parts['dirname'];
+				$filename_basename = $filename_path_parts['basename'];
+				$filename_extension = $filename_path_parts['extension'];
+				$filename_filename = $filename_path_parts['filename'];
+
+				if(empty($filename_filename)){
+					return 'Error: Filename is required';
+				}
+
+				// Get the filename without extension
+				$sanitized_filename = sanitize_file_name($filename_basename);
+				$filename_no_scaled = preg_replace('/-scaled\.[^.]*$|\.[^.]*$/', '', $sanitized_filename);
+
+				$query = $wpdb->prepare(
+					"SELECT p.ID, p.post_title, pm.meta_value AS file_path
+            FROM {$wpdb->posts} p
+            INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
+            WHERE p.post_type = 'attachment' 
+            AND pm.meta_key = '_wp_attached_file'
+            AND pm.meta_value LIKE %s",
+					'%' . $wpdb->esc_like($filename_no_scaled) . '%'
+				);
+
+				$results = $wpdb->get_results($query);
+
+				error_log("MediaImporter::getAttachmentIdByFilename - Original filename: $sanitized_filename");
+				error_log("MediaImporter::getAttachmentIdByFilename - Search pattern: %{$filename_filename}%");
+				error_log("MediaImporter::getAttachmentIdByFilename - SQL Query: " . $query);
+				error_log("MediaImporter::getAttachmentIdByFilename - Results count: " . count($results));
+
+				if (empty($results)) {
+					error_log("MediaImporter::getAttachmentIdByFilename - No existing attachment found.");
+					return 'no attachment found';
+				} else {
+					error_log("MediaImporter::getAttachmentIdByFilename - Found matching files:");
+					foreach ($results as $result) {
+						error_log("  ID: {$result->ID}, Path: {$result->file_path}");
+					}
+
+					// Check for exact matches first
+					$exact_matches = array_filter($results, function($result) use ($filename_no_scaled) {
+						return $result->file_path === $filename_no_scaled;
+					});
+
+					if (count($exact_matches) > 0) {
+						$match = reset($exact_matches);
+						error_log("MediaImporter::getAttachmentIdByFilename - Exact match found. ID: {$match->ID}, Path: {$match->file_path}");
+						return 'existing-attachment';
+					} else {
+						// If no exact match, consider the first partial match
+						$match = reset($results);
+						error_log("MediaImporter::getAttachmentIdByFilename - Partial match found. ID: {$match->ID}, Path: {$match->file_path}");
+						return 'existing-attachment';
+					}
+				}
+			}
+
+			private function uploadImage($url, $product_id){
+				$upload = wp_upload_bits(basename($url), null, file_get_contents($url));
+				if(!empty($upload['error'])){
+					error_log('Image upload failed');
+					return false;
+				}
+
+				$wp_filetype = wp_check_filetype(basename($upload['file']));
+				$attachment = [
+					'post_mime_type' => $wp_filetype['type'],
+					'post_title' => sanitize_file_name(basename($upload['file'])),
+					'post_content' => '',
+					'post_status' => 'inherit'
+				];
+				$attachment_id = wp_insert_attachment($attachment, $upload['file'], $product_id);
+
+				require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+				$attachment_data = wp_generate_attachment_metadata($attachment_id, $upload['file']);
+
+				wp_update_attachment_metadata($attachment_id, $attachment_data);
+
+				// Set custom taxonomy
+				//wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
+
+				error_log("MediaImporter::uploadImage - New attachment uploaded. ID: $attachment_id");
+				return $attachment_id;
+			}
+
+			private function getOrUploadImage($url, $product_id) {
+				$result = $this->getAttachmentIdByFilename($url);
+
+				if ($result === 'existing-attachment') {
+					// Get the actual attachment ID
+					$attachment_id = $this->getActualAttachmentId($url);
+					if ($attachment_id) {
+						// Set custom taxonomy
+						wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
+						error_log("MediaImporter::getOrUploadImage - Using existing attachment. ID: $attachment_id");
+						return $attachment_id;
+					}
+				}
+
+				if ($result === 'no attachment found') {
+					$attachment_id = $this->uploadImage($url, $product_id);
+					if ($attachment_id) {
+						wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
+						error_log("MediaImporter::getOrUploadImage - Uploaded new image. ID: $attachment_id");
+						return $attachment_id;
+					} else {
+						error_log("MediaImporter::getOrUploadImage - Failed to upload new image.");
+					}
+				}
+
+				if ($result === 'Error: Filename is required') {
+					error_log("MediaImporter::getOrUploadImage - No filename passed through");
+				} else {
+					error_log("MediaImporter::getOrUploadImage - Unexpected result: $result");
+				}
+
+				return null;
+			}
+
+			// Helper function to get the actual attachment ID
+			private function getActualAttachmentId($url) {
+				global $wpdb;
+
+				$filename_path_parts = pathinfo($url);
+
+				$filename_dirname = $filename_path_parts['dirname'];
+				$filename_basename = $filename_path_parts['basename'];
+				$filename_extension = $filename_path_parts['extension'];
+				$filename_filename = $filename_path_parts['filename'];
+
+				$sanitized_filename = sanitize_file_name($filename_filename);
+				$filename_no_scaled = preg_replace('/-scaled\.[^.]*$|\.[^.]*$/', '', $sanitized_filename);
+
+				$query = $wpdb->prepare(
+					"SELECT p.ID, p.post_title, pm.meta_value AS file_path
+		            FROM {$wpdb->posts} p
+		            INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
+		            WHERE p.post_type = 'attachment' 
+		            AND pm.meta_key = '_wp_attached_file'
+		            AND pm.meta_value LIKE %s",
+					'%' . $wpdb->esc_like($filename_no_scaled) . '%'
+				);
+
+				return $wpdb->get_var($query);
+			}
+
+			function processImages(){
+				if(!$this->product_id){
+					error_log('Invalid product ID');
+					return null;
+				}
+
+				$gallery_image_ids = [];
+
+				foreach($this->images as $index => $image){
+					$image_url = (string) $image ?? '';
+					if (empty($image_url)) {
+						error_log("MediaImporter::processImages - Empty image URL, skipping");
+						continue;
+					}
+
+					$attachment_id = $this->getOrUploadImage($image_url, $this->product_id);
+
+					if($attachment_id !== null){
+						if($index === 0){
+							// Set first image as thumbnail
+							set_post_thumbnail($this->product_id, $attachment_id);
+						}else{
+							$gallery_image_ids[] = $attachment_id;
+						}
+					}
+				}
+
+				// Set gallery images
+				if(!empty($gallery_image_ids)){
+					update_post_meta($this->product_id, '_product_image_gallery', implode(',', $gallery_image_ids));
+				}
+			}
+
+			function removeDeletedImages(){
+				global $wpdb;
+
+				$query = $wpdb->prepare(
+					"SELECT p.ID, p.post_title, pm.meta_value AS file_path
+	            FROM {$wpdb->posts} p
+	            INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
+	            WHERE p.post_type = 'attachment' 
+	            AND pm.meta_key = '_wp_attached_file'
+	            AND pm.meta_value LIKE %s",
+					'%' . $wpdb->esc_like($filename_no_scaled) . '%'
+				);
+
+				$results = $wpdb->get_results($query);
+				$web_images = [];
+
+				foreach($results as $web_image){
+					$web_image_basename = $web_image->post_title;
+					$sanitized_web_image = sanitize_file_name($web_image_basename);
+					// Keep everything before the last dot
+					$web_image_no_ext = preg_replace('/\.[^.]*$/', '', $sanitized_web_image);
+					$web_images[$web_image_no_ext] = $web_image->ID;
+					error_log("Web Image: " . $web_image_no_ext);
+				}
+
+				// Find images from external feed
+				$feed_images = [];
+				foreach($this->images as $key => $image){
+					$image_url = (string) $image;
+					$basename_image = basename($image_url);
+					$sanitized_image = sanitize_file_name($basename_image);
+					// Keep everything before the last dot
+					$image_without_ext = preg_replace('/\.[^.]*$/', '', $sanitized_image);
+					$feed_images[] = $image_without_ext;
+					error_log("Feed Image: " . $image_without_ext);
+				}
+
+				// Find outliers
+				$images_to_be_deleted = array_diff(array_keys($web_images), $feed_images);
+				foreach($images_to_be_deleted as $index => $item){
+					error_log("[$index]. Deleting image URL: $item");
+
+					$attachment_id = $web_images[$item];
+					$delete_result = wp_delete_attachment($attachment_id, true);
+
+					if($delete_result){
+						error_log("Successfully deleted attachment ID: $attachment_id");
+					} else {
+						error_log("Failed to delete attachment ID: $attachment_id");
+					}
+				}
+			}
+		};
 
 		try {
 			// Import images
@@ -162,6 +406,9 @@ function update_woocommerce_products_from_xml() {
 		} catch (\Exception $e) {
 			error_log("update_woocommerce_products_event - Image processing ERROR: " . $e->getMessage());
 		}
+
+		// Clear videos field first if it exists
+		if (get_field('videos', $boat)) delete_field('videos', $boat);
 
 		foreach ($advert->advert_media->media as $media) {
 			// Initialise string parts of url
@@ -283,35 +530,18 @@ function update_woocommerce_products_from_xml() {
 		// Add tax paid
 		$vat_type = (string) $advert_features->asking_price['vat_type'];
 		if(!empty($vat_type)){
-			update_post_meta($product->get_id(), 'vat_type', $vat_type);
-		}
-
-		// Add Vessel Lying custom field
-		$vessel_lying = $advert_features->vessel_lying;
-		$vessel_lying_attribute = '';
-		if(!empty($vessel_lying)) {
-			// Set meta value
-			$location = (string) $vessel_lying;
-			update_post_meta($product->get_id(), 'location', $location);
-			error_log($location . " now set as location meta value.");
-
-			// Set product attribute
-			$vessel_lying_attribute = new WC_Product_Attribute();
-			$vessel_lying_attribute->set_name('Location');
-			$vessel_lying_attribute->set_visible(true);
-			$vessel_lying_attribute->set_variation(false);
-			$vessel_lying_attribute->set_options([$location]);
+			MarineSync_Post_Type::set_boat_field($boat, 'vat_type', $vat_type);
 		}
 
 		// Add boat category custom field
 		if(!empty($boat_category)){
-			update_post_meta($product->get_id(), 'boat_category', $boat_category);
+			MarineSync_Post_Type::set_boat_field($boat, 'boat_category', $boat_category);
 			error_log($boat_category . " now set as boat category.");
 		}
 
 		// Add boat type custom field
 		if(!empty($boat_type)){
-			update_post_meta($product->get_id(), 'boat_type', $boat_type);
+			MarineSync_Post_Type::set_boat_field($boat, 'boat_type', $boat_type);
 			error_log($boat_type . " now set as boat type.");
 		}
 
@@ -319,7 +549,7 @@ function update_woocommerce_products_from_xml() {
 		$loa_item = $boat_features->dimensions->xpath('item[@name="loa"]');
 		if (!empty($loa_item)) {
 			$loa = (float) $loa_item[0];
-			update_post_meta($product->get_id(), 'loa', $loa);
+			MarineSync_Post_Type::set_boat_field($boat, 'loa', $loa);
 			error_log($loa . " now set as loa meta value.");
 		}
 
@@ -327,7 +557,7 @@ function update_woocommerce_products_from_xml() {
 		$beam_item = $boat_features->dimensions->xpath('item[@name="beam"]');
 		if (!empty($beam_item)) {
 			$beam = (float) $beam_item[0];
-			update_post_meta($product->get_id(), 'beam', $beam);
+			MarineSync_Post_Type::set_boat_field($boat, 'beam', $beam);
 			error_log($beam . " now set as beam meta value.");
 		}
 
@@ -335,48 +565,24 @@ function update_woocommerce_products_from_xml() {
 		$year_item = $boat_features->build->xpath('item[@name="year"]');
 		if (!empty($year_item)) {
 			$year = (int) $year_item[0];
-			update_post_meta($product->get_id(), 'year', $year);
+			MarineSync_Post_Type::set_boat_field($boat, 'year', $year);
 			error_log($year . " now set as year meta value.");
 		}
 
-		// Add hull material
-		try {
-			$hull_material = (string) $boat_features->xpath('rb:additional/rb:item[@name="hull_material"]')[0];
-			$hull_material_value = ucfirst($hull_material);
-			if(!empty($hull_material_value)){
-				update_post_meta($product->get_id(), '_rightboat_metadata_rb_additional_hull_material', $hull_material_value);
-				error_log("Hull material meta set to: " . $hull_material_value);
-			}
-		} catch (\Exception $e) {
-			error_log("Hull material error: " . $e->getMessage());
-		}
-
-
-		// Clear the field first
-		update_post_meta($product->get_id(), '_rightboat_metadata_all_additional', '');
-
-		// Initialize array fresh for this product
-		$additional_items = [];
-		$additional_nodes = $advert->boat_features->xpath('rb:additional/rb:item');
-		if(!empty($additional_nodes)){
-			foreach($additional_nodes as $item){
-				$name = (string) $item['name'];
-				$value = (string) $item;
-				$additional_items[] = str_replace("_", " ", ucfirst($name)) . ': ' . ucfirst($value);
-			}
-
-
-			$all_additional_info = implode("\n", $additional_items);
-			update_post_meta($product->get_id(), '_rightboat_metadata_all_additional', $all_additional_info);
-			error_log("All additional info saved: " . $all_additional_info);
+		// Add Hull material custom field
+		$hull_material = (string) $boat_features->xpath('rb:additional/rb:item[@name="hull_material"]')[0];
+		$hull_material_value = ucfirst($hull_material);
+		if(!empty($hull_material_value)){
+			MarineSync_Post_Type::set_boat_field($boat, 'hull_type', $hull_material_value);
+			error_log("Hull material meta set to: " . $hull_material_value);
 		}
 
 		// Add Price custom field
 		if($poa === "true"){
-			update_post_meta($product->get_id(), 'asking_price', "POA");
+			MarineSync_Post_Type::set_asking_price($boat, 0);
 			error_log("POA " . $poa . " set as post meta.");
 		}else{
-			MarineSync_Post_Type::set_asking_price($boat, (int) $price);
+			MarineSync_Post_Type::set_asking_price($boat, $price);
 
 			if($currency == 'GBP'){
 				$currency_symbol = "£";
@@ -388,14 +594,19 @@ function update_woocommerce_products_from_xml() {
 				$currency_symbol = "€";
 				MarineSync_Post_Type::set_boat_field($boat, 'currency', $currency_symbol);
 			}else{
-				$concat_currency_price = number_format($price) . ' ' . $currency;
-				MarineSync_Post_Type::set_boat_field($boat, 'currency', $currency_symbol);
+				MarineSync_Post_Type::set_boat_field($boat, 'currency', $currency);
 			}
 		}
 
 		error_log("Boat price set to: " . $price);
 
 		$build_attributes = extract_items_from_parent($boat_features->build, $product);
+
+		// Set build attributes
+		foreach ($boat_features->build as $item) {
+
+		}
+
 		$all_attributes = array_merge($all_attributes, $build_attributes);
 		error_log(print_r($build_attributes) . " added to all attributes.");
 
@@ -452,152 +663,43 @@ function update_woocommerce_products_from_xml() {
 }
 
 // Extract items from parent nodes
-function extract_items_from_parent($xmlSelector, $product) {
+function extract_items_from_parent($xmlSelector, $boat) {
 	$attributes = array();
 
+	// Get the boat ID (should already be an ID)
+	$boat_id = $boat;
+
 	foreach ($xmlSelector as $parentNode) {
-		$attribute = new WC_Product_Attribute();
 		$attribute_name = str_replace("_", " ", $parentNode->getName());
-		$attribute->set_name(ucwords($attribute_name));
-		$attribute->set_visible(true);
-		$attribute->set_variation(false);
 
 		$options = array();
 		foreach ($parentNode->children() as $item) {
-			// Continue configuring attribute
 			$name = (string) str_replace("_", " ", ucwords($item->attributes()->name));
 			$value = (string) $item;
 			$options[] = "{$name}: {$value}";
 
 			// Set attribute as post meta for shortcode
 			try {
-				$no_us = str_replace(" ", "_", $name);
+				$field_key = str_replace(" ", "_", strtolower($name));
 
-				update_post_meta($product->get_id(), "_rightboat_metadata_" . $no_us, $value);
+				// Check if this field exists as an ACF field
+				if (function_exists('get_field_object') && get_field_object($field_key, $boat_id)) {
+					// Field exists in ACF, use the MarineSync method
+					MarineSync_Post_Type::set_boat_field($boat_id, $field_key, $value);
+					error_log("ACF field found for {$field_key}, using set_boat_field method");
+				} else {
+					// Field doesn't exist in ACF, use regular post meta
+					error_log("No ACF field found for {$field_key}, using regular post meta");
+				}
 			} catch (\Exception $e) {
 				error_log("extract_items_from_parent - Error: " . $e->getMessage());
 			}
-		}
-
-		if (!empty($options)) {
-			$attribute->set_options($options);
-			$attribute->set_position(count($attributes));
-			$attributes[] = $attribute;
 		}
 
 		error_log("$attribute_name imported");
 	}
 
 	return $attributes;
-}
-
-function get_attachment_id_from_url($url) {
-	global $wpdb;
-
-	// Check if the image already exists in the media library based on the URL
-	$attachment = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE guid='%s'", $url));
-
-	return $attachment ? $attachment[0] : false;
-}
-
-// Check if image exists by URL
-function get_uploaded_image_urls() {
-	$uploaded_images = get_option('uploaded_image_urls', array());
-	return $uploaded_images;
-}
-
-function add_uploaded_image_url($url) {
-	$uploaded_images = get_uploaded_image_urls();
-	$uploaded_images[] = $url;
-	update_option('uploaded_image_urls', array_unique($uploaded_images));
-}
-function deletion($adverts) {
-	// Initialise SKUs array
-	$current_skus = [];
-	$existing_skus = [];
-
-	// Retrieve adverts
-	foreach ($adverts as $advert) {
-		// Define sku
-		$sku = (string) $advert['ref'];
-		$current_skus[] = $sku;
-
-		error_log("deletion() - Feed Item REF: $sku");
-	}
-
-	// Build WP Query
-	$category_slug = 'rightboat';
-
-	// Define arguments for query
-	$args = array(
-		'post_type' => 'product',
-		'posts_per_page' => -1,
-		'post_status' => 'publish',
-		'tax_query' => array(
-			array(
-				'taxonomy' => 'product_cat',
-				'field' => 'slug',
-				'terms' => $category_slug
-			)
-		),
-		'fields' => 'ids'
-	);
-
-	// Create new products query instance
-	$products_query = new WP_Query($args);
-
-	// Get the product IDs
-	$product_ids = $products_query->posts;
-
-	// Loop through product IDs and get the SKU for each product
-	foreach ($product_ids as $product_id) {
-		$product = wc_get_product($product_id);
-		if ($product) {
-			$sku = $product->get_sku();
-			$existing_skus[] = $sku;
-
-			error_log("deletion() - Product SKU: $sku");
-		}
-	}
-
-	// Compare two arrays to find outliers
-	$sku_outliers = array_diff($existing_skus, $current_skus);
-
-	// Loop through SKUs to delete corresponding products
-	foreach ($sku_outliers as $outlier) {
-		// Get product ID by SKU
-		$product_id = wc_get_product_id_by_sku($outlier);
-		if ($product_id) {
-			$product = wc_get_product($product_id);
-			$sold_boats_process = get_option('sold_boats_process');
-
-			if ($sold_boats_process === "delete") {
-				$product->delete(true);
-			} elseif ($sold_boats_process === "draft") {
-				$product->set_status('draft');
-				$product->save();
-			} elseif ($sold_boats_process === "hide") {
-				$product->set_catalog_visibility('hidden');
-				$product->save();
-			} elseif ($sold_boats_process === "sold") {
-				$product->set_stock_status('outofstock');
-				update_post_meta($product_id, 'current_status', "Sold"); // set status meta value to Sold rather than Available
-
-				wp_set_object_terms($product_id, 'Sold', 'product_tag');
-
-				// Remove the "Available" tag if it exists
-				$available_tag = get_term_by('name', 'Available', 'product_tag');
-				if ($available_tag) {
-					wp_remove_object_terms($product->get_id(), $available_tag->term_id, 'product_tag');
-					error_log("Available tag removed from the product.");
-				}
-
-				$product->save();
-			}
-
-			error_log('Product ' . $outlier . ' no longer for sale, status set to ' . get_option('sold_boats_process') . '.');
-		}
-	}
 }
 
 // Custom http request timeout
