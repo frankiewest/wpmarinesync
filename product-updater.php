@@ -158,7 +158,7 @@ function update_woocommerce_products_from_xml() {
 		}
 
 		// Image processing
-		$media_importer = new class($boat_images, $boat, 'marinesync-media-importer') {
+		$media_importer = new class($boat_images, $boat_id, 'marinesync-media-importer') {
 			private $images, $boat_id, $term;
 
 			function __construct($images, $boat_id, $term){
