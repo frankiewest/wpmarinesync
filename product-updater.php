@@ -322,24 +322,25 @@ function update_woocommerce_products_from_xml() {
 				return $wpdb->get_var($query);
 			}
 
-			public function processImages($post_id, $images)
-			{
-				if (empty($images) || !is_array($images)) {
+			public function processImages() {
+				if ( empty( $this->images ) || ! is_array( $this->images ) ) {
 					return;
 				}
 
-				// Set the first image as the featured image
-				$first_image = array_shift($images);
-				$thumbnail_id = media_sideload_image($first_image, $post_id, null, 'id');
+				$post_id = $this->boat_id;
 
-				if (!is_wp_error($thumbnail_id)) {
-					set_post_thumbnail($post_id, $thumbnail_id);
+				// Set the first image as the featured image
+				$first_image  = array_shift( $this->images );
+				$thumbnail_id = media_sideload_image( $first_image, $post_id, null, 'id' );
+
+				if ( ! is_wp_error( $thumbnail_id ) ) {
+					set_post_thumbnail( $post_id, $thumbnail_id );
 				}
 
 				// Prepare the gallery for 'boat_media' ACF field
 				$gallery_attachment_ids = [];
 
-				foreach ($images as $image_url) {
+				foreach ($this->images as $image_url) {
 					$attachment_id = media_sideload_image($image_url, $post_id, null, 'id');
 
 					if (!is_wp_error($attachment_id)) {
