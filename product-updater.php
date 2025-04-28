@@ -320,40 +320,34 @@ function update_woocommerce_products_from_xml() {
 				return $wpdb->get_var($query);
 			}
 
-			function processImages(){
-				if(!$this->boat_id){
-					error_log('Invalid product ID');
-					return null;
+			public function processImages($post_id, $images)
+			{
+				if (empty($images) || !is_array($images)) {
+					return;
 				}
 
-				$gallery_image_ids = [];
+				// Set the first image as the featured image
+				$first_image = array_shift($images);
+				$thumbnail_id = media_sideload_image($first_image, $post_id, null, 'id');
 
-				foreach($this->images as $index => $image){
-					$image_url = (string) $image ?? '';
-					if (empty($image_url)) {
-						error_log("MediaImporter::processImages - Empty image URL, skipping");
-						continue;
-					}
+				if (!is_wp_error($thumbnail_id)) {
+					set_post_thumbnail($post_id, $thumbnail_id);
+				}
 
-					$attachment_id = $this->getOrUploadImage($image_url, $this->boat_id);
+				// Prepare the gallery for 'boat_media' ACF field
+				$gallery_attachment_ids = [];
 
-					if($attachment_id !== null){
-						if($index === 0){
-							// Set first image as thumbnail
-							set_post_thumbnail($this->boat_id, $attachment_id);
-						}else{
-							$gallery_image_ids[] = $attachment_id;
-						}
+				foreach ($images as $image_url) {
+					$attachment_id = media_sideload_image($image_url, $post_id, null, 'id');
+
+					if (!is_wp_error($attachment_id)) {
+						$gallery_attachment_ids[] = $attachment_id;
 					}
 				}
 
-				// Set gallery images
-				if(!empty($gallery_image_ids)){
-					if(get_field('boat_media', $this->boat_id)) {
-						$gallery = get_field( 'boat_media', $this->boat_id );
-						$gallery = array_merge( $gallery, $gallery_image_ids );
-						update_field( 'boat_media', $gallery, $this->boat_id );
-					}
+				// Update the ACF gallery field
+				if (!empty($gallery_attachment_ids)) {
+					update_field('boat_media', $gallery_attachment_ids, $post_id);
 				}
 			}
 		};
