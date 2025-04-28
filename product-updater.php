@@ -42,6 +42,8 @@ function woocommerce_xml_updater_settings() {
 
 // Cron callback function
 function update_woocommerce_products_from_xml() {
+	error_log('=== Rightboat XML Import: Cron started at ' . current_time('mysql') . ' ===');
+
 	// XML Feed URL
 	$xml_feed_url = "https://import.rightboat.com/exports/mark-williamsandsmithells-com-openmarine-e51131675d.xml?version=1744751307";
 
@@ -72,6 +74,8 @@ function update_woocommerce_products_from_xml() {
 		$advert_features = $advert->advert_features;
 		$boat_features = $advert->boat_features;
 		$sku = (string) $advert['ref'];
+
+		error_log('Rightboat XML Import: Processing boat ref ' . $sku);
 
 		// Extract advert_features
 		$title = (string) $advert_features->manufacturer . ' ' . (string) $advert_features->model;
@@ -358,7 +362,7 @@ function update_woocommerce_products_from_xml() {
 		try {
 			// Import images
 			error_log("update_woocommerce_products_event - Processing images manually.");
-			$media_importer->processImages($boat_id, $boat_images);
+			$media_importer->processImages();
 			error_log("update_woocommerce_products_event - Finished processing images.");
 		} catch (\Exception $e) {
 			error_log("update_woocommerce_products_event - Image processing ERROR: " . $e->getMessage());
