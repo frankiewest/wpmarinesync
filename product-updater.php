@@ -164,10 +164,21 @@ function update_woocommerce_products_from_xml() {
 		}
 
 		// Image processing
+		$boat_images = []; // Get only images
+		foreach ($advert->advert_media->media as $media) {
+			$type = (string) $media['type'];
+			$url = (string) $media;
+			if (strpos($type, 'image/') === 0 && !empty($url)) {
+				$boat_images[] = $url; // Store the URL directly
+			}
+		}
+		error_log('Rightboat XML Import: Found ' . count($boat_images) . ' images for boat ref ' . $sku . ': ' . print_r($boat_images, true));
+
+// Image processing class
 		$media_importer = new class($boat_images, $boat_id, 'marinesync-media-importer') {
 			private $images, $boat_id, $term;
 
-			function __construct($images, $boat_id, $term){
+			function __construct($images, $boat_id, $term) {
 				$this->images = $images;
 				$this->boat_id = $boat_id;
 				$this->term = $term;
@@ -176,70 +187,43 @@ function update_woocommerce_products_from_xml() {
 			private function getAttachmentIdByFilename($url) {
 				global $wpdb;
 
-				// Path parts
 				$filename_path_parts = pathinfo($url);
-
-				$filename_dirname = $filename_path_parts['dirname'];
 				$filename_basename = $filename_path_parts['basename'];
-				$filename_extension = $filename_path_parts['extension'];
-				$filename_filename = $filename_path_parts['filename'];
-
-				if(empty($filename_filename)){
-					return 'Error: Filename is required';
-				}
-
-				// Get the filename without extension
-				$sanitized_filename = sanitize_file_name($filename_basename);
-				$filename_no_scaled = preg_replace('/-scaled\.[^.]*$|\.[^.]*$/', '', $sanitized_filename);
+				$filename_no_scaled = preg_replace('/-scaled\.[^.]*$|\.[^.]*$/', '', sanitize_file_name($filename_basename));
 
 				$query = $wpdb->prepare(
-					"SELECT p.ID, p.post_title, pm.meta_value AS file_path
-	            FROM {$wpdb->posts} p
-	            INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
-	            WHERE p.post_type = 'attachment' 
-	            AND pm.meta_key = '_wp_attached_file'
-	            AND pm.meta_value LIKE %s",
+					"SELECT p.ID, pm.meta_value AS file_path
+             FROM {$wpdb->posts} p
+             INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
+             WHERE p.post_type = 'attachment'
+             AND pm.meta_key = '_wp_attached_file'
+             AND pm.meta_value LIKE %s",
 					'%' . $wpdb->esc_like($filename_no_scaled) . '%'
 				);
 
 				$results = $wpdb->get_results($query);
 
-				error_log("MediaImporter::getAttachmentIdByFilename - Original filename: $sanitized_filename");
-				error_log("MediaImporter::getAttachmentIdByFilename - Search pattern: %{$filename_filename}%");
-				error_log("MediaImporter::getAttachmentIdByFilename - SQL Query: " . $query);
-				error_log("MediaImporter::getAttachmentIdByFilename - Results count: " . count($results));
-
 				if (empty($results)) {
-					error_log("MediaImporter::getAttachmentIdByFilename - No existing attachment found.");
-					return 'no attachment found';
-				} else {
-					error_log("MediaImporter::getAttachmentIdByFilename - Found matching files:");
-					foreach ($results as $result) {
-						error_log("  ID: {$result->ID}, Path: {$result->file_path}");
-					}
-
-					// Check for exact matches first
-					$exact_matches = array_filter($results, function($result) use ($filename_no_scaled) {
-						return $result->file_path === $filename_no_scaled;
-					});
-
-					if (count($exact_matches) > 0) {
-						$match = reset($exact_matches);
-						error_log("MediaImporter::getAttachmentIdByFilename - Exact match found. ID: {$match->ID}, Path: {$match->file_path}");
-						return 'existing-attachment';
-					} else {
-						// If no exact match, consider the first partial match
-						$match = reset($results);
-						error_log("MediaImporter::getAttachmentIdByFilename - Partial match found. ID: {$match->ID}, Path: {$match->file_path}");
-						return 'existing-attachment';
-					}
+					error_log("MediaImporter::getAttachmentIdByFilename - No existing attachment found for $filename_basename");
+					return false;
 				}
+
+				$match = reset($results);
+				error_log("MediaImporter::getAttachmentIdByFilename - Found attachment ID: {$match->ID} for $filename_basename");
+				return $match->ID;
 			}
 
-			private function uploadImage($url, $boat_id){
-				$upload = wp_upload_bits(basename($url), null, file_get_contents($url));
-				if(!empty($upload['error'])){
-					error_log('Image upload failed');
+			private function uploadImage($url, $boat_id) {
+				$response = wp_remote_get($url, ['timeout' => 20]);
+				if (is_wp_error($response)) {
+					error_log("MediaImporter::uploadImage - Failed to fetch image $url: " . $response->get_error_message());
+					return false;
+				}
+
+				$image_data = wp_remote_retrieve_body($response);
+				$upload = wp_upload_bits(basename($url), null, $image_data);
+				if (!empty($upload['error'])) {
+					error_log("MediaImporter::uploadImage - Upload failed for $url: " . $upload['error']);
 					return false;
 				}
 
@@ -252,118 +236,75 @@ function update_woocommerce_products_from_xml() {
 				];
 				$attachment_id = wp_insert_attachment($attachment, $upload['file'], $boat_id);
 
-				require_once(ABSPATH . 'wp-admin/includes/image.php');
+				if (is_wp_error($attachment_id)) {
+					error_log("MediaImporter::uploadImage - Failed to insert attachment for $url: " . $attachment_id->get_error_message());
+					return false;
+				}
 
 				$attachment_data = wp_generate_attachment_metadata($attachment_id, $upload['file']);
-
 				wp_update_attachment_metadata($attachment_id, $attachment_data);
 
-				// Set custom taxonomy
-				//wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
-
-				error_log("MediaImporter::uploadImage - New attachment uploaded. ID: $attachment_id");
+				wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
+				error_log("MediaImporter::uploadImage - New attachment uploaded. ID: $attachment_id for $url");
 				return $attachment_id;
 			}
 
 			private function getOrUploadImage($url, $boat_id) {
-				$result = $this->getAttachmentIdByFilename($url);
-
-				if ($result === 'existing-attachment') {
-					// Get the actual attachment ID
-					$attachment_id = $this->getActualAttachmentId($url);
-					if ($attachment_id) {
-						// Set custom taxonomy
-						wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
-						error_log("MediaImporter::getOrUploadImage - Using existing attachment. ID: $attachment_id");
-						return $attachment_id;
-					}
+				$attachment_id = $this->getAttachmentIdByFilename($url);
+				if ($attachment_id) {
+					wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
+					error_log("MediaImporter::getOrUploadImage - Using existing attachment ID: $attachment_id for $url");
+					return $attachment_id;
 				}
 
-				if ($result === 'no attachment found') {
-					$attachment_id = $this->uploadImage($url, $boat_id);
-					if ($attachment_id) {
-						wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
-						error_log("MediaImporter::getOrUploadImage - Uploaded new image. ID: $attachment_id");
-						return $attachment_id;
-					} else {
-						error_log("MediaImporter::getOrUploadImage - Failed to upload new image.");
-					}
-				}
-
-				if ($result === 'Error: Filename is required') {
-					error_log("MediaImporter::getOrUploadImage - No filename passed through");
-				} else {
-					error_log("MediaImporter::getOrUploadImage - Unexpected result: $result");
-				}
-
-				return null;
-			}
-
-			// Helper function to get the actual attachment ID
-			private function getActualAttachmentId($url) {
-				global $wpdb;
-
-				$filename_path_parts = pathinfo($url);
-
-				$filename_dirname = $filename_path_parts['dirname'];
-				$filename_basename = $filename_path_parts['basename'];
-				$filename_extension = $filename_path_parts['extension'];
-				$filename_filename = $filename_path_parts['filename'];
-
-				$sanitized_filename = sanitize_file_name($filename_filename);
-				$filename_no_scaled = preg_replace('/-scaled\.[^.]*$|\.[^.]*$/', '', $sanitized_filename);
-
-				$query = $wpdb->prepare(
-					"SELECT p.ID, p.post_title, pm.meta_value AS file_path
-		            FROM {$wpdb->posts} p
-		            INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
-		            WHERE p.post_type = 'attachment' 
-		            AND pm.meta_key = '_wp_attached_file'
-		            AND pm.meta_value LIKE %s",
-					'%' . $wpdb->esc_like($filename_no_scaled) . '%'
-				);
-
-				return $wpdb->get_var($query);
+				return $this->uploadImage($url, $boat_id);
 			}
 
 			public function processImages() {
-				if ( empty( $this->images ) || ! is_array( $this->images ) ) {
+				if (empty($this->images) || !is_array($this->images)) {
+					error_log("MediaImporter::processImages - No images to process");
 					return;
 				}
 
 				$post_id = $this->boat_id;
-
-				// Set the first image as the featured image
-				$first_image  = array_shift( $this->images );
-				$thumbnail_id = media_sideload_image( $first_image, $post_id, null, 'id' );
-
-				if ( ! is_wp_error( $thumbnail_id ) ) {
-					set_post_thumbnail( $post_id, $thumbnail_id );
-				}
-
-				// Prepare the gallery for 'boat_media' ACF field
 				$gallery_attachment_ids = [];
 
-				foreach ($this->images as $image_url) {
-					$attachment_id = media_sideload_image($image_url, $post_id, null, 'id');
-
-					if (!is_wp_error($attachment_id)) {
-						$gallery_attachment_ids[] = $attachment_id;
+				// Process first image as featured image
+				$first_image = array_shift($this->images);
+				if ($first_image) {
+					$thumbnail_id = $this->getOrUploadImage($first_image, $post_id);
+					if ($thumbnail_id) {
+						set_post_thumbnail($post_id, $thumbnail_id);
+						error_log("MediaImporter::processImages - Set featured image ID: $thumbnail_id for post $post_id");
+					} else {
+						error_log("MediaImporter::processImages - Failed to set featured image for $first_image");
 					}
 				}
 
-				// Update the ACF gallery field
+				// Process remaining images for gallery
+				foreach ($this->images as $image_url) {
+					$attachment_id = $this->getOrUploadImage($image_url, $post_id);
+					if ($attachment_id) {
+						$gallery_attachment_ids[] = $attachment_id;
+						error_log("MediaImporter::processImages - Added gallery image ID: $attachment_id for $image_url");
+					} else {
+						error_log("MediaImporter::processImages - Failed to process gallery image $image_url");
+					}
+				}
+
+				// Update ACF gallery field
 				if (!empty($gallery_attachment_ids)) {
 					update_field('boat_media', $gallery_attachment_ids, $post_id);
+					error_log("MediaImporter::processImages - Updated ACF gallery field with " . count($gallery_attachment_ids) . " images");
 				}
 			}
 		};
 
+		// Import images
+		error_log("update_woocommerce_products_event - Starting image processing for boat ID: $boat_id");
 		try {
-			// Import images
-			error_log("update_woocommerce_products_event - Processing images manually.");
 			$media_importer->processImages();
-			error_log("update_woocommerce_products_event - Finished processing images.");
+			error_log("update_woocommerce_products_event - Finished processing images for boat ID: $boat_id");
 		} catch (\Exception $e) {
 			error_log("update_woocommerce_products_event - Image processing ERROR: " . $e->getMessage());
 		}
