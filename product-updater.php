@@ -349,10 +349,10 @@ function update_woocommerce_products_from_xml() {
 
 				// Set gallery images
 				if(!empty($gallery_image_ids)){
-					if(get_field('gallery', $this->boat_id)) {
-						$gallery = get_field( 'gallery', $this->boat_id );
+					if(get_field('boat_media', $this->boat_id)) {
+						$gallery = get_field( 'boat_media', $this->boat_id );
 						$gallery = array_merge( $gallery, $gallery_image_ids );
-						update_field( 'gallery', $gallery, $this->boat_id );
+						update_field( 'boat_media', $gallery, $this->boat_id );
 					}
 				}
 			}
