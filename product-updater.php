@@ -150,11 +150,11 @@ function update_woocommerce_products_from_xml() {
 
 		// Image processing
 		$media_importer = new class($boat_images, $boat, 'marinesync-media-importer') {
-			private $images, $product_id, $term;
+			private $images, $boat_id, $term;
 
-			function __construct($images, $product_id, $term){
+			function __construct($images, $boat_id, $term){
 				$this->images = $images;
-				$this->product_id = $product_id;
+				$this->boat_id = $boat_id;
 				$this->term = $term;
 			}
 
@@ -179,11 +179,11 @@ function update_woocommerce_products_from_xml() {
 
 				$query = $wpdb->prepare(
 					"SELECT p.ID, p.post_title, pm.meta_value AS file_path
-            FROM {$wpdb->posts} p
-            INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
-            WHERE p.post_type = 'attachment' 
-            AND pm.meta_key = '_wp_attached_file'
-            AND pm.meta_value LIKE %s",
+	            FROM {$wpdb->posts} p
+	            INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
+	            WHERE p.post_type = 'attachment' 
+	            AND pm.meta_key = '_wp_attached_file'
+	            AND pm.meta_value LIKE %s",
 					'%' . $wpdb->esc_like($filename_no_scaled) . '%'
 				);
 
@@ -221,7 +221,7 @@ function update_woocommerce_products_from_xml() {
 				}
 			}
 
-			private function uploadImage($url, $product_id){
+			private function uploadImage($url, $boat_id){
 				$upload = wp_upload_bits(basename($url), null, file_get_contents($url));
 				if(!empty($upload['error'])){
 					error_log('Image upload failed');
@@ -235,7 +235,7 @@ function update_woocommerce_products_from_xml() {
 					'post_content' => '',
 					'post_status' => 'inherit'
 				];
-				$attachment_id = wp_insert_attachment($attachment, $upload['file'], $product_id);
+				$attachment_id = wp_insert_attachment($attachment, $upload['file'], $boat_id);
 
 				require_once(ABSPATH . 'wp-admin/includes/image.php');
 
@@ -250,7 +250,7 @@ function update_woocommerce_products_from_xml() {
 				return $attachment_id;
 			}
 
-			private function getOrUploadImage($url, $product_id) {
+			private function getOrUploadImage($url, $boat_id) {
 				$result = $this->getAttachmentIdByFilename($url);
 
 				if ($result === 'existing-attachment') {
@@ -265,7 +265,7 @@ function update_woocommerce_products_from_xml() {
 				}
 
 				if ($result === 'no attachment found') {
-					$attachment_id = $this->uploadImage($url, $product_id);
+					$attachment_id = $this->uploadImage($url, $boat_id);
 					if ($attachment_id) {
 						wp_set_object_terms($attachment_id, $this->term, 'us_media_category');
 						error_log("MediaImporter::getOrUploadImage - Uploaded new image. ID: $attachment_id");
@@ -312,7 +312,7 @@ function update_woocommerce_products_from_xml() {
 			}
 
 			function processImages(){
-				if(!$this->product_id){
+				if(!$this->boat_id){
 					error_log('Invalid product ID');
 					return null;
 				}
@@ -326,12 +326,12 @@ function update_woocommerce_products_from_xml() {
 						continue;
 					}
 
-					$attachment_id = $this->getOrUploadImage($image_url, $this->product_id);
+					$attachment_id = $this->getOrUploadImage($image_url, $this->boat_id);
 
 					if($attachment_id !== null){
 						if($index === 0){
 							// Set first image as thumbnail
-							set_post_thumbnail($this->product_id, $attachment_id);
+							set_post_thumbnail($this->boat_id, $attachment_id);
 						}else{
 							$gallery_image_ids[] = $attachment_id;
 						}
@@ -340,59 +340,10 @@ function update_woocommerce_products_from_xml() {
 
 				// Set gallery images
 				if(!empty($gallery_image_ids)){
-					update_post_meta($this->product_id, '_product_image_gallery', implode(',', $gallery_image_ids));
-				}
-			}
-
-			function removeDeletedImages(){
-				global $wpdb;
-
-				$query = $wpdb->prepare(
-					"SELECT p.ID, p.post_title, pm.meta_value AS file_path
-	            FROM {$wpdb->posts} p
-	            INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
-	            WHERE p.post_type = 'attachment' 
-	            AND pm.meta_key = '_wp_attached_file'
-	            AND pm.meta_value LIKE %s",
-					'%' . $wpdb->esc_like($filename_no_scaled) . '%'
-				);
-
-				$results = $wpdb->get_results($query);
-				$web_images = [];
-
-				foreach($results as $web_image){
-					$web_image_basename = $web_image->post_title;
-					$sanitized_web_image = sanitize_file_name($web_image_basename);
-					// Keep everything before the last dot
-					$web_image_no_ext = preg_replace('/\.[^.]*$/', '', $sanitized_web_image);
-					$web_images[$web_image_no_ext] = $web_image->ID;
-					error_log("Web Image: " . $web_image_no_ext);
-				}
-
-				// Find images from external feed
-				$feed_images = [];
-				foreach($this->images as $key => $image){
-					$image_url = (string) $image;
-					$basename_image = basename($image_url);
-					$sanitized_image = sanitize_file_name($basename_image);
-					// Keep everything before the last dot
-					$image_without_ext = preg_replace('/\.[^.]*$/', '', $sanitized_image);
-					$feed_images[] = $image_without_ext;
-					error_log("Feed Image: " . $image_without_ext);
-				}
-
-				// Find outliers
-				$images_to_be_deleted = array_diff(array_keys($web_images), $feed_images);
-				foreach($images_to_be_deleted as $index => $item){
-					error_log("[$index]. Deleting image URL: $item");
-
-					$attachment_id = $web_images[$item];
-					$delete_result = wp_delete_attachment($attachment_id, true);
-
-					if($delete_result){
-						error_log("Successfully deleted attachment ID: $attachment_id");
-					} else {
-						error_log("Failed to delete attachment ID: $attachment_id");
+					if(get_field('gallery', $this->boat_id)) {
+						$gallery = get_field( 'gallery', $this->boat_id );
+						$gallery = array_merge( $gallery, $gallery_image_ids );
+						update_field( 'gallery', $gallery, $this->boat_id );
 					}
 				}
 			}
