@@ -355,7 +355,7 @@ function update_woocommerce_products_from_xml() {
 		try {
 			// Import images
 			error_log("update_woocommerce_products_event - Processing images manually.");
-			$media_importer->processImages();
+			$media_importer->processImages($boat_id, $boat_images);
 			error_log("update_woocommerce_products_event - Finished processing images.");
 		} catch (\Exception $e) {
 			error_log("update_woocommerce_products_event - Image processing ERROR: " . $e->getMessage());
