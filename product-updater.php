@@ -43,7 +43,7 @@ function woocommerce_xml_updater_settings() {
 // Cron callback function
 function update_woocommerce_products_from_xml() {
 	// XML Feed URL
-	$xml_feed_url = get_option('xml_feed_url');
+	$xml_feed_url = "https://import.rightboat.com/exports/mark-williamsandsmithells-com-openmarine-e51131675d.xml?version=1744751307";
 
 	// Validate XML Feed URL
 	if (!$xml_feed_url || !is_string($xml_feed_url) || !preg_match('/^http(s)?:\/\/[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(\/.*)?$/i', $xml_feed_url)) {
