@@ -572,7 +572,7 @@ class MarineSync_Post_Type {
 			'post_type' => 'marinesync-boats',
 			'meta_query' => array(
 				array(
-					'key' => 'boat_id',
+					'key' => 'boat_ref',
 					'value' => $ref,
 					'compare' => '='
 				)
@@ -586,5 +586,50 @@ class MarineSync_Post_Type {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Save a boat post.
+	 *
+	 * @param int $boat_id The ID of the boat post to save.
+	 * @return bool True on success, false on failure.
+	 */
+	public static function save_boat($boat_id) {
+		if (empty($boat_id) || !is_int($boat_id)) {
+			error_log('MarineSync_Post_Type::save_boat - Invalid boat ID.');
+			return false;
+		}
+
+		$post = get_post($boat_id);
+
+		if (!$post) {
+			error_log("MarineSync_Post_Type::save_boat - Post with ID {$boat_id} does not exist.");
+			return false;
+		}
+
+		if ($post->post_type !== 'marinesync-boats') {
+			error_log("MarineSync_Post_Type::save_boat - Post with ID {$boat_id} is not of type 'marinesync-boats'.");
+			return false;
+		}
+
+		// Force a re-save of the post to ensure meta is committed
+		$updated_post = [
+			'ID' => $boat_id,
+			'post_title' => $post->post_title, // Retain existing title
+			'post_content' => $post->post_content, // Retain existing content
+			'post_status' => $post->post_status, // Retain existing status
+		];
+
+		$result = wp_update_post($updated_post, true);
+
+		if (is_wp_error($result)) {
+			error_log("MarineSync_Post_Type::save_boat - Failed to save post ID {$boat_id}: " . $result->get_error_message());
+			return false;
+		}
+
+		do_action('marinesync_boat_saved', $boat_id);
+
+		error_log("MarineSync_Post_Type::save_boat - Successfully saved boat ID {$boat_id}.");
+		return true;
 	}
 }
