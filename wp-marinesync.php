@@ -19,6 +19,8 @@
 
 namespace MarineSync;
 
+use MarineSync\PostType\MarineSync_Post_Type;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -32,6 +34,9 @@ define('MARINESYNC_PLUGIN_URL', plugin_dir_url(__FILE__));
 if (file_exists(MARINESYNC_PLUGIN_DIR . 'product-updater.php')) {
     require_once MARINESYNC_PLUGIN_DIR . 'product-updater.php';
 }
+
+// Add shortcode
+add_shortcode('ms_field', [MarineSync_Post_Type::class, 'marinesync_shortcode']);
 
 // Autoloader for plugin classes
 spl_autoload_register(function ($class) {

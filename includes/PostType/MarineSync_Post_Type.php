@@ -632,4 +632,16 @@ class MarineSync_Post_Type {
 		error_log("MarineSync_Post_Type::save_boat - Successfully saved boat ID {$boat_id}.");
 		return true;
 	}
+
+	public static function marinesync_shortcode($atts): string {
+		$atts = shortcode_atts(array(
+			'field' => 'boat_ref',
+		), $atts, 'marinesync');
+
+		if(get_field($atts['field'])) {
+			return get_field($atts['field']);
+		}
+
+		return '';
+	}
 }
