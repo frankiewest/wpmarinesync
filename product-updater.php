@@ -434,7 +434,7 @@ function update_woocommerce_products_from_xml() {
 
 		// Add vessel lying
 		$vessel_lying = (string) $advert_features->vessel_lying;
-		if (!empty($vat_type)) {
+		if (!empty($vessel_lying)) {
 			MarineSync_Post_Type::set_boat_field($boat, 'vessel_lying', $vessel_lying);
 		}
 
