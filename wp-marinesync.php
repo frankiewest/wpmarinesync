@@ -72,7 +72,7 @@ spl_autoload_register(function ($class) {
 });
 
 // Add shortcode
-add_shortcode('ms_field', ['\MarineSync\MarineSync\MarineSync_Post_Type', 'marinesync_shortcode']);
+add_shortcode('ms_field', ['\MarineSync\PostType\MarineSync_Post_Type', 'marinesync_shortcode']);
 
 // Check for ACF dependency
 function marinesync_check_acf() {
