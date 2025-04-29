@@ -634,6 +634,11 @@ class MarineSync_Post_Type {
 	}
 
 	public static function marinesync_shortcode($atts): string {
+		// Check if in admin interface
+		if(is_admin()) {
+			return 'In admin interface';
+		}
+
 		$atts = shortcode_atts(array(
 			'field' => 'boat_ref',
 			'number_format' => 'no'
