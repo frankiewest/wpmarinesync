@@ -35,9 +35,6 @@ if (file_exists(MARINESYNC_PLUGIN_DIR . 'product-updater.php')) {
     require_once MARINESYNC_PLUGIN_DIR . 'product-updater.php';
 }
 
-// Add shortcode
-add_shortcode('ms_field', [MarineSync_Post_Type::class, 'marinesync_shortcode']);
-
 // Autoloader for plugin classes
 spl_autoload_register(function ($class) {
     // Project-specific namespace prefix
@@ -73,6 +70,9 @@ spl_autoload_register(function ($class) {
         error_log('MS054: Class file not found: ' . $file);
     }
 });
+
+// Add shortcode
+add_shortcode('ms_field', ['\MarineSync\MarineSync\MarineSync_Post_Type', 'marinesync_shortcode']);
 
 // Check for ACF dependency
 function marinesync_check_acf() {
