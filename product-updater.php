@@ -78,6 +78,7 @@ function update_woocommerce_products_from_xml() {
 		$advert_features = $advert->advert_features;
 		$boat_features = $advert->boat_features;
 		$sku = (string) $advert['ref'];
+		$office_id = (string) $advert['office_id'];
 
 		error_log('Rightboat XML Import: Processing boat ref ' . $sku);
 
@@ -98,9 +99,6 @@ function update_woocommerce_products_from_xml() {
 		$boat = MarineSync_Post_Type::get_boat_by_ref($sku);
 
 		$boat_id = ($boat instanceof WP_Post) ? $boat->ID : $boat;
-
-		// Initialize all attributes
-		$all_attributes = array();
 
 		if ($boat_id) {
 			// Boat exists
@@ -132,6 +130,11 @@ function update_woocommerce_products_from_xml() {
 
 		// Always work with the ID
 		$boat = $boat_id;
+
+		// Set office
+		if(!empty($office_id)) {
+			MarineSync_Post_Type::set_boat_field($boat_id, 'office_id', $office_id);
+		}
 
 		// Add Status custom field
 		$status = (string) $advert['status'];
@@ -429,6 +432,12 @@ function update_woocommerce_products_from_xml() {
 			MarineSync_Post_Type::set_boat_field($boat, 'vat_type', $vat_type);
 		}
 
+		// Add vessel lying
+		$vessel_lying = (string) $advert_features->vessel_lying;
+		if (!empty($vat_type)) {
+			MarineSync_Post_Type::set_boat_field($boat, 'vessel_lying', $vessel_lying);
+		}
+
 		// Add boat category custom field
 		if (!empty($boat_category)) {
 			MarineSync_Post_Type::set_boat_field($boat, 'boat_category', $boat_category);
@@ -497,47 +506,36 @@ function update_woocommerce_products_from_xml() {
 		error_log("Boat price set to: " . $price);
 
 		$build_attributes = extract_items_from_parent($boat_features->build, $boat_id);
-		$all_attributes = array_merge($all_attributes, $build_attributes);
 		error_log(print_r($build_attributes, true) . " added to all attributes.");
 
 		$dimensions_attributes = extract_items_from_parent($boat_features->dimensions, $boat_id);
-		$all_attributes = array_merge($all_attributes, $dimensions_attributes);
 		error_log(print_r($dimensions_attributes, true) . " added to all attributes.");
 
 		$navigation_attributes = extract_items_from_parent($boat_features->navigation, $boat_id);
-		$all_attributes = array_merge($all_attributes, $navigation_attributes);
 		error_log(print_r($navigation_attributes, true) . " added to all attributes.");
 
 		$engine_attributes = extract_items_from_parent($boat_features->engine, $boat_id);
-		$all_attributes = array_merge($all_attributes, $engine_attributes);
 		error_log(print_r($engine_attributes, true) . " added to all attributes.");
 
 		$rigSails_attributes = extract_items_from_parent($boat_features->rig_sails, $boat_id);
-		$all_attributes = array_merge($all_attributes, $rigSails_attributes);
 		error_log(print_r($rigSails_attributes, true) . " added to all attributes.");
 
 		$electronics_attributes = extract_items_from_parent($boat_features->electronics, $boat_id);
-		$all_attributes = array_merge($all_attributes, $electronics_attributes);
 		error_log(print_r($electronics_attributes, true) . " added to all attributes.");
 
 		$galley_attributes = extract_items_from_parent($boat_features->galley, $boat_id);
-		$all_attributes = array_merge($all_attributes, $galley_attributes);
 		error_log(print_r($galley_attributes, true) . " added to all attributes.");
 
 		$safety_features_attributes = extract_items_from_parent($boat_features->safety_equipment, $boat_id);
-		$all_attributes = array_merge($all_attributes, $safety_features_attributes);
 		error_log(print_r($safety_features_attributes, true) . " added to all attributes.");
 
 		$accommodation_attributes = extract_items_from_parent($boat_features->accommodation, $boat_id);
-		$all_attributes = array_merge($all_attributes, $accommodation_attributes);
 		error_log(print_r($accommodation_attributes, true) . " added to all attributes.");
 
 		$general_attributes = extract_items_from_parent($boat_features->general, $boat_id);
-		$all_attributes = array_merge($all_attributes, $general_attributes);
 		error_log(print_r($general_attributes, true) . " added to all attributes.");
 
 		$equipment_attributes = extract_items_from_parent($boat_features->equipment, $boat_id);
-		$all_attributes = array_merge($all_attributes, $equipment_attributes);
 		error_log(print_r($equipment_attributes, true) . " added to all attributes.");
 
 		MarineSync_Post_Type::save_boat($boat_id);
