@@ -636,12 +636,25 @@ class MarineSync_Post_Type {
 	public static function marinesync_shortcode($atts): string {
 		$atts = shortcode_atts(array(
 			'field' => 'boat_ref',
+			'number_format' => 'no'
 		), $atts, 'marinesync');
 
-		if(get_field($atts['field'])) {
-			return get_field($atts['field']);
+		// Get the ID of the current post
+		$id = get_the_ID();
+
+		// Check if the post type is 'marinesync-boats'
+		if (get_post_type($id) !== 'marinesync-boats') {
+			return 'Not a boat! Invalid use of shortcode.';
 		}
 
-		return '';
+		if(!get_field($atts['field'], $id)) {
+			return 'Field not found';
+		}
+
+		if($atts['field'] === 'asking_price' && $atts['number_format'] === 'yes') {
+			return number_format(get_field($atts['field'], $id), 2);
+		}
+
+		return get_field($atts['field'], $id);
 	}
 }
