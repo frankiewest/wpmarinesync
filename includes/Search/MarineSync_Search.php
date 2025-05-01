@@ -82,6 +82,22 @@ class MarineSync_Search {
 		return array_filter($filtered_results, 'strlen');
 	}
 
+	/**
+	 * @return false|string|void
+	 */
+	public static function render_search_form() {
+		if(is_admin()) return;
+
+		ob_start();
+		include MARINESYNC_PLUGIN_DIR . 'includes/custom-boat-search.php';
+		return ob_get_clean();
+	}
+
+	/**
+	 * @param $query
+	 *
+	 * @return void
+	 */
 	public static function custom_search_query($query) {
 		$meta_query = [];
 

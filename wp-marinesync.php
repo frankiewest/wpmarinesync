@@ -75,7 +75,7 @@ spl_autoload_register(function ($class) {
 add_shortcode('ms_field', ['\\MarineSync\\PostType\\MarineSync_Post_Type', 'marinesync_shortcode']);
 
 // Add shortcode for custom boat search
-add_shortcode('ms_custom_search', ['\\MarineSync\\Search\\MarineSync_Search', 'custom_search_query']);
+add_shortcode('ms_custom_search', ['\\MarineSync\\Search\\MarineSync_Search', 'render_search_form']);
 
 // Check for ACF dependency
 function marinesync_check_acf() {
