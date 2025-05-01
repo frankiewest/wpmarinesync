@@ -363,7 +363,13 @@ class MarineSync_Search {
 		// Add post_type
 		$query->set('post_type', 'marinesync-boats');
 
-		// Add meta_query to query
-		$query->set('meta_query', $meta_query);
+		// Add tax_query and meta_query to query
+		if (!empty($tax_query)) {
+			$query->set( 'tax_query', $tax_query );
+		}
+
+		if (!empty($meta_query)) {
+			$query->set( 'meta_query', $meta_query );
+		}
 	}
 }
