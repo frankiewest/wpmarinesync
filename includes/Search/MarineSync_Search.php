@@ -130,10 +130,10 @@ class MarineSync_Search {
 	}
 
 	/**
-	 * @return false|string|void
+	 * @return false|string
 	 */
-	public static function render_search_form() {
-		if(is_admin()) return;
+	public static function render_search_form(): bool|string {
+		if(is_admin()) return "in admin interface";
 
 		ob_start();
 		include MARINESYNC_PLUGIN_DIR . 'includes/custom-boat-search.php';
@@ -145,7 +145,7 @@ class MarineSync_Search {
 	 *
 	 * @return void
 	 */
-	public static function custom_search_query($query) {
+	public static function custom_search_query($query): void {
 		$meta_query = [];
 		$tax_query = [];
 
