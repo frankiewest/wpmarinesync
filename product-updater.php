@@ -404,6 +404,12 @@ function update_woocommerce_products_from_xml() {
 			MarineSync_Post_Type::set_manufacturer($boat, $manufacturer);
 		}
 
+		// Add manufacturer as a product tag
+		$model = (string) $advert_features->model;
+		if (!empty($model)) {
+			MarineSync_Post_Type::set_model($boat, $model);
+		}
+
 		// Add new or used status as a product tag
 		$new_or_used = (string) $advert_features->new_or_used;
 		if (!empty($new_or_used)) {
