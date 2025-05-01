@@ -100,14 +100,18 @@ class MarineSync_Search {
 	 */
 	public static function custom_search_query($query) {
 		$meta_query = [];
+		$tax_query = [];
 
 		// Add manufacturer filter
 		if(isset($_GET['manufacturer']) && !empty($_GET['manufacturer'])){
 			$manufacturer = sanitize_text_field($_GET['manufacturer']);
-			$meta_query[] = [
-				'key' => 'manufacturer',
-				'value' => $manufacturer,
-				'compare' => 'LIKE'
+			$tax_query[] = [
+				[
+					'taxonomy' => 'manufacturer',
+					'terms' => $manufacturer,
+					'field' => 'name',
+					'operator' => 'IN'
+				]
 			];
 		}
 
