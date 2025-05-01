@@ -7,7 +7,7 @@ $manufacturers = MarineSync_Search::search_meta_value(meta_key: 'manufacturer', 
 
 ?>
 
-<form action="">
+<form id="boat-search-form">
 	<div class="custom_search_form_column">
 		<select name="manufacturer" class="custom_search_form_column">
 			<option value="">All Manufacturers</option>
