@@ -633,6 +633,10 @@ class MarineSync_Post_Type {
 		return true;
 	}
 
+	/**
+	 * @param $atts
+	 * @return string
+	 */
 	public static function marinesync_shortcode($atts): string {
 		// Check if in admin interface
 		if(is_admin()) {

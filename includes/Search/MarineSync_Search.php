@@ -1,0 +1,302 @@
+<?php
+
+namespace MarineSync\Search;
+
+use WP_Error;
+
+class MarineSync_Search {
+	/**
+	 * Search postmeta by meta_key and meta_value
+	 *
+	 * @param string $meta_key
+	 * @param string $meta_value
+	 *
+	 * @return array|null
+	 */
+	public static function search_meta_value(string $meta_key, string $meta_value = ''): array|null {
+		if($meta_key === '' && $meta_value === '') {
+			return null;
+		}
+
+		// Get global wpdb
+		global $wpdb;
+
+		// Begin forming query
+		$query = "
+		SELECT DISTINCT meta_value
+		FROM {$wpdb->postmeta}
+		WHERE meta_key = {$meta_key}
+		";
+
+		// Check if meta_value is not empty
+		if ($meta_value !== '') {
+			$query .= " AND meta_value = {$meta_value}";
+		}
+
+		$query .= "
+		ORDER BY meta_value ASC
+		";
+
+		$results = $wpdb->get_col($query);
+
+		return array_filter($results, 'strlen');
+	}
+
+	/**
+	 * Search years range
+	 *
+	 * @param int $min
+	 * @param int $max
+	 *
+	 * @return array|null|WP_Error
+	 */
+	public static function search_years(int $min = 0 , int $max = 9999): array|null|WP_Error {
+		if($min < 0 || $max < 0) {
+			return null;
+		}
+
+		if($min > $max) {
+			return new WP_Error('invalid_year_range', 'Invalid year range');
+		}
+
+		// Get global wpdb
+		global $wpdb;
+
+		// Begin forming query
+		$query = "
+		SELECT DISTINCT meta_value
+		FROM {$wpdb->postmeta}
+		WHERE meta_key = 'year'
+		";
+
+		$query .= "
+		ORDER BY meta_value ASC
+		";
+
+		$results = $wpdb->get_col($query);
+
+		$filtered_results = array_filter($results, function($year) use ($min, $max) {
+			return $year >= $min && $year <= $max;
+		});
+
+		return array_filter($filtered_results, 'strlen');
+	}
+
+	public static function custom_search_query($query) {
+		$meta_query = [];
+
+		// Add manufacturer filter
+		if(isset($_GET['manufacturer']) && !empty($_GET['manufacturer'])){
+			$manufacturer = sanitize_text_field($_GET['manufacturer']);
+			$meta_query[] = [
+				'key' => 'manufacturer',
+				'value' => $manufacturer,
+				'compare' => 'LIKE'
+			];
+		}
+
+		// Add price range filter
+		if(isset($_GET['price_range']) && !empty($_GET['price_range'])){
+			$price_range = sanitize_text_field($_GET['price_range']);
+			switch($price_range){
+				case 'up-to-30k':
+					$meta_query[] = [
+						'key' => 'asking_price',
+						'value' => 30000,
+						'compare' => '<',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '30k-50k':
+					$meta_query[] = [
+						'key' => 'asking_price',
+						'value' => [30000, 50000],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '50k-100k':
+					$meta_query[] = [
+						'key' => 'asking_price',
+						'value' => [50000, 100000],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '100k-200k':
+					$meta_query[] = [
+						'key' => 'asking_price',
+						'value' => [100000, 200000],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '200k-300k':
+					$meta_query[] = [
+						'key' => 'asking_price',
+						'value' => [200000, 300000],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case 'over-300k':
+					$meta_query[] = [
+						'key' => 'asking_price',
+						'value' => 300000,
+						'compare' => '>=',
+						'type' => 'NUMERIC'
+					];
+					break;
+				default:
+					// Do nothing
+					break;
+			}
+		}
+
+		if(isset($_GET['boat_type']) && !empty($_GET['boat_type'])){
+			$boat_type = sanitize_text_field($_GET['boat_type']);
+			$meta_query[] = [
+				'key' => 'boat_type',
+				'value' => $boat_type,
+				'compare' => '='
+			];
+		}
+
+		// Add price range filter
+		if(isset($_GET['loa']) && !empty($_GET['loa'])){
+			$loa = sanitize_text_field($_GET['loa']);
+			switch($loa){
+				case 'up-to-10m':
+					$meta_query[] = [
+						'key' => 'loa',
+						'value' => 10,
+						'compare' => '<',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '10m-15m':
+					$meta_query[] = [
+						'key' => 'loa',
+						'value' => [10, 15],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '15m-20m':
+					$meta_query[] = [
+						'key' => 'loa',
+						'value' => [15, 20],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case 'over-20m':
+					$meta_query[] = [
+						'key' => 'loa',
+						'value' => 20,
+						'compare' => '>',
+						'type' => 'NUMERIC'
+					];
+					break;
+				default:
+					// Do nothing
+					break;
+			}
+		}
+		// Add year range filter
+		if (isset($_GET['year_range']) && !empty($_GET['year_range'])) {
+			$year_range = sanitize_text_field($_GET['year_range']);
+			switch ($year_range) {
+				case 'pre-1980':
+					$meta_query[] = [
+						'key' => 'year',
+						'value' => 1980,
+						'compare' => '<',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '1980-1990':
+					$meta_query[] = [
+						'key' => 'year',
+						'value' => [1980, 1990],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '1990-2000':
+					$meta_query[] = [
+						'key' => 'year',
+						'value' => [1990, 2000],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '2000-2010':
+					$meta_query[] = [
+						'key' => 'year',
+						'value' => [2000, 2010],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '2010-2020':
+					$meta_query[] = [
+						'key' => 'year',
+						'value' => [2010, 2020],
+						'compare' => 'BETWEEN',
+						'type' => 'NUMERIC'
+					];
+					break;
+				case '2020-plus':
+					$meta_query[] = [
+						'key' => 'year',
+						'value' => 2020,
+						'compare' => '>=',
+						'type' => 'NUMERIC'
+					];
+					break;
+				default:
+					// Do nothing
+					break;
+			}
+		}
+
+		// Add sort by
+		if(isset($_GET['sortby_field']) && !empty($_GET['sortby_field'])) {
+			$sortby_field = sanitize_text_field($_GET['sortby_field']);
+			switch($sortby_field){
+				case 'price-high-low':
+					$query->set('meta_key', 'asking_price');
+					$query->set('orderby', 'meta_value_num');
+					$query->set('order', 'DESC');
+					break;
+				case 'price-low-high':
+					$query->set('meta_key', 'asking_price');
+					$query->set('orderby', 'meta_value_num');
+					$query->set('order', 'ASC');
+					break;
+				case 'loa-high-low':
+					$query->set('meta_key', 'loa');
+					$query->set('orderby', 'meta_value_num');
+					$query->set('order', 'DESC');
+					break;
+				case 'loa-low-high':
+					$query->set('meta_key', 'loa');
+					$query->set('orderby', 'meta_value_num');
+					$query->set('order', 'ASC');
+					break;
+				default:
+					$query->set('meta_key', 'asking_price');
+					$query->set('orderby', 'meta_value_num');
+					$query->set('order', 'DESC');
+					break;
+			}
+		}
+
+		// Add post_type
+		$query->set('post_type', 'marinesync-boats');
+
+		// Add meta_query to query
+		$query->set('meta_query', $meta_query);
+	}
+}
