@@ -14,58 +14,77 @@ class MarineSync_Search {
 	 * @return array|null
 	 */
 	public static function search_meta_value(string $meta_key, string $meta_value = '', string $type = 'meta'): array|null {
-		if($meta_key === '' && $meta_value === '') {
+		if ($meta_key === '' && $meta_value === '') {
 			return null;
 		}
 
-		// Get global wpdb
 		global $wpdb;
 
-		// Check if type is meta
-		if($type === 'meta') {
-			// Begin forming query
-			$query = "
-			SELECT DISTINCT meta_value
-			FROM {$wpdb->postmeta}
-			WHERE meta_key = {$meta_key}
-			";
+		// Initialize results
+		$results = [];
 
-			// Check if meta_value is not empty
-			if ($meta_value !== '') {
-				$query .= " AND meta_value = {$meta_value}";
+		try {
+			if ($type === 'meta') {
+				// Prepare the base query with placeholder
+				$query = $wpdb->prepare(
+					"SELECT DISTINCT meta_value
+                FROM {$wpdb->postmeta}
+                WHERE meta_key = %s",
+					$meta_key
+				);
+
+				// Add meta_value condition if provided
+				if ($meta_value !== '') {
+					$query = $wpdb->prepare(
+						$query . " AND meta_value = %s",
+						$meta_value
+					);
+				}
+
+				$query .= " ORDER BY meta_value ASC";
+
+			} elseif ($type === 'tax') {
+				// Prepare the base query with placeholder
+				$query = $wpdb->prepare(
+					"SELECT DISTINCT terms.name
+                FROM {$wpdb->terms} AS terms
+                INNER JOIN {$wpdb->term_taxonomy} AS taxonomy 
+                    ON terms.term_id = taxonomy.term_id
+                INNER JOIN {$wpdb->term_relationships} AS relationships 
+                    ON taxonomy.term_taxonomy_id = relationships.term_taxonomy_id
+                INNER JOIN {$wpdb->posts} AS posts 
+                    ON relationships.object_id = posts.ID
+                WHERE taxonomy.taxonomy = %s",
+					$meta_key
+				);
+
+				// Add name condition if meta_value provided
+				if ($meta_value !== '') {
+					$query = $wpdb->prepare(
+						$query . " AND terms.name = %s",
+						$meta_value
+					);
+				}
+
+				$query .= " ORDER BY terms.name ASC";
+
+			} else {
+				return null;
 			}
 
-			$query .= "
-			ORDER BY meta_value ASC
-			";
-
+			// Execute the query
 			$results = $wpdb->get_col($query);
 
-			return array_filter($results, 'strlen');
-		} else if ($type === 'tax') {
-			// Begin forming query
-			$query = "
-			SELECT DISTINCT terms.name
-			FROM {$wpdb->terms} AS terms
-			INNER JOIN {$wpdb->term_taxonomy} AS taxonomy ON terms.term_id = taxonomy.term_id
-			INNER JOIN {$wpdb->term_relationships} AS relationships ON taxonomy.term_taxonomy_id = relationships.term_taxonomy_id
-			INNER JOIN {$wpdb->posts} AS posts ON relationships.object_id = posts.ID
-			WHERE taxonomy.taxonomy = {$meta_key}
-			";
-
-			// Check if meta_value is not empty
-			if ($meta_value !== '') {
-				$query .= " AND terms.name = {$meta_value}";
+			// Check for database errors
+			if ($wpdb->last_error) {
+				error_log('Database error in search_meta_value: ' . $wpdb->last_error);
+				return null;
 			}
 
-			$query .= "
-			ORDER BY terms.name ASC
-			";
-
-			$results = $wpdb->get_col($query);
-
 			return array_filter($results, 'strlen');
-		} else {
+
+		} catch (Exception $e) {
+			error_log('Exception in search_meta_value: ' . $e->getMessage());
 			return null;
 		}
 	}

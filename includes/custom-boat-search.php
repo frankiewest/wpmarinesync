@@ -4,7 +4,6 @@ use MarineSync\Search\MarineSync_Search;
 
 // Get manufacturers, models and years
 $manufacturers = MarineSync_Search::search_meta_value(meta_key: 'manufacturer', type: 'tax');
-$models = MarineSync_Search::search_meta_value(meta_key: 'model');
 
 ?>
 
