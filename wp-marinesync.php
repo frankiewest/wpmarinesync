@@ -347,7 +347,7 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column_name,
 		case 'boat_name':
 			echo MarineSync_Post_Type::get_boat_name($post_id);
 			break;
-		case 'location':
+		case 'vessel_lying':
 			echo MarineSync_Post_Type::get_location($post_id);
 			break;
 		case 'asking_price':
@@ -361,7 +361,7 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column_name,
 // Make columns sortable
 add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
 	$columns['boat_name'] = 'boat_name';
-	$columns['location'] = 'location';
+	$columns['vessel_lying'] = 'vessel_lying';
 	$columns['asking_price'] = 'asking_price';
 	return $columns;
 });
@@ -378,7 +378,7 @@ add_action('pre_get_posts', function($query) {
 
 	$orderby = $query->get('orderby');
 
-	if (in_array($orderby, ['boat_name', 'location', 'asking_price'])) {
+	if (in_array($orderby, ['boat_name', 'vessel_lying', 'asking_price'])) {
 		$query->set('meta_key', $orderby);
 		$query->set('orderby', $orderby === 'asking_price' ? 'meta_value_num' : 'meta_value');
 	}
