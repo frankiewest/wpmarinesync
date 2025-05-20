@@ -7,165 +7,247 @@ namespace MarineSync\PostType;
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
-    exit;
+	exit;
 }
 
 class MarineSync_Post_Type {
-    /**
-     * @return void
-     */
-    public static function register(): void {
-        error_log('MS014: Starting post type registration');
-        
-        $labels = array(
-            'name'               => _x('Boats', 'post type general name', 'marinesync'),
-            'singular_name'      => _x('Boat', 'post type singular name', 'marinesync'),
-            'menu_name'          => _x('Boats', 'admin menu', 'marinesync'),
-            'name_admin_bar'     => _x('Boat', 'add new on admin bar', 'marinesync'),
-            'add_new'            => _x('Add New', 'boat', 'marinesync'),
-            'add_new_item'       => __('Add New Boat', 'marinesync'),
-            'new_item'           => __('New Boat', 'marinesync'),
-            'edit_item'          => __('Edit Boat', 'marinesync'),
-            'view_item'          => __('View Boat', 'marinesync'),
-            'all_items'          => __('All Boats', 'marinesync'),
-            'search_items'       => __('Search Boats', 'marinesync'),
-            'parent_item_colon'  => __('Parent Boats:', 'marinesync'),
-            'not_found'          => __('No boats found.', 'marinesync'),
-            'not_found_in_trash' => __('No boats found in Trash.', 'marinesync'),
-        );
-        
-        $args = array(
-            'labels'             => $labels,
-            'public'             => true,
-            'publicly_queryable' => true,
-            'show_ui'            => true,
-            'show_in_menu'       => true,
-            'query_var'          => true,
-            'rewrite'            => array('slug' => 'boats'),
-            'capability_type'    => 'post',
-            'has_archive'        => true,
-            'hierarchical'       => false,
-            'menu_position'      => 5,
-            'menu_icon'          => 'dashicons-anchor',
-            'supports'           => array('title', 'editor', 'thumbnail', 'excerpt'),
-            'show_in_rest'       => true,
-        );
-        
-        register_post_type('marinesync-boats', $args);
+	/**
+	 * @return void
+	 */
+	public static function register(): void {
+		error_log('MS014: Starting post type registration');
 
-	    // Register boat status taxonomy
-	    $status_labels = array(
-		    'name'              => _x('Boat Statuses', 'taxonomy general name', 'marinesync'),
-		    'singular_name'     => _x('Boat Status', 'taxonomy singular name', 'marinesync'),
-		    'search_items'      => __('Search Boat Statuses', 'marinesync'),
-		    'all_items'         => __('All Boat Statuses', 'marinesync'),
-		    'parent_item'       => __('Parent Boat Status', 'marinesync'),
-		    'parent_item_colon' => __('Parent Boat Status:', 'marinesync'),
-		    'edit_item'         => __('Edit Boat Status', 'marinesync'),
-		    'update_item'       => __('Update Boat Status', 'marinesync'),
-		    'add_new_item'      => __('Add New Boat Status', 'marinesync'),
-		    'new_item_name'     => __('New Boat Status Name', 'marinesync'),
-		    'menu_name'         => __('Boat Statuses', 'marinesync'),
-	    );
+		$labels = array(
+			'name'               => _x('Boats', 'post type general name', 'marinesync'),
+			'singular_name'      => _x('Boat', 'post type singular name', 'marinesync'),
+			'menu_name'          => _x('Boats', 'admin menu', 'marinesync'),
+			'name_admin_bar'     => _x('Boat', 'add new on admin bar', 'marinesync'),
+			'add_new'            => _x('Add New', 'boat', 'marinesync'),
+			'add_new_item'       => __('Add New Boat', 'marinesync'),
+			'new_item'           => __('New Boat', 'marinesync'),
+			'edit_item'          => __('Edit Boat', 'marinesync'),
+			'view_item'          => __('View Boat', 'marinesync'),
+			'all_items'          => __('All Boats', 'marinesync'),
+			'search_items'       => __('Search Boats', 'marinesync'),
+			'parent_item_colon'  => __('Parent Boats:', 'marinesync'),
+			'not_found'          => __('No boats found.', 'marinesync'),
+			'not_found_in_trash' => __('No boats found in Trash.', 'marinesync'),
+		);
 
-	    register_taxonomy('boat-status', array('marinesync-boats'), array(
-		    'hierarchical'      => true,
-		    'labels'            => $status_labels,
-		    'show_ui'           => true,
-		    'show_admin_column' => true,
-		    'query_var'         => true,
-		    'rewrite'           => array('slug' => 'boat-status'),
-		    'show_in_rest'      => true,
-	    ));
+		$args = array(
+			'labels'             => $labels,
+			'public'             => true,
+			'publicly_queryable' => true,
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'query_var'          => true,
+			'rewrite'            => array('slug' => 'boats'),
+			'capability_type'    => 'post',
+			'has_archive'        => true,
+			'hierarchical'       => false,
+			'menu_position'      => 5,
+			'menu_icon'          => 'dashicons-palmtree',
+			'supports'           => array('title', 'editor', 'thumbnail', 'excerpt'),
+			'show_in_rest'       => true,
+		);
 
-	    // Register boat condition taxonomy
-	    $condition_labels = array(
-		    'name'              => _x('Boat Conditions', 'taxonomy general name', 'marinesync'),
-		    'singular_name'     => _x('Boat Condition', 'taxonomy singular name', 'marinesync'),
-		    'search_items'      => __('Search Boat Conditions', 'marinesync'),
-		    'all_items'         => __('All Boat Conditions', 'marinesync'),
-		    'parent_item'       => __('Parent Boat Condition', 'marinesync'),
-		    'parent_item_colon' => __('Parent Boat Condition:', 'marinesync'),
-		    'edit_item'         => __('Edit Boat Condition', 'marinesync'),
-		    'update_item'       => __('Update Boat Condition', 'marinesync'),
-		    'add_new_item'      => __('Add New Boat Condition', 'marinesync'),
-		    'new_item_name'     => __('New Boat Condition Name', 'marinesync'),
-		    'menu_name'         => __('Boat Conditions', 'marinesync'),
-	    );
+		register_post_type('marinesync-boats', $args);
 
-	    register_taxonomy('boat-condition', array('marinesync-boats'), array(
-		    'hierarchical'      => true,
-		    'labels'            => $condition_labels,
-		    'show_ui'           => true,
-		    'show_admin_column' => true,
-		    'query_var'         => true,
-		    'rewrite'           => array('slug' => 'boat-condition'),
-		    'show_in_rest'      => true,
-	    ));
-        
-        // Register boat type taxonomy
-        $type_labels = array(
-            'name'              => _x('Boat Types', 'taxonomy general name', 'marinesync'),
-            'singular_name'     => _x('Boat Type', 'taxonomy singular name', 'marinesync'),
-            'search_items'      => __('Search Boat Types', 'marinesync'),
-            'all_items'         => __('All Boat Types', 'marinesync'),
-            'parent_item'       => __('Parent Boat Type', 'marinesync'),
-            'parent_item_colon' => __('Parent Boat Type:', 'marinesync'),
-            'edit_item'         => __('Edit Boat Type', 'marinesync'),
-            'update_item'       => __('Update Boat Type', 'marinesync'),
-            'add_new_item'      => __('Add New Boat Type', 'marinesync'),
-            'new_item_name'     => __('New Boat Type Name', 'marinesync'),
-            'menu_name'         => __('Boat Types', 'marinesync'),
-        );
-        
-        register_taxonomy('boat-type', array('marinesync-boats'), array(
-            'hierarchical'      => true,
-            'labels'            => $type_labels,
-            'show_ui'           => true,
-            'show_admin_column' => true,
-            'query_var'         => true,
-            'rewrite'           => array('slug' => 'boat-type'),
-            'show_in_rest'      => true,
-        ));
-        
-        // Register manufacturer taxonomy
-        $manufacturer_labels = array(
-            'name'              => _x('Manufacturers', 'taxonomy general name', 'marinesync'),
-            'singular_name'     => _x('Manufacturer', 'taxonomy singular name', 'marinesync'),
-            'search_items'      => __('Search Manufacturers', 'marinesync'),
-            'all_items'         => __('All Manufacturers', 'marinesync'),
-            'parent_item'       => __('Parent Manufacturer', 'marinesync'),
-            'parent_item_colon' => __('Parent Manufacturer:', 'marinesync'),
-            'edit_item'         => __('Edit Manufacturer', 'marinesync'),
-            'update_item'       => __('Update Manufacturer', 'marinesync'),
-            'add_new_item'      => __('Add New Manufacturer', 'marinesync'),
-            'new_item_name'     => __('New Manufacturer Name', 'marinesync'),
-            'menu_name'         => __('Manufacturers', 'marinesync'),
-        );
-        
-        register_taxonomy('manufacturer', array('marinesync-boats'), array(
-            'hierarchical'      => true,
-            'labels'            => $manufacturer_labels,
-            'show_ui'           => true,
-            'show_admin_column' => true,
-            'query_var'         => true,
-            'rewrite'           => array('slug' => 'manufacturer'),
-            'show_in_rest'      => true,
-        ));
-        
-        error_log('MS015: Post type registration complete');
-    }
+		// Register boat status taxonomy
+		$status_labels = array(
+			'name'              => _x('Boat Statuses', 'taxonomy general name', 'marinesync'),
+			'singular_name'     => _x('Boat Status', 'taxonomy singular name', 'marinesync'),
+			'search_items'      => __('Search Boat Statuses', 'marinesync'),
+			'all_items'         => __('All Boat Statuses', 'marinesync'),
+			'parent_item'       => __('Parent Boat Status', 'marinesync'),
+			'parent_item_colon' => __('Parent Boat Status:', 'marinesync'),
+			'edit_item'         => __('Edit Boat Status', 'marinesync'),
+			'update_item'       => __('Update Boat Status', 'marinesync'),
+			'add_new_item'      => __('Add New Boat Status', 'marinesync'),
+			'new_item_name'     => __('New Boat Status Name', 'marinesync'),
+			'menu_name'         => __('Boat Statuses', 'marinesync'),
+		);
 
-    /**
-     * @param $post_id
-     * @return mixed
-     */
-    public static function get_boat_id($post_id = null): mixed {
-        if (!$post_id) {
-            $post_id = get_the_ID();
-        }
-        return get_post_meta($post_id, 'boat_id', true);
-    }
+		register_taxonomy('boat-status', array('marinesync-boats'), array(
+			'hierarchical'      => true,
+			'labels'            => $status_labels,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'query_var'         => true,
+			'rewrite'           => array('slug' => 'boat-status'),
+			'show_in_rest'      => true,
+		));
+
+		// Register boat condition taxonomy
+		$condition_labels = array(
+			'name'              => _x('Boat Conditions', 'taxonomy general name', 'marinesync'),
+			'singular_name'     => _x('Boat Condition', 'taxonomy singular name', 'marinesync'),
+			'search_items'      => __('Search Boat Conditions', 'marinesync'),
+			'all_items'         => __('All Boat Conditions', 'marinesync'),
+			'parent_item'       => __('Parent Boat Condition', 'marinesync'),
+			'parent_item_colon' => __('Parent Boat Condition:', 'marinesync'),
+			'edit_item'         => __('Edit Boat Condition', 'marinesync'),
+			'update_item'       => __('Update Boat Condition', 'marinesync'),
+			'add_new_item'      => __('Add New Boat Condition', 'marinesync'),
+			'new_item_name'     => __('New Boat Condition Name', 'marinesync'),
+			'menu_name'         => __('Boat Conditions', 'marinesync'),
+		);
+
+		register_taxonomy('boat-condition', array('marinesync-boats'), array(
+			'hierarchical'      => true,
+			'labels'            => $condition_labels,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'query_var'         => true,
+			'rewrite'           => array('slug' => 'boat-condition'),
+			'show_in_rest'      => true,
+		));
+
+		// Register boat type taxonomy
+		$type_labels = array(
+			'name'              => _x('Boat Types', 'taxonomy general name', 'marinesync'),
+			'singular_name'     => _x('Boat Type', 'taxonomy singular name', 'marinesync'),
+			'search_items'      => __('Search Boat Types', 'marinesync'),
+			'all_items'         => __('All Boat Types', 'marinesync'),
+			'parent_item'       => __('Parent Boat Type', 'marinesync'),
+			'parent_item_colon' => __('Parent Boat Type:', 'marinesync'),
+			'edit_item'         => __('Edit Boat Type', 'marinesync'),
+			'update_item'       => __('Update Boat Type', 'marinesync'),
+			'add_new_item'      => __('Add New Boat Type', 'marinesync'),
+			'new_item_name'     => __('New Boat Type Name', 'marinesync'),
+			'menu_name'         => __('Boat Types', 'marinesync'),
+		);
+
+		register_taxonomy('boat-type', array('marinesync-boats'), array(
+			'hierarchical'      => true,
+			'labels'            => $type_labels,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'query_var'         => true,
+			'rewrite'           => array('slug' => 'boat-type'),
+			'show_in_rest'      => true,
+		));
+
+		// Register manufacturer taxonomy
+		$manufacturer_labels = array(
+			'name'              => _x('Manufacturers', 'taxonomy general name', 'marinesync'),
+			'singular_name'     => _x('Manufacturer', 'taxonomy singular name', 'marinesync'),
+			'search_items'      => __('Search Manufacturers', 'marinesync'),
+			'all_items'         => __('All Manufacturers', 'marinesync'),
+			'parent_item'       => __('Parent Manufacturer', 'marinesync'),
+			'parent_item_colon' => __('Parent Manufacturer:', 'marinesync'),
+			'edit_item'         => __('Edit Manufacturer', 'marinesync'),
+			'update_item'       => __('Update Manufacturer', 'marinesync'),
+			'add_new_item'      => __('Add New Manufacturer', 'marinesync'),
+			'new_item_name'     => __('New Manufacturer Name', 'marinesync'),
+			'menu_name'         => __('Manufacturers', 'marinesync'),
+		);
+
+		register_taxonomy('manufacturer', array('marinesync-boats'), array(
+			'hierarchical'      => true,
+			'labels'            => $manufacturer_labels,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'query_var'         => true,
+			'rewrite'           => array('slug' => 'manufacturer'),
+			'show_in_rest'      => true,
+		));
+
+		// Register hooks for custom admin columns
+		add_filter('manage_marinesync-boats_posts_columns', [__CLASS__, 'set_custom_columns']);
+		add_action('manage_marinesync-boats_posts_custom_column', [__CLASS__, 'render_custom_column'], 10, 2);
+		add_action('admin_head', [__CLASS__, 'add_admin_styles']);
+
+		error_log('MS015: Post type registration complete');
+	}
+
+	/**
+	 * Set custom columns for the marinesync-boats post type admin screen.
+	 *
+	 * @param array $columns The existing columns.
+	 * @return array The modified columns.
+	 */
+	public static function set_custom_columns($columns): array {
+		error_log('MS016: Setting custom columns for marinesync-boats');
+
+		// Create a new array to ensure thumbnail is first
+		$new_columns = [];
+
+		// Add thumbnail column
+		$new_columns['thumbnail'] = __('', 'marinesync');
+
+		// Preserve existing columns (except 'cb' checkbox, which we'll add back)
+		unset($columns['cb']); // Remove checkbox temporarily
+		$new_columns = array_merge($new_columns, $columns);
+
+		// Add checkbox column back (it will appear after thumbnail)
+		$new_columns['cb'] = '<input type="checkbox" />';
+
+		error_log('MS017: Custom columns set: ' . print_r($new_columns, true));
+		return $new_columns;
+	}
+
+	/**
+	 * Render content for custom columns.
+	 *
+	 * @param string $column_name The name of the column.
+	 * @param int $post_id The post ID.
+	 * @return void
+	 */
+	public static function render_custom_column($column_name, $post_id): void {
+		if ($column_name === 'thumbnail') {
+			error_log('MS018: Rendering thumbnail column for post ID: ' . $post_id);
+
+			// Get the thumbnail
+			$thumbnail_id = get_post_thumbnail_id($post_id);
+			if ($thumbnail_id) {
+				$thumbnail = wp_get_attachment_image($thumbnail_id, [50, 50], false, ['class' => 'marinesync-admin-thumbnail']);
+				echo $thumbnail;
+			} else {
+				// Display a placeholder or empty cell
+				echo '<span class="marinesync-no-thumbnail">' . __('No Thumbnail', 'marinesync') . '</span>';
+			}
+		}
+	}
+
+	/**
+	 * Add custom styles for the admin columns.
+	 *
+	 * @return void
+	 */
+	public static function add_admin_styles(): void {
+		// Only apply styles on the marinesync-boats edit screen
+		$screen = get_current_screen();
+		if ($screen && $screen->id === 'edit-marinesync-boats') {
+			echo '<style>
+                .column-thumbnail {
+                    width: 60px !important;
+                    text-align: center;
+                }
+                .marinesync-admin-thumbnail {
+                    max-width: 50px;
+                    height: auto;
+                    display: block;
+                    margin: 0 auto;
+                }
+                .marinesync-no-thumbnail {
+                    color: #777;
+                    font-style: italic;
+                }
+            </style>';
+		}
+	}
+
+	/**
+	 * @param $post_id
+	 * @return mixed
+	 */
+	public static function get_boat_id($post_id = null): mixed {
+		if (!$post_id) {
+			$post_id = get_the_ID();
+		}
+		return get_post_meta($post_id, 'boat_id', true);
+	}
 
 	/**
 	 * @param $post_id
@@ -657,7 +739,7 @@ class MarineSync_Post_Type {
 		}
 
 		if(!get_field($atts['field'], $id)) {
-			return 'Field not found';
+			return '';
 		}
 
 		if($atts['field'] === 'asking_price' && $atts['number_format'] === 'yes') {
