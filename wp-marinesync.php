@@ -345,14 +345,15 @@ add_filter('manage_marinesync-boats_posts_columns', function($columns) {
 add_action('manage_marinesync-boats_posts_custom_column', function($column_name, $post_id) {
 	switch ($column_name) {
 		case 'boat_name':
-			echo esc_html(get_field('boat_name', $post_id));
+			echo MarineSync_Post_Type::get_boat_name($post_id);
 			break;
 		case 'location':
-			echo esc_html(get_field('location', $post_id));
+			echo MarineSync_Post_Type::get_location($post_id);
 			break;
 		case 'asking_price':
-			$price = get_field('asking_price', $post_id);
-			echo esc_html($price ? number_format($price, 2) : '');
+			$price = MarineSync_Post_Type::get_asking_price($post_id);
+            $currency = MarineSync_Post_Type::get_boat_field($post_id, 'currency');
+			echo esc_html($price ? $currency . number_format($price, 2) : '');
 			break;
 	}
 }, 10, 2);
