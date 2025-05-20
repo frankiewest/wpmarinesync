@@ -36,11 +36,11 @@ class Functions_MarineSync {
 	 * @param array $atts
 	 * @return string
 	 */
-
+<?php
 	public function marinesync_shortcode( $atts ) {
 		$atts = shortcode_atts( array(
 			'field' => ''
-		), $atts, 'marinesync' );
+		), $atts, 'ms_field' );
 
 		// Check we're in the admin area
 		if ( is_admin() ) return;
