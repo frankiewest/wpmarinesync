@@ -352,7 +352,7 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column_name,
 			break;
 		case 'asking_price':
 			$price = MarineSync_Post_Type::get_asking_price($post_id);
-            $currency = MarineSync_Post_Type::get_boat_field($post_id, 'currency');
+            $currency = MarineSync_Post_Type::get_boat_field('currency', $post_id);
 			echo esc_html($price ? $currency . number_format($price, 2) : '');
 			break;
 	}
