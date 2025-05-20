@@ -334,7 +334,7 @@ add_filter('manage_marinesync-boats_posts_columns', function($columns) {
 		if ($key === 'title') {
 			// Insert custom columns after title
 			$new_columns['boat_name'] = __('Boat Name', 'marinesync');
-			$new_columns['location'] = __('Location', 'marinesync');
+			$new_columns['vessel_lying'] = __('Vessel Lying', 'marinesync');
 			$new_columns['asking_price'] = __('Asking Price', 'marinesync');
 		}
 	}
