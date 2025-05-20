@@ -3452,4 +3452,199 @@ class Acf_add_boat_data {
 			error_log('MS014: No options page found');
 		}
 	}
+
+	public static function add_boat_data_template() {
+		error_log('MS030: Starting ACF Boat Data Template field group creation');
+
+		if (!function_exists('acf_add_local_field_group')) {
+			error_log('MS031: ACF functions not available for Boat Data Template');
+			return;
+		}
+
+		error_log('MS032: Function exists check for template: ' . (function_exists('acf_add_local_field_group') ? 'Yes' : 'No'));
+		error_log('MS033: Class exists check for template: ' . (class_exists('ACF') ? 'Yes' : 'No'));
+
+		$result = acf_add_local_field_group(array(
+			'key' => 'group_68bcdc1021663',
+			'title' => 'Boat Data Template',
+			'fields' => array(
+				array(
+					'key' => 'field_68bcdc1021664',
+					'label' => 'General Description',
+					'name' => '',
+					'aria-label' => '',
+					'type' => 'tab',
+					'instructions' => '',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'placement' => 'top',
+					'endpoint' => 0,
+					'selected' => 0,
+				),
+				array(
+					'key' => 'field_68bcdc1021665',
+					'label' => 'General Description',
+					'name' => 'general_description',
+					'aria-label' => '',
+					'type' => 'textarea',
+					'instructions' => 'Enter a general description of the boat.',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'default_value' => '',
+					'maxlength' => '',
+					'rows' => 5,
+					'placeholder' => '',
+					'new_lines' => 'wpautop',
+					'allow_in_bindings' => 0,
+				),
+				array(
+					'key' => 'field_68bcdc1021666',
+					'label' => 'Accommodation',
+					'name' => '',
+					'aria-label' => '',
+					'type' => 'tab',
+					'instructions' => '',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'placement' => 'top',
+					'endpoint' => 0,
+					'selected' => 0,
+				),
+				array(
+					'key' => 'field_68bcdc1021667',
+					'label' => 'Accommodation Details',
+					'name' => 'accommodation_details',
+					'aria-label' => '',
+					'type' => 'textarea',
+					'instructions' => 'Describe the accommodation features of the boat.',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'default_value' => '',
+					'maxlength' => '',
+					'rows' => 5,
+					'placeholder' => '',
+					'new_lines' => 'wpautop',
+					'allow_in_bindings' => 0,
+				),
+				array(
+					'key' => 'field_68bcdc1021668',
+					'label' => 'Mechanical & Engine',
+					'name' => '',
+					'aria-label' => '',
+					'type' => 'tab',
+					'instructions' => '',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'placement' => 'top',
+					'endpoint' => 0,
+					'selected' => 0,
+				),
+				array(
+					'key' => 'field_68bcdc1021669',
+					'label' => 'Mechanical & Engine Details',
+					'name' => 'mechanical_engine_details',
+					'aria-label' => '',
+					'type' => 'textarea',
+					'instructions' => 'Provide details about the mechanical and engine specifications.',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'default_value' => '',
+					'maxlength' => '',
+					'rows' => 5,
+					'placeholder' => '',
+					'new_lines' => 'wpautop',
+					'allow_in_bindings' => 0,
+				),
+				array(
+					'key' => 'field_68bcdc1021670',
+					'label' => 'Navigation Equipment',
+					'name' => '',
+					'aria-label' => '',
+					'type' => 'tab',
+					'instructions' => '',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'placement' => 'top',
+					'endpoint' => 0,
+					'selected' => 0,
+				),
+				array(
+					'key' => 'field_68bcdc1021671',
+					'label' => 'Navigation Equipment Details',
+					'name' => 'navigation_equipment_details',
+					'aria-label' => '',
+					'type' => 'textarea',
+					'instructions' => 'List the navigation equipment available on the boat.',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'default_value' => '',
+					'maxlength' => '',
+					'rows' => 5,
+					'placeholder' => '',
+					'new_lines' => 'wpautop',
+					'allow_in_bindings' => 0,
+				),
+			),
+			'location' => array(
+				array(
+					array(
+						'param' => 'post_type',
+						'operator' => '==',
+						'value' => 'marinesync-boats',
+					),
+				),
+			),
+			'menu_order' => 1,
+			'position' => 'normal',
+			'style' => 'default',
+			'label_placement' => 'top',
+			'instruction_placement' => 'label',
+			'hide_on_screen' => '',
+			'active' => true,
+			'description' => 'Template fields for boat descriptions and specifications.',
+			'show_in_rest' => 0,
+		));
+
+		error_log('MS034: ACF Boat Data Template field group creation result: ' . ($result ? 'Success' : 'Failed'));
+	}
 }
