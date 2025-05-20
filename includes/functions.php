@@ -40,7 +40,7 @@ class Functions_MarineSync {
 	public function marinesync_shortcode( $atts ) {
 		$atts = shortcode_atts( array(
 			'field' => ''
-		), $atts, 'ms_field' );
+		), $atts, 'marinesync' );
 
 		// Check we're in the admin area
 		if ( is_admin() ) return;
