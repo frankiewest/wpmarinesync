@@ -53,6 +53,31 @@ class MarineSync_Post_Type {
 
 		register_post_type('marinesync-boats', $args);
 
+		// Register boat category taxonomy
+		$category_labels = array(
+			'name'              => _x('Boat Categories', 'taxonomy general name', 'marinesync'),
+			'singular_name'     => _x('Boat Category', 'taxonomy singular name', 'marinesync'),
+			'search_items'      => __('Search Boat Categories', 'marinesync'),
+			'all_items'         => __('All Boat Categories', 'marinesync'),
+			'parent_item'       => __('Parent Boat Category', 'marinesync'),
+			'parent_item_colon' => __('Parent Boat Category:', 'marinesync'),
+			'edit_item'         => __('Edit Boat Category', 'marinesync'),
+			'update_item'       => __('Update Boat Category', 'marinesync'),
+			'add_new_item'      => __('Add New Boat Category', 'marinesync'),
+			'new_item_name'     => __('New Boat Category Name', 'marinesync'),
+			'menu_name'         => __('Boat Categories', 'marinesync'),
+		);
+
+		register_taxonomy('boat-cat', array('marinesync-boats'), array(
+			'hierarchical'      => true,
+			'labels'            => $category_labels,
+			'show_ui'           => true,
+			'show_admin_column' => false,
+			'query_var'         => true,
+			'rewrite'           => array('slug' => 'boat-cat'),
+			'show_in_rest'      => true,
+		));
+
 		// Register boat status taxonomy
 		$status_labels = array(
 			'name'              => _x('Boat Statuses', 'taxonomy general name', 'marinesync'),
