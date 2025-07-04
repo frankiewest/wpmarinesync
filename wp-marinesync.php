@@ -385,3 +385,28 @@ add_action('pre_get_posts', function($query) {
 		$query->set('orderby', $orderby === 'asking_price' ? 'meta_value_num' : 'meta_value');
 	}
 });
+
+// Add role
+function marinesync_register_boat_admin_role() {
+	add_role('boat_admin', 'Boat Admin', ['read' => true]);
+	$caps = [
+		'edit_boat',
+		'read_boat',
+		'delete_boat',
+		'edit_boats',
+		'edit_others_boats',
+		'publish_boats',
+		'read_private_boats',
+		'delete_boats',
+		'delete_others_boats',
+		'edit_published_boats',
+		'delete_published_boats',
+	];
+	$role = get_role('boat_admin');
+	if ($role) {
+		foreach ($caps as $cap) {
+			$role->add_cap($cap);
+		}
+	}
+}
+add_action('init', 'marinesync_register_boat_admin_role');
