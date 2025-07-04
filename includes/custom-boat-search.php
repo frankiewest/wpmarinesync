@@ -73,7 +73,7 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
         </select>
     </div>
     <div class="custom_search_form_column">
-        <input type="text" name="s" value="<?php echo get_search_query(); ?>">
+        <input type="text" name="s" value="<?php echo get_search_query() ?? ''; ?>">
     </div>
 
 	<div class="custom_search_form_column">
