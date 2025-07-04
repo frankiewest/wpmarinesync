@@ -387,11 +387,16 @@ add_action('pre_get_posts', function($query) {
 });
 
 // Add role
-function marinesync_register_boat_admin_role() {
-	add_role('boat_admin', 'Boat Admin', ['read' => true]);
+function marinesync_register_boat_admin_role_and_admin_caps() {
+	// 1. Add or update Boat Admin role
+	$role = get_role('boat_admin');
+	if (!$role) {
+		add_role('boat_admin', 'Boat Admin', ['read' => true]);
+		$role = get_role('boat_admin');
+	}
+
 	$caps = [
-            'read',
-        'edit_posts',
+		// Boat CPT caps
 		'edit_boat',
 		'read_boat',
 		'delete_boat',
@@ -403,14 +408,34 @@ function marinesync_register_boat_admin_role() {
 		'delete_others_boats',
 		'edit_published_boats',
 		'delete_published_boats',
+
+		// Posts
+		'edit_posts',
+		'edit_others_posts',
+		'publish_posts',
+		'delete_posts',
+		'delete_others_posts',
+		'edit_published_posts',
+		'delete_published_posts',
+
+		// Pages
+		'edit_pages',
+		'edit_others_pages',
+		'publish_pages',
+		'delete_pages',
+		'delete_others_pages',
+		'edit_published_pages',
+		'delete_published_pages',
+
+		// Media
+		'upload_files',
 	];
-	$role = get_role('boat_admin');
-	if ($role) {
-		foreach ($caps as $cap) {
-			$role->add_cap($cap);
-		}
+
+	foreach ($caps as $cap) {
+		$role->add_cap($cap);
 	}
 
+	// 2. Also add these capabilities to the Administrator role
 	$admin = get_role('administrator');
 	if ($admin) {
 		foreach ($caps as $cap) {
@@ -418,4 +443,4 @@ function marinesync_register_boat_admin_role() {
 		}
 	}
 }
-add_action('init', __NAMESPACE__ . '\\marinesync_register_boat_admin_role');
+add_action('init', __NAMESPACE__ . '\\marinesync_register_boat_admin_role_and_admin_caps');
