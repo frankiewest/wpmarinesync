@@ -19,7 +19,7 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
 	</div>
 	<div class="custom_search_form_column">
 		<select name="price_range">
-			<option value="">Any Price (£)</option>
+			<option value="">Price</option>
 			<option value="up-to-30k" <?= selected(isset($_GET['price_range']) ? $_GET['price_range'] : '', 'up-to-30k') ?>>Up to £30K</option>
 			<option value="30k-50k" <?= selected(isset($_GET['price_range']) ? $_GET['price_range'] : '', '30k-50k') ?>>£30K to £50K</option>
 			<option value="50k-100k" <?= selected(isset($_GET['price_range']) ? $_GET['price_range'] : '', '50k-100k') ?>>£50K to £100K</option>
@@ -28,6 +28,14 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
 			<option value="over-300k" <?= selected(isset($_GET['price_range']) ? $_GET['price_range'] : '', 'over-300k') ?>>Over £300K</option>
 		</select>
 	</div>
+    <div class="custom_search_form_column">
+        <select name="currency">
+            <option value="">Currency</option>
+            <option value="gbp" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'gbp') ?>>GBP (£)</option>
+            <option value="eur" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'eur') ?>>EUR (€)</option>
+            <option value="usd" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'usd') ?>>USD ($)</option>
+        </select>
+    </div>
 	<div class="custom_search_form_column">
 		<select name="boat_type" class="custom_search_form_column">
 			<option value="">Power/Sail</option>
@@ -37,7 +45,7 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
 	</div>
 	<div class="custom_search_form_column">
 		<select name="loa" class="custom_search_form_column">
-			<option value="">Any LOA (m)</option>
+			<option value="">LOA (m)</option>
 			<option value="up-to-10m" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', 'up-to-10m') ?>>Up to 10m</option>
 			<option value="10m-15m" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', '10m-15m') ?>>10m - 15m</option>
 			<option value="15m-20m" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', '15m-20m') ?>>15m - 20m</option>
@@ -46,7 +54,7 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
 	</div>
 	<div class="custom_search_form_column">
 		<select name="year_range" class="custom_search_form_column">
-			<option value="">Any Year</option>
+			<option value="">Year</option>
 			<option value="pre-1980" <?= selected(isset($_GET['year_range']) ? $_GET['year_range'] : '', 'pre-1980') ?>>Up to 1980</option>
 			<option value="1980-1990" <?= selected(isset($_GET['year_range']) ? $_GET['year_range'] : '', '1980-1990') ?>>1980 - 1990</option>
 			<option value="1990-2000" <?= selected(isset($_GET['year_range']) ? $_GET['year_range'] : '', '1990-2000') ?>>1990 - 2000</option>
