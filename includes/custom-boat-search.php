@@ -31,9 +31,9 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
     <div class="custom_search_form_column">
         <select name="currency">
             <option value="">Currency</option>
-            <option value="gbp" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'gbp') ?>>GBP (£)</option>
-            <option value="eur" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'eur') ?>>EUR (€)</option>
-            <option value="usd" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'usd') ?>>USD ($)</option>
+            <option value="£" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'gbp') ?>>GBP (£)</option>
+            <option value="€" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'eur') ?>>EUR (€)</option>
+            <option value="$" <?= selected(isset($_GET['currency']) ? $_GET['currency'] : '', 'usd') ?>>USD ($)</option>
         </select>
     </div>
 	<div class="custom_search_form_column">
