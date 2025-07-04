@@ -328,6 +328,16 @@ class MarineSync_Search {
 			}
 		}
 
+		// Add currency filter
+		if (isset($_GET['currency']) && !empty($_GET['currency'])) {
+			$currency = sanitize_text_field($_GET['currency']);
+			$meta_query[] = [
+				'key' => 'currency',
+				'value' => $currency,
+				'compare' => '='
+			];
+		}
+
 		// Add sort by
 		if(isset($_GET['sortby_field']) && !empty($_GET['sortby_field'])) {
 			$sortby_field = sanitize_text_field($_GET['sortby_field']);
