@@ -2,8 +2,9 @@
 // Use search class
 use MarineSync\Search\MarineSync_Search;
 
-// Get manufacturers, models and years
+// Get manufacturers, location
 $manufacturers = MarineSync_Search::search_meta_value(meta_key: 'manufacturer', type: 'tax');
+$locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type: 'meta');
 
 ?>
 
@@ -63,6 +64,14 @@ $manufacturers = MarineSync_Search::search_meta_value(meta_key: 'manufacturer', 
 			<option value="loa-low-high" <?= selected(isset($_GET['sortby_field']) ? $_GET['sortby_field'] : '', 'loa-low-high') ?>>LOA Low > High</option>
 		</select>
 	</div>
+    <div class="custom_search_form_column">
+        <select name="vessel_lying" class="custom_search_form_column">
+            <option value="">All Locations</option>
+			<?php foreach($locations as $location): ?>
+                <option value="<?= esc_attr($location) ?>" <?= selected(isset($_GET['vessel_lying']) ? $_GET['vessel_lying'] : '', $location) ?>><?= esc_html($location) ?></option>
+			<?php endforeach; ?>
+        </select>
+    </div>
 
 	<input type="hidden" name="s" value="<?php echo get_search_query(); ?>">
 
