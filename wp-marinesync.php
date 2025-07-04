@@ -409,4 +409,4 @@ function marinesync_register_boat_admin_role() {
 		}
 	}
 }
-add_action('init', 'marinesync_register_boat_admin_role');
+add_action('init', __NAMESPACE__ . '\\marinesync_register_boat_admin_role');
