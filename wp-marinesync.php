@@ -390,6 +390,8 @@ add_action('pre_get_posts', function($query) {
 function marinesync_register_boat_admin_role() {
 	add_role('boat_admin', 'Boat Admin', ['read' => true]);
 	$caps = [
+            'read',
+        'edit_posts',
 		'edit_boat',
 		'read_boat',
 		'delete_boat',
