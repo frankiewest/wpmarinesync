@@ -408,5 +408,12 @@ function marinesync_register_boat_admin_role() {
 			$role->add_cap($cap);
 		}
 	}
+
+	$admin = get_role('administrator');
+	if ($admin) {
+		foreach ($caps as $cap) {
+			$admin->add_cap($cap);
+		}
+	}
 }
 add_action('init', __NAMESPACE__ . '\\marinesync_register_boat_admin_role');
