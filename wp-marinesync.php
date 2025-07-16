@@ -565,3 +565,35 @@ add_action('admin_menu', function() {
 	);
 });
 
+// Add [marinesync_pdf_button] shortcode
+add_shortcode('marinesync_pdf_button', function($atts) {
+	$atts = shortcode_atts([
+		'id' => get_the_ID(),
+		'label' => 'Download PDF',
+		'class' => 'marinesync-pdf-btn'
+	], $atts, 'marinesync_pdf_button');
+	$post_id = intval($atts['id']);
+	$label = esc_html($atts['label']);
+	$class = esc_attr($atts['class']);
+
+	// The endpoint URL for the PDF (see next section)
+	$pdf_url = esc_url(add_query_arg([
+		'marinesync_pdf' => $post_id
+	], home_url('/')));
+
+	return "<a href='{$pdf_url}' class='{$class}' target='_blank' rel='noopener'>{$label}</a>";
+});
+add_action('init', function() {
+	if (!empty($_GET['marinesync_pdf']) && is_numeric($_GET['marinesync_pdf'])) {
+		$post_id = intval($_GET['marinesync_pdf']);
+		// Safety check: optionally verify post type
+		if (get_post_type($post_id) === 'marinesync-boats') {
+			$pdf = new \MarineSync\PDF\MarineSync_PDF($post_id);
+			$pdf->generatePdf();
+			exit;
+		} else {
+			wp_die('Invalid or missing Boat ID.');
+		}
+	}
+});
+
