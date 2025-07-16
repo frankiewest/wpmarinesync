@@ -164,6 +164,7 @@ final class MarineSync_PDF {
 		                        </td>
 		                    </tr>
 		                </table>
+		                <img src='" . esc_url($boat_data['featured_image_url']) . "' style='width: 100%; display: block;'>
 		                <table style='width: 100%; margin-bottom: 20px; table-layout: fixed;'>
 						  <tr>
 						    <!-- Featured Image Left -->
