@@ -426,14 +426,8 @@ class MarineSync_Admin_Page {
                                 </button>
                             </p>
                         </form>
-                    </div>
-
-                    <div class="marinesync-card">
-                        <h2><?php _e('Export Options', 'marinesync'); ?></h2>
-                        <p><?php _e('Export your boat listings as an Open Marine compliant XML file.', 'marinesync'); ?></p>
-
                         <form id="export-options-form" method="post" style="margin-bottom:1em;">
-			                <?php wp_nonce_field('marinesync_export_options', 'export_options_nonce'); ?>
+		                    <?php wp_nonce_field('marinesync_export_options', 'export_options_nonce'); ?>
                             <label for="sold_boats_export">
                                 <strong><?php _e('Include “Sold” Boats in Export?', 'marinesync'); ?></strong>
                             </label>
