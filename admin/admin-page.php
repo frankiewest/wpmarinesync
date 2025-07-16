@@ -712,7 +712,7 @@ class MarineSync_Admin_Page {
 			}
 
 			// Create <adverts>
-			$adverts = $xml->addChild('adverts');
+			$adverts = $broker->addChild('adverts');
 			error_log('MS037: Starting boat entries processing');
 
 			foreach ($boat_posts as $index => $post) {
