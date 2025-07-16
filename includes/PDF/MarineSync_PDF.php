@@ -76,6 +76,8 @@ final class MarineSync_PDF {
 		$boat_data = $this->parseBoatMeta();
 		error_log("MSPDF010: Parsed boat data for HTML generation for boat_id={$this->boat_id}");
 
+		$images = $boat_data['boat_media'];
+
 		return "
 		    <style>
 		        @page {
@@ -121,7 +123,7 @@ final class MarineSync_PDF {
 		                </table>
 		                <div style='margin-bottom: 20px;'>
 		                    <img src='" . $boat_data['featured_image_url'] . "' style='width: 100%;'>
-		                    ". $boat_data['boat_media'] ."
+		                    ". print_r($images, true) ."
 		                </div>
 		                <div>
 		                    <h2>Boat Details</h2>
