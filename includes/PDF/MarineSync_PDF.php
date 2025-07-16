@@ -121,6 +121,7 @@ final class MarineSync_PDF {
 		                </table>
 		                <div style='margin-bottom: 20px;'>
 		                    <img src='" . $boat_data['featured_image_url'] . "' style='width: 100%;'>
+		                    ". $boat_data['boat_media'] ."
 		                </div>
 		                <div>
 		                    <h2>Boat Details</h2>
