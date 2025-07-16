@@ -248,7 +248,7 @@ final class MarineSync_PDF {
 		                        </tr>
 		                        <tr>
 		                            <td style='border: 1px solid #000; padding: 8px; color: #888;'>Name:</td>
-		                            <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['boat_name']) . "</strong></td>
+		                            <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['boat_name'] ?? $post_title) . "</strong></td>
 		                            <td style='border: 1px solid #000; padding: 8px; color: #888;'>Max Draft:</td>
 		                            <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['max_draft'] ?? ($boat_data['draft'] ?? '')) . "</strong></td>
 		                        </tr>
