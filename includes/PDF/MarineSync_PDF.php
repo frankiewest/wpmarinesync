@@ -113,7 +113,7 @@ final class MarineSync_PDF {
 		                            <span style='display: block;'>" . esc_html($boat_data['vessel_lying']) . "</span>
 		                        </td>
 		                        <td style='width: 30%; text-align: right;'>
-		                            <img src='" . $boat_data['company_logo'] . "' style='width: 200px;'>
+		                            <img src='" . $boat_data['company_logo_url'] . "' style='width: 200px;'>
 		                            <span>Tel: " . esc_html($boat_data['contact_no']) . "</span>
 		                            <span>Email: " . esc_html($boat_data['contact_email']) . "</span>
 		                        </td>
