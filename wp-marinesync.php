@@ -412,10 +412,10 @@ add_filter('manage_marinesync-boats_posts_columns', function($columns) {
 	foreach ($columns as $key => $label) {
 		$new_columns[$key] = $label;
 		if ($key === 'title') {
-			$new_columns['boat_ref'] = __('Reference', 'marinesync');
 			$new_columns['loa'] = __('Length (ft)', 'marinesync');
 			$new_columns['featured_boat'] = __('Featured', 'marinesync');
-		}
+			$new_columns['boat_ref'] = __('Reference', 'marinesync');
+        }
 	}
 	return $new_columns;
 });
