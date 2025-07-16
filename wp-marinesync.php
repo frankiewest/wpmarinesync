@@ -456,6 +456,10 @@ add_action('restrict_manage_posts', function($post_type) {
 
 	// Output buttons after the tabs but before bulk actions
 	echo '<div style="margin: 12px 0 8px; display: flex; gap: 10px;">';
+    echo '<style>
+        .alignleft {
+            float: unset;
+        }</style>';
 	foreach ($terms as $term) {
 		$url = admin_url('edit.php?boat-status=' . $term->slug . '&post_type=marinesync-boats');
 		$current = isset($_GET['boat-status']) && $_GET['boat-status'] === $term->slug;
