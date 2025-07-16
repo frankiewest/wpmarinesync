@@ -603,39 +603,37 @@ add_shortcode('marinesync_video', function($atts) {
 		'index' => 1,
 		'field' => 'videos',
 		'subfield' => 'video_url',
+		'class' => 'marinesync-video-embed'
 	], $atts, 'marinesync_video');
 
 	$post_id = intval($atts['id']);
 	$index = max(1, intval($atts['index']));
 	$field = $atts['field'];
 	$subfield = $atts['subfield'];
+	$class = esc_attr($atts['class']);
 
-	if (!$post_id) {
-		return '';
-	}
+	if (!$post_id) return '';
 
 	$videos = get_field($field, $post_id);
-	if (empty($videos) || !is_array($videos)) {
-		return '';
-	}
+	if (empty($videos) || !is_array($videos)) return '';
 
 	$video_index = $index - 1;
-	if (!isset($videos[$video_index][$subfield])) {
-		return '';
-	}
+	if (empty($videos[$video_index][$subfield])) return '';
 
 	$url = trim($videos[$video_index][$subfield]);
 	$youtube_id = null;
 
-	// Match YouTube long or short URLs
+	// YouTube ID extraction (matches youtu.be and youtube.com/watch?v=)
 	if (preg_match('~(?:youtube\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([A-Za-z0-9_-]{11})~i', $url, $matches)) {
 		$youtube_id = $matches[1];
 	}
 
 	if ($youtube_id) {
-		return "https://www.youtube.com/embed/" . esc_attr($youtube_id);
+		$embed_url = "https://www.youtube.com/embed/" . esc_attr($youtube_id);
+		return '<div class="' . $class . '" style="max-width:640px;margin:auto;"><iframe width="100%" height="360" src="' . esc_url($embed_url) . '" frameborder="0" allowfullscreen></iframe></div>';
+	} else {
+		// Fallback to HTML5 <video> tag
+		return '<div class="' . $class . '" style="max-width:640px;margin:auto;"><video width="100%" height="360" controls preload="metadata"><source src="' . esc_url($url) . '" type="video/mp4">Your browser does not support the video tag.</video></div>';
 	}
-
-	// Not YouTube? Just return original
-	return esc_url($url);
 });
+
