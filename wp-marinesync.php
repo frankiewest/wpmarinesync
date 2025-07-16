@@ -600,38 +600,42 @@ add_action('init', function() {
 add_shortcode('marinesync_video', function($atts) {
 	$atts = shortcode_atts([
 		'id' => get_the_ID(),
-		'index' => 1, // 1-based index, so "1" = first video
-		'field' => 'videos', // The repeater field name
-		'subfield' => 'youtube_url', // The repeater subfield name
-		'class' => 'marinesync-youtube-embed'
+		'index' => 1,
+		'field' => 'videos',
+		'subfield' => 'video_url',
 	], $atts, 'marinesync_video');
 
 	$post_id = intval($atts['id']);
-	$index = max(1, intval($atts['index'])); // make sure it's at least 1
+	$index = max(1, intval($atts['index']));
 	$field = $atts['field'];
 	$subfield = $atts['subfield'];
-	$class = esc_attr($atts['class']);
 
 	if (!$post_id) {
-		return '<div class="error">Invalid Post ID.</div>';
+		return '';
 	}
 
 	$videos = get_field($field, $post_id);
 	if (empty($videos) || !is_array($videos)) {
-		return '<div class="notice">No videos found.</div>';
+		return '';
 	}
 
 	$video_index = $index - 1;
 	if (!isset($videos[$video_index][$subfield])) {
-		return '<div class="notice">Video not found.</div>';
+		return '';
 	}
 
-	// Extract YouTube ID from full URL or use as-is
 	$url = trim($videos[$video_index][$subfield]);
-	preg_match('/(?:youtube\.com.*v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $matches);
-	$youtube_id = $matches[1] ?? $url; // fallback: treat as ID
+	$youtube_id = null;
 
-	// Compose embed
-	$embed_url = "https://www.youtube.com/embed/" . esc_attr($youtube_id);
-	return '<div class="' . $class . '" style="max-width: 640px;margin:auto;"><iframe width="100%" height="360" src="' . esc_url($embed_url) . '" frameborder="0" allowfullscreen></iframe></div>';
+	// Match YouTube long or short URLs
+	if (preg_match('~(?:youtube\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([A-Za-z0-9_-]{11})~i', $url, $matches)) {
+		$youtube_id = $matches[1];
+	}
+
+	if ($youtube_id) {
+		return "https://www.youtube.com/embed/" . esc_attr($youtube_id);
+	}
+
+	// Not YouTube? Just return original
+	return esc_url($url);
 });
