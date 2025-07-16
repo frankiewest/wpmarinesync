@@ -63,6 +63,9 @@ final class MarineSync_PDF {
 		$acf_fields['company_logo_url'] = MARINESYNC_PLUGIN_URL . 'assets/images/companylogo.png';
 
 		error_log("MSPDF008: Returning combined meta for boat_id={$this->boat_id} with " . count($acf_fields) . " fields.");
+
+		print_r($acf_fields, true);
+
 		return $acf_fields;
 	}
 
