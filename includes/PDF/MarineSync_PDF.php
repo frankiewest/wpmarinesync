@@ -25,7 +25,7 @@ final class MarineSync_PDF {
 		error_log("MSPDF002: Starting parseBoatMeta for boat_id={$this->boat_id}");
 
 		// Search for boat using MS methods
-		$boat = MarineSync_Post_Type::get_boat_id($this->boat_id) ?? 0;
+		$boat = $this->boat_id ?? 0;
 
 		// Check if ID returns a boat
 		if (!$boat) {
