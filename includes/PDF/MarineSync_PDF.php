@@ -161,8 +161,7 @@ final class MarineSync_PDF {
 		                        <td style='width: 30%; text-align: right;'>
 		                            <img src='" . $boat_data['company_logo_url'] . "' style='width: 200px;'><br>
 		                            <span>Tel: " . esc_html($office_tel) . "</span><br>
-									<span>Email: " . esc_html($office_email) . "</span><br>
-									<span>Address: " . esc_html($office_address) . "</span>
+									<span>Email: " . esc_html($office_email) . "</span>
 		                        </td>
 		                    </tr>
 		                </table>
