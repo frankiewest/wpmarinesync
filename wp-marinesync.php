@@ -469,23 +469,35 @@ add_action('restrict_manage_posts', function($post_type) {
 }, 10, 1);
 
 add_filter('manage_marinesync-boats_posts_columns', function($columns) {
-	// Build columns in desired order: after 'title' put 'boat_ref', then 'loa', then 'featured_boat'
 	$new_columns = [];
-	foreach ($columns as $key => $label) {
-		$new_columns[$key] = $label;
-		if ($key === 'title') {
-			$new_columns['boat_ref'] = __('Reference', 'marinesync');
-			$new_columns['loa'] = __('Length (m)', 'marinesync');
-			$new_columns['featured_boat'] = __('Featured', 'marinesync');
-		}
+	// Always keep checkbox first
+	if (isset($columns['cb'])) {
+		$new_columns['cb'] = $columns['cb'];
+	}
+	// Add columns in desired order
+	$new_columns['title']         = __('Boat Name', 'marinesync');
+	$new_columns['vessel_lying']  = __('Vessel Lying', 'marinesync');
+	$new_columns['price']         = __('Asking Price', 'marinesync');
+	$new_columns['loa']           = __('Length (ft)', 'marinesync');
+	$new_columns['featured_boat'] = __('Featured', 'marinesync');
+	$new_columns['boat_ref']      = __('Reference', 'marinesync');
+	// Put date at the end
+	if (isset($columns['date'])) {
+		$new_columns['date'] = $columns['date'];
 	}
 	return $new_columns;
 });
 
 add_action('manage_marinesync-boats_posts_custom_column', function($column, $post_id) {
 	switch ($column) {
-		case 'boat_ref':
-			echo esc_html(get_field('boat_ref', $post_id));
+		case 'vessel_lying':
+			echo esc_html(get_field('vessel_lying', $post_id));
+			break;
+		case 'price':
+			$price = get_field('price', $post_id);
+			if ($price) {
+				echo '£' . number_format($price);
+			}
 			break;
 		case 'loa':
 			$length = get_field('loa', $post_id);
@@ -494,14 +506,18 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column, $pos
 		case 'featured_boat':
 			echo has_term('featured', 'boat-cat', $post_id) ? '<strong>Featured</strong>' : 'No';
 			break;
-		// Add others as needed...
+		case 'boat_ref':
+			echo esc_html(get_field('boat_ref', $post_id));
+			break;
 	}
 }, 10, 2);
 
 add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
 	$columns['boat_ref'] = 'boat_ref';
 	$columns['loa'] = 'loa';
+	$columns['price'] = 'price';
 	$columns['featured_boat'] = 'featured_boat';
+	$columns['vessel_lying'] = 'vessel_lying';
 	return $columns;
 });
 
@@ -517,6 +533,14 @@ add_action('pre_get_posts', function($query) {
 	if ($orderby === 'loa') {
 		$query->set('meta_key', 'loa');
 		$query->set('orderby', 'meta_value_num');
+	}
+	if ($orderby === 'price') {
+		$query->set('meta_key', 'price');
+		$query->set('orderby', 'meta_value_num');
+	}
+	if ($orderby === 'vessel_lying') {
+		$query->set('meta_key', 'vessel_lying');
+		$query->set('orderby', 'meta_value');
 	}
 	if ($orderby === 'featured_boat') {
 		$query->set('tax_query', [[
