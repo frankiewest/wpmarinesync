@@ -166,6 +166,40 @@ final class MarineSync_PDF {
 
 		$post_title = get_post_field('post_title', $this->boat_id) ?? '';
 
+		$additional_fields = [
+			'control_type' => 'Control Type',
+			'range' => 'Range',
+			'last_serviced' => 'Last Serviced',
+			'passenger_capacity' => 'Passenger Capacity',
+			'where' => 'Where',
+			'super_structure_colour' => 'Super Structure Colour',
+			'super_structure_construction' => 'Super Structure Construction',
+			'ballast' => 'Ballast',
+			'displacement' => 'Displacement',
+			'hours' => 'Hours',
+			'epirb' => 'Epirb',
+			'bilge_pump' => 'Bilge Pump',
+			'fire_extinguisher' => 'Fire Extinguisher',
+			'berths' => 'Berths',
+			'known_defects' => 'Known Defects',
+			'reg_details' => 'Reg Details',
+			'owners_comments' => 'Owners Comments',
+			'external_url' => 'External URL',
+			'battery' => 'Battery',
+			'mob_system' => 'Mob System',
+			'open_marine' => 'Open Marine',
+			'broker' => 'Broker'
+		];
+
+
+		// Gather additional info fields
+		$additional_info_html = '';
+		foreach ( $additional_fields as $field => $label ) {
+			if ( ! empty( $boat_data[ $field ] ) ) {
+				$additional_info_html .= "<p><strong>" . esc_html( $label ) . ":</strong> " . esc_html( $boat_data[ $field ] ) . "</p>";
+			}
+		}
+
 		return "
 		    <style>
 		        @page {
@@ -311,7 +345,7 @@ final class MarineSync_PDF {
 		            <div class='page-break'>
 		                <h2>Additional Information</h2>
 		                <hr style='border: 1px solid #000; margin: 10px 0 20px 0;'>
-		                ".nl2br($boat_data['additional_info'])."
+		                ".$additional_info_html."
 		            </div>
 		        </div>
 		    </div>
