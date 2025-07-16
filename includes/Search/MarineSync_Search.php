@@ -149,6 +149,14 @@ class MarineSync_Search {
 		$meta_query = [];
 		$tax_query = [];
 
+		// Exclude sold
+		$tax_query[] = [
+			'taxonomy' => 'boat-status',
+			'field'    => 'slug',
+			'terms'    => ['sold'],
+			'operator' => 'NOT IN'
+		];
+
 		// Add manufacturer filter
 		if(isset($_GET['manufacturer']) && !empty($_GET['manufacturer'])){
 			$manufacturer = sanitize_text_field($_GET['manufacturer']);
