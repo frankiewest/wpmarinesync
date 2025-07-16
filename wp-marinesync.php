@@ -468,91 +468,68 @@ add_action('restrict_manage_posts', function($post_type) {
 	echo '</div>';
 }, 10, 1);
 
-// Add the Length column
 add_filter('manage_marinesync-boats_posts_columns', function($columns) {
-	$columns['loa'] = 'Length (m)';
-	return $columns;
+	// Insert 'loa' (Length) after the title
+	$new_columns = [];
+	foreach ($columns as $key => $label) {
+		$new_columns[$key] = $label;
+		if ($key === 'title') {
+			$new_columns['loa'] = __('Length (m)', 'marinesync');
+		}
+		if ($key === 'loa') {
+			$new_columns['featured_boat'] = __('Featured', 'marinesync');
+		}
+	}
+	return $new_columns;
 });
 
-// Populate Length column with ACF value
 add_action('manage_marinesync-boats_posts_custom_column', function($column, $post_id) {
-	if ($column === 'loa') {
-		$length = get_field('loa', $post_id); // ACF number field
-		if ($length) {
-			echo esc_html($length);
-		}
+	switch ($column) {
+		case 'loa':
+			$length = get_field('loa', $post_id);
+			if ($length) echo esc_html($length);
+			break;
+		case 'featured_boat':
+			echo has_term('featured', 'boat-cat', $post_id) ? '<strong>Featured</strong>' : 'No';
+			break;
 	}
 }, 10, 2);
 
 add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
 	$columns['loa'] = 'loa';
-	return $columns;
-});
-
-// Enable sorting by Length (loa) using meta query
-add_action('pre_get_posts', function($query) {
-	if (!is_admin() || !$query->is_main_query()) return;
-
-	if ($query->get('post_type') === 'marinesync-boats') {
-		if ($query->get('orderby') == 'loa') {
-			$query->set('meta_key', 'loa');
-			$query->set('orderby', 'meta_value_num');
-		}
-		// Force default ordering by length
-		if (!$query->get('orderby') && !$query->get('order')) {
-			$query->set('meta_key', 'loa');
-			$query->set('orderby', 'meta_value_num');
-			$query->set('order', 'DESC'); // or ASC, up to you
-		}
-	}
-});
-
-add_filter('manage_marinesync-boats_posts_columns', function($columns) {
-	$insert_after = 'loa';
-	$new = [];
-	foreach ($columns as $key => $label) {
-		$new[$key] = $label;
-		if ($key === $insert_after) {
-			$new['featured_boat'] = 'Featured';
-		}
-	}
-	return $new;
-});
-
-add_action('manage_marinesync-boats_posts_custom_column', function($column, $post_id) {
-	if ($column === 'featured_boat') {
-		$featured = has_term('featured', 'boat-cat', $post_id);
-		echo $featured ? '<strong>Featured</strong>' : 'No';
-	}
-}, 10, 2);
-
-add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
 	$columns['featured_boat'] = 'featured_boat';
 	return $columns;
 });
 
 add_action('pre_get_posts', function($query) {
-	if (!is_admin() || !$query->is_main_query()) return;
-	if ($query->get('post_type') === 'marinesync-boats') {
-		if ($query->get('orderby') == 'featured_boat') {
-			$query->set('tax_query', [
-				[
-					'taxonomy' => 'boat-cat',
-					'field' => 'slug',
-					'terms' => 'featured',
-					'operator' => 'EXISTS'
-				]
-			]);
-		}
+	if (!is_admin() || !$query->is_main_query() || $query->get('post_type') !== 'marinesync-boats') return;
+
+	$orderby = $query->get('orderby');
+
+	if ($orderby === 'loa') {
+		$query->set('meta_key', 'loa');
+		$query->set('orderby', 'meta_value_num');
+	}
+	if ($orderby === 'featured_boat') {
+		$query->set('tax_query', [
+			[
+				'taxonomy' => 'boat-cat',
+				'field' => 'slug',
+				'terms' => 'featured',
+				'operator' => 'EXISTS'
+			]
+		]);
 	}
 
-	if (
-		is_admin() &&
-		$query->is_main_query() &&
-		$query->get('post_type') === 'marinesync-boats' &&
-		!isset($_GET['boat-status']) &&
-		!isset($_GET['s']) // allow search override
-	) {
+	// Force default ordering by length if not specified
+	if (!$orderby && !$query->get('order')) {
+		$query->set('meta_key', 'loa');
+		$query->set('orderby', 'meta_value_num');
+		$query->set('order', 'DESC');
+	}
+
+	// Default to showing only 'active' boats unless filtering or searching
+	if (!isset($_GET['boat-status']) && !isset($_GET['s'])) {
 		$tax_query = (array) $query->get('tax_query');
 		$tax_query[] = [
 			'taxonomy' => 'boat-status',
@@ -581,3 +558,4 @@ add_action('admin_menu', function() {
 		}
 	);
 });
+
