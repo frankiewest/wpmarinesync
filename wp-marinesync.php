@@ -570,7 +570,7 @@ add_shortcode('marinesync_pdf_button', function($atts) {
 	$atts = shortcode_atts([
 		'id' => get_the_ID(),
 		'label' => 'Download PDF',
-		'class' => 'marinesync-pdf-btn'
+		'class' => 'w-btn us-btn-style_1 icon_atright marinesync-pdf-btn'
 	], $atts, 'marinesync_pdf_button');
 	$post_id = intval($atts['id']);
 	$label = esc_html($atts['label']);
@@ -580,8 +580,9 @@ add_shortcode('marinesync_pdf_button', function($atts) {
 	$pdf_url = esc_url(add_query_arg([
 		'marinesync_pdf' => $post_id
 	], home_url('/')));
-
-	return "<a href='{$pdf_url}' class='{$class}' target='_blank' rel='noopener'>{$label}</a>";
+	return "<div class='w-btn-wrapper align_center'>
+            <a href='{$pdf_url}' class='{$class}' target='_blank' rel='noopener'>{$label}</a>
+            </div>";
 });
 add_action('init', function() {
 	if (!empty($_GET['marinesync_pdf']) && is_numeric($_GET['marinesync_pdf'])) {
