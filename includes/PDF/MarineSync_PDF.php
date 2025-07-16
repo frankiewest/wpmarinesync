@@ -165,29 +165,7 @@ final class MarineSync_PDF {
 		                    </tr>
 		                </table>
 		                <img src='" . esc_url($boat_data['featured_image_url']) . "' style='width: 100%; display: block;'>
-		                <table style='width: 100%; margin-bottom: 20px; table-layout: fixed;'>
-						  <tr>
-						    <!-- Featured Image Left -->
-						    <td style='width: 60%; vertical-align: top; padding-right: 10px;'>
-						      <img src='" . esc_url($boat_data['featured_image_url']) . "' style='width: 100%; display: block;'>
-						    </td>
-						    <!-- 2 Stacked Images Right -->
-						    <td style='width: 40%; vertical-align: top;'>
-						      <table style='width: 100%;'>
-						        <tr>
-						          <td style='padding-bottom: 10px;'>
-						            " . (!empty($images[0]['url']) ? "<img src='" . esc_url($images[0]['url']) . "' style='width: 100%; display: block;'>" : "") . "
-						          </td>
-						        </tr>
-						        <tr>
-						          <td>
-						            " . (!empty($images[1]['url']) ? "<img src='" . esc_url($images[1]['url']) . "' style='width: 100%; display: block;'>" : "") . "
-						          </td>
-						        </tr>
-						      </table>
-						    </td>
-						  </tr>
-						</table>
+		         
 
 		                <div>
 		                    <h2>Boat Details</h2>
