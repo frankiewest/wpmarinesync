@@ -164,6 +164,8 @@ final class MarineSync_PDF {
 
 		$details_html = $this->getDetailsSectionsHtml($this->boat_id);
 
+		$post_title = get_post_field($this->boat_id, 'post_title') ?? '';
+
 		return "
 		    <style>
 		        @page {
@@ -196,7 +198,7 @@ final class MarineSync_PDF {
 		                <table style='width: 100%; margin-bottom: 20px;'>
 		                    <tr>
 		                        <td style='width: 70%;line-height: 0.7em'>
-		                            <h2 style='margin: 0;'>" . esc_html($boat_data['name']) . "</h2>
+		                            <h2 style='margin: 0;'>" . $post_title . "</h2>
 		                            <span style='display: block; font-size: 20px; margin: 10px 0;'>£" . esc_html(number_format($boat_data['price'])) . " " . esc_html($boat_data['vat_type'])."</span>
 		                            <span style='display: block;'>" . esc_html($boat_data['vessel_lying']) . "</span>
 		                        </td>
