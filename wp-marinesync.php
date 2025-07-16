@@ -545,6 +545,23 @@ add_action('pre_get_posts', function($query) {
 			]);
 		}
 	}
+
+	if (
+		is_admin() &&
+		$query->is_main_query() &&
+		$query->get('post_type') === 'marinesync-boats' &&
+		!isset($_GET['boat-status']) &&
+		!isset($_GET['s']) // allow search override
+	) {
+		$tax_query = (array) $query->get('tax_query');
+		$tax_query[] = [
+			'taxonomy' => 'boat-status',
+			'field'    => 'slug',
+			'terms'    => ['active'],
+			'operator' => 'IN'
+		];
+		$query->set('tax_query', $tax_query);
+	}
 });
 
 
