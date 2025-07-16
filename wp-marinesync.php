@@ -436,9 +436,9 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column, $pos
 }, 10, 2);
 
 add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
-	$columns['boat_ref'] = 'boat_ref';
 	$columns['loa'] = 'loa';
 	$columns['featured_boat'] = 'featured_boat';
+	$columns['boat_ref'] = 'boat_ref';
 	return $columns;
 });
 
