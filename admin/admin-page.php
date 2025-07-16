@@ -940,18 +940,17 @@ class MarineSync_Admin_Page {
 						// Add dimensions
 						$dimensions = $boat_features->addChild('dimensions');
 
-						// Add dimension items directly
-						$beam_item = $dimensions->addChild('item', (string)MarineSync_Post_Type::get_boat_field('beam', $post->ID));
-						$beam_item->addAttribute('name', 'beam');
+						$dimension_fields = ['beam', 'draft', 'loa', 'engine_power'];
+						foreach ($dimension_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
 
-						$draft_item = $dimensions->addChild('item', (string)MarineSync_Post_Type::get_boat_field('draft', $post->ID));
-						$draft_item->addAttribute('name', 'draft');
-
-						$loa_item = $dimensions->addChild('item', (string)MarineSync_Post_Type::get_boat_field('loa', $post->ID));
-						$loa_item->addAttribute('name', 'loa');
-
-						$engine_power_item = $dimensions->addChild('item', (string)MarineSync_Post_Type::get_boat_field('engine_power', $post->ID));
-						$engine_power_item->addAttribute('name', 'engine_power');
+							$item = $dimensions->addChild('item', (string)$value);
+							$item->addAttribute('name', $field);
+							if ($unit) {
+								$item->addAttribute('unit', $unit);
+							}
+						}
 
 						// Add build
 						$build = $boat_features->addChild('build');
