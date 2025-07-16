@@ -13,6 +13,7 @@ final class MarineSync_PDF {
 
 	public function __construct($boat_id){
 		$this->boat_id = $boat_id;
+		error_log("MSPDF001: Constructed MarineSync_PDF for boat_id={$boat_id}");
 	}
 
 	/**
@@ -21,29 +22,39 @@ final class MarineSync_PDF {
 	 * @return array
 	 */
 	private function parseBoatMeta(): array {
+		error_log("MSPDF002: Starting parseBoatMeta for boat_id={$this->boat_id}");
+
 		// Search for boat using MS methods
 		$boat = MarineSync_Post_Type::get_boat_id($this->boat_id) ?? 0;
 
 		// Check if ID returns a boat
-		if (!$boat) throw new \Exception('Boat not found with this ID: ' . $this->boat_id);
+		if (!$boat) {
+			error_log("MSPDF003: Boat not found with this ID: {$this->boat_id}");
+			throw new \Exception('Boat not found with this ID: ' . $this->boat_id);
+		}
 
 		// Get featured image URL
 		$featured_image_id = get_post_thumbnail_id($this->boat_id);
 		$featured_image_url = wp_get_attachment_image_url($featured_image_id);
+		error_log("MSPDF004: Featured image URL for boat_id={$this->boat_id} is " . ($featured_image_url ?: 'NOT FOUND'));
 
 		// Get all ACF fields
 		$acf_fields = get_fields($this->boat_id) ?: [];
+		error_log("MSPDF005: Fetched " . count($acf_fields) . " ACF fields for boat_id={$this->boat_id}");
 
 		// Get all meta fields (as fallback)
 		$meta_fields = get_post_meta($this->boat_id);
+		error_log("MSPDF006: Fetched " . count($meta_fields) . " meta fields for boat_id={$this->boat_id}");
 
 		// Merge meta fields that are missing from ACF fields
+		$merged = 0;
 		foreach ($meta_fields as $key => $values) {
 			if (!array_key_exists($key, $acf_fields)) {
-				// get_post_meta returns array, but usually we want single value
 				$acf_fields[$key] = (count($values) === 1) ? $values[0] : $values;
+				$merged++;
 			}
 		}
+		error_log("MSPDF007: Merged {$merged} meta fields into ACF fields for boat_id={$this->boat_id}");
 
 		// add featured image
 		$acf_fields['featured_image_url'] = $featured_image_url;
@@ -51,6 +62,7 @@ final class MarineSync_PDF {
 		// add company logo if needed
 		$acf_fields['company_logo_url'] = MARINESYNC_PLUGIN_URL . 'assets/images/company-logo.png';
 
+		error_log("MSPDF008: Returning combined meta for boat_id={$this->boat_id} with " . count($acf_fields) . " fields.");
 		return $acf_fields;
 	}
 
@@ -60,7 +72,10 @@ final class MarineSync_PDF {
 	 * @return mixed
 	 */
 	private function generateHtml() {
+		error_log("MSPDF009: Starting generateHtml for boat_id={$this->boat_id}");
 		$boat_data = $this->parseBoatMeta();
+		error_log("MSPDF010: Parsed boat data for HTML generation for boat_id={$this->boat_id}");
+
 		return "
 		    <style>
 		        @page {
@@ -219,29 +234,44 @@ final class MarineSync_PDF {
 	 * @return void
 	 */
 	public function generatePdf(): void {
-		// Pass in boat meta to retrieve data
-		$boat_data = $this->parseBoatMeta() ?? [];
-		$boat_name = $boat_data['boat_name'] ?? get_post_field($this->boat_id, 'post_title');
+		error_log("MSPDF011: Called generatePdf for boat_id={$this->boat_id}");
 
-		// Return nothing if boat data is an empty array
-		if (empty($boat_data)) {
-			return;
+		try {
+			// Pass in boat meta to retrieve data
+			$boat_data = $this->parseBoatMeta() ?? [];
+			$boat_name = $boat_data['boat_name'] ?? get_post_field('post_title', $this->boat_id);
+
+			// Return nothing if boat data is an empty array
+			if (empty($boat_data)) {
+				error_log("MSPDF012: Empty boat_data array for boat_id={$this->boat_id}");
+				return;
+			}
+
+			// Configure options
+			$options = new Options();
+			$options->set('isHtml5ParserEnabled', true);
+			$options->set('isPhpEnabled', true);
+			$options->set('isRemoteEnabled', true);
+
+			$dompdf = new Dompdf($options);
+
+			$html = $this->generateHtml();
+			error_log("MSPDF013: Generated HTML for boat_id={$this->boat_id} (" . strlen($html) . " chars)");
+
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'portrait');
+			$dompdf->render();
+
+			error_log("MSPDF014: PDF rendered for boat_id={$this->boat_id}");
+
+			header('Content-Type: application/pdf');
+			header('Content-Disposition: inline; filename="'.$boat_name.'.pdf"');
+
+			$dompdf->stream("{$boat_name}.pdf", ["Attachment" => false]);
+			error_log("MSPDF015: PDF stream sent for boat_id={$this->boat_id}");
+		} catch (\Exception $e) {
+			error_log("MSPDF099: Exception in generatePdf for boat_id={$this->boat_id}: " . $e->getMessage());
+			wp_die('Error generating PDF: ' . esc_html($e->getMessage()));
 		}
-
-		// Configure options
-		$options = new Options();
-		$options->set('isHtml5ParserEnabled', true);
-		$options->set('isPhpEnabled', true);
-		$options->set('isRemoteEnabled', true);
-
-		$dompdf = new Dompdf($options);
-		$dompdf->loadHtml($this->generateHtml());
-		$dompdf->setPaper('A4', 'portrait');
-		$dompdf->render();
-
-		header('Content-Type: application/pdf');
-		header('Content-Disposition: inline; filename="'.$boat_name.'.pdf"');
-
-		$dompdf->stream("{$boat_name}.pdf", ["Attachment" => false]);
 	}
 }
