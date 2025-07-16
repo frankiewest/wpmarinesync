@@ -962,7 +962,7 @@ class MarineSync_Admin_Page {
 						$fuel_tanks_item->addAttribute('name', 'fuel_tanks_capacity');
 
 						$hull_material_item = $additional->addChild('item', (string)MarineSync_Post_Type::get_boat_field('hull_material', $post->ID));
-						$hull_material_item->addAttribute('name', 'hull_material');
+						$hull_material_item->addAttribute('name', 'hull_type');
 
 						$water_tanks_item = $additional->addChild('item', (string)MarineSync_Post_Type::get_boat_field('water_tanks_capacity', $post->ID));
 						$water_tanks_item->addAttribute('name', 'water_tanks_capacity');
