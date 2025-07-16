@@ -64,7 +64,7 @@ final class MarineSync_PDF {
 
 		error_log("MSPDF008: Returning combined meta for boat_id={$this->boat_id} with " . count($acf_fields) . " fields.");
 
-		print_r($acf_fields, true);
+		error_log(print_r($acf_fields, true););
 
 		return $acf_fields;
 	}
