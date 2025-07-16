@@ -347,6 +347,30 @@ function marinesync_register_boat_admin_role_and_admin_caps() {
 		'edit_published_boats',
 		'delete_published_boats',
 
+		// Taxonomies: boat-cat
+		'manage_boat-cat',
+		'edit_boat-cat',
+		'delete_boat-cat',
+		'assign_boat-cat',
+
+		// Taxonomies: boat-status
+		'manage_boat-status',
+		'edit_boat-status',
+		'delete_boat-status',
+		'assign_boat-status',
+
+		// Taxonomies: boat-condition
+		'manage_boat-condition',
+		'edit_boat-condition',
+		'delete_boat-condition',
+		'assign_boat-condition',
+
+		// Taxonomies: boat-type
+		'manage_boat-type',
+		'edit_boat-type',
+		'delete_boat-type',
+		'assign_boat-type',
+
 		// Posts
 		'edit_posts',
 		'edit_others_posts',
