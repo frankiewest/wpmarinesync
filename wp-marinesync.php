@@ -469,14 +469,13 @@ add_action('restrict_manage_posts', function($post_type) {
 }, 10, 1);
 
 add_filter('manage_marinesync-boats_posts_columns', function($columns) {
-	// Insert 'loa' (Length) after the title
+	// Build columns in desired order: after 'title' put 'boat_ref', then 'loa', then 'featured_boat'
 	$new_columns = [];
 	foreach ($columns as $key => $label) {
 		$new_columns[$key] = $label;
 		if ($key === 'title') {
+			$new_columns['boat_ref'] = __('Reference', 'marinesync');
 			$new_columns['loa'] = __('Length (m)', 'marinesync');
-		}
-		if ($key === 'loa') {
 			$new_columns['featured_boat'] = __('Featured', 'marinesync');
 		}
 	}
@@ -485,6 +484,9 @@ add_filter('manage_marinesync-boats_posts_columns', function($columns) {
 
 add_action('manage_marinesync-boats_posts_custom_column', function($column, $post_id) {
 	switch ($column) {
+		case 'boat_ref':
+			echo esc_html(get_field('boat_ref', $post_id));
+			break;
 		case 'loa':
 			$length = get_field('loa', $post_id);
 			if ($length) echo esc_html($length);
@@ -492,10 +494,12 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column, $pos
 		case 'featured_boat':
 			echo has_term('featured', 'boat-cat', $post_id) ? '<strong>Featured</strong>' : 'No';
 			break;
+		// Add others as needed...
 	}
 }, 10, 2);
 
 add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
+	$columns['boat_ref'] = 'boat_ref';
 	$columns['loa'] = 'loa';
 	$columns['featured_boat'] = 'featured_boat';
 	return $columns;
@@ -506,19 +510,21 @@ add_action('pre_get_posts', function($query) {
 
 	$orderby = $query->get('orderby');
 
+	if ($orderby === 'boat_ref') {
+		$query->set('meta_key', 'boat_ref');
+		$query->set('orderby', 'meta_value');
+	}
 	if ($orderby === 'loa') {
 		$query->set('meta_key', 'loa');
 		$query->set('orderby', 'meta_value_num');
 	}
 	if ($orderby === 'featured_boat') {
-		$query->set('tax_query', [
-			[
-				'taxonomy' => 'boat-cat',
-				'field' => 'slug',
-				'terms' => 'featured',
-				'operator' => 'EXISTS'
-			]
-		]);
+		$query->set('tax_query', [[
+			'taxonomy' => 'boat-cat',
+			'field' => 'slug',
+			'terms' => 'featured',
+			'operator' => 'EXISTS'
+		]]);
 	}
 
 	// Force default ordering by length if not specified
