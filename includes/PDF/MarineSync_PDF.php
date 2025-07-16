@@ -96,6 +96,36 @@ final class MarineSync_PDF {
 	}
 
 	/**
+	 * Gather all ACF details fields and return as a single HTML string.
+	 * @param int $post_id
+	 * @return string
+	 */
+	private function getDetailsSectionsHtml($post_id) {
+		$acf_fields = [
+			'construction_details',
+			'machinery_details',
+			'electrics_details',
+			'tankage_details',
+			'accommodation_details',
+			'domestic_details',
+			'deck_details',
+			'navigation_details',
+			'tenders_details',
+			'safety_details',
+		];
+		$desc = '';
+		foreach ($acf_fields as $acf_field) {
+			$acf_value = get_field($acf_field, $post_id);
+			if (!empty($acf_value)) {
+				// Add a heading for each section
+				$label = ucwords(str_replace('_', ' ', str_replace('_details', '', $acf_field)));
+				$desc .= "<h3>{$label}</h3>\n" . $acf_value . "\n";
+			}
+		}
+		return $desc;
+	}
+
+	/**
 	 * Generate HTML
 	 *
 	 * @return mixed
@@ -120,7 +150,7 @@ final class MarineSync_PDF {
 			($office['country'] ?? '')
 			, ', ');
 
-
+		$details_html = $this->getDetailsSectionsHtml($this->boat_id);
 
 		return "
 		    <style>
@@ -220,7 +250,7 @@ final class MarineSync_PDF {
 		            <div style='color: black;'>
 		                <h2 style='color:#2E5274;'>Boat Description</h2>
 		                <hr style='border: 1px solid #000; margin: 10px 0 20px 0;'>
-		                ". $boat_data['description'] . "
+		                ". $details_html . "
 		            </div>
 		            <div>
 		                <h2>Information & Features</h2>
