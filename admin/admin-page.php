@@ -19,6 +19,7 @@ class MarineSync_Admin_Page {
 	 */
 	private static $instance = null;
 	private $options;
+	private $sold_boats_export;
 	private $feed_running = false;
 
     /**
@@ -56,6 +57,8 @@ class MarineSync_Admin_Page {
 		$this->options = get_option('marinesync_feed_settings', array(
 			'export_feed_frequency' => 24
 		));
+
+		$this->sold_boats_export = get_option('marinesync_sold_boats_export', 'show');
         
         // Setup scheduled events if needed
         $this->setup_scheduled_exports();
@@ -387,6 +390,15 @@ class MarineSync_Admin_Page {
 		        $export_schedule_updated = true;
 		    }
 		}
+
+		if (isset($_POST['sold_boats_export']) && isset($_POST['export_options_nonce']) &&
+		    wp_verify_nonce($_POST['export_options_nonce'], 'marinesync_export_options')
+		) {
+			$value = in_array($_POST['sold_boats_export'], ['show', 'hide']) ? $_POST['sold_boats_export'] : 'show';
+			update_option('marinesync_sold_boats_export', $value);
+			$this->sold_boats_export = $value;
+			echo '<div class="notice notice-success"><p>' . __('Export setting updated.', 'marinesync') . '</p></div>';
+		}
 		?>
         <div class="wrap marinesync-admin">
             <h1><?php _e('Export Boats', 'marinesync'); ?></h1>
@@ -413,6 +425,23 @@ class MarineSync_Admin_Page {
 					                <?php _e('Run Boat Export', 'marinesync'); ?>
                                 </button>
                             </p>
+                        </form>
+                    </div>
+
+                    <div class="marinesync-card">
+                        <h2><?php _e('Export Options', 'marinesync'); ?></h2>
+                        <p><?php _e('Export your boat listings as an Open Marine compliant XML file.', 'marinesync'); ?></p>
+
+                        <form id="export-options-form" method="post" style="margin-bottom:1em;">
+			                <?php wp_nonce_field('marinesync_export_options', 'export_options_nonce'); ?>
+                            <label for="sold_boats_export">
+                                <strong><?php _e('Include “Sold” Boats in Export?', 'marinesync'); ?></strong>
+                            </label>
+                            <select name="sold_boats_export" id="sold_boats_export">
+                                <option value="show" <?php selected($this->sold_boats_export, 'show'); ?>><?php _e('Show', 'marinesync'); ?></option>
+                                <option value="hide" <?php selected($this->sold_boats_export, 'hide'); ?>><?php _e('Hide', 'marinesync'); ?></option>
+                            </select>
+                            <button type="submit" class="button button-primary"><?php _e('Save Settings', 'marinesync'); ?></button>
                         </form>
                     </div>
 
@@ -606,12 +635,22 @@ class MarineSync_Admin_Page {
 
 		global $wpdb;
 
-		// Get all boat posts
-		$boat_posts = get_posts(array(
+		$boat_args = array(
 			'post_type' => 'marinesync-boats',
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
-		));
+		);
+		if (get_option('marinesync_sold_boats_export', 'show') === 'hide') {
+			$boat_args['tax_query'] = array(
+				array(
+					'taxonomy' => 'boat-status',
+					'field' => 'slug',
+					'terms' => array('sold'),
+					'operator' => 'NOT IN'
+				)
+			);
+		}
+		$boat_posts = get_posts($boat_args);
 
 		$count = count($boat_posts);
 		error_log('MS027: Found ' . $count . ' boat posts to export');
