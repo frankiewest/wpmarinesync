@@ -405,7 +405,7 @@ function marinesync_register_boat_admin_role_and_admin_caps() {
 		}
 	}
 }
-add_action('init', __NAMESPACE__ . 'MarineSync\\marinesync_register_boat_admin_role_and_admin_caps');
+add_action('init', __NAMESPACE__ . '\\marinesync_register_boat_admin_role_and_admin_caps');
 
 add_action('restrict_manage_posts', function($post_type) {
 	if ($post_type !== 'marinesync-boats') return;
