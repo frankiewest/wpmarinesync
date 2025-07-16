@@ -121,10 +121,24 @@ final class MarineSync_PDF {
 		                        </td>
 		                    </tr>
 		                </table>
-		                <div style='margin-bottom: 20px;'>
-		                    <img src='" . $boat_data['featured_image_url'] . "' style='width: 100%;'>
-		                    ". print_r($images, true) ."
-		                </div>
+		                <div style='margin-bottom: 20px; display: flex; gap: 20px; align-items: flex-start;'>
+						    <!-- Featured image on the left -->
+						    <div style='flex: 1 1 0; min-width: 0;'>
+						        <img src='" . esc_url($boat_data['featured_image_url']) . "' style='width: 100%; display: block;'>
+						    </div>
+						    <!-- Two images on the right, stacked vertically -->
+						    <div style='flex: 1 1 0; display: flex; flex-direction: column; gap: 10px; min-width: 0;'>
+						        " . (
+									!empty($images[0]['url']) ?
+										"<img src='" . esc_url($images[0]['url']) . "' style='width: 100%; display: block;'>" : ""
+									) . "
+						        " . (
+								       !empty($images[1]['url']) ?
+									       "<img src='" . esc_url($images[1]['url']) . "' style='width: 100%; display: block;'>" : ""
+								       ) . "
+						    </div>
+						</div>
+
 		                <div>
 		                    <h2>Boat Details</h2>
 		                    <hr style='border: 1px solid #000; margin: 10px 0 20px 0;'>
