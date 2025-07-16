@@ -67,6 +67,32 @@ final class MarineSync_PDF {
 	}
 
 	/**
+	 * Get Office details by office_id
+	 * @param string|int $office_id
+	 * @return array|null
+	 */
+	private function getOfficeDetails($office_id) {
+		error_log("MSPDF016: Looking up office details for office_id={$office_id}");
+		if (!$office_id) return null;
+
+		$offices = get_field('offices', 'option');
+		if (empty($offices) || !is_array($offices)) {
+			error_log("MSPDF017: No offices found in ACF options");
+			return null;
+		}
+
+		foreach ($offices as $office) {
+			if (!empty($office['id']) && strval($office['id']) === strval($office_id)) {
+				error_log("MSPDF018: Match found for office_id={$office_id}");
+				return $office;
+			}
+		}
+
+		error_log("MSPDF019: No match for office_id={$office_id}");
+		return null;
+	}
+
+	/**
 	 * Generate HTML
 	 *
 	 * @return mixed
@@ -77,6 +103,19 @@ final class MarineSync_PDF {
 		error_log("MSPDF010: Parsed boat data for HTML generation for boat_id={$this->boat_id}");
 
 		$images = array_slice($boat_data['boat_media'], 0, 2);
+
+		$office_id = $boat_data['office_id'] ?? '';
+		$office = $this->getOfficeDetails($office_id);
+
+		$office_tel = $office['daytime_phone'] ?? '';
+		$office_email = $office['office_email'] ?? '';
+		$office_address = trim(
+			($office['address'] ?? '') . ', ' .
+			($office['town'] ?? '') . ', ' .
+			($office['county'] ?? '') . ', ' .
+			($office['postcode'] ?? '') . ', ' .
+			($office['country'] ?? '')
+			, ', ');
 
 		return "
 		    <style>
@@ -115,9 +154,10 @@ final class MarineSync_PDF {
 		                            <span style='display: block;'>" . esc_html($boat_data['vessel_lying']) . "</span>
 		                        </td>
 		                        <td style='width: 30%; text-align: right;'>
-		                            <img src='" . $boat_data['company_logo_url'] . "' style='width: 200px;'>
-		                            <span>Tel: " . esc_html($boat_data['contact_no']) . "</span>
-		                            <span>Email: " . esc_html($boat_data['contact_email']) . "</span>
+		                            " . $boat_data['company_logo_url'] . "
+		                            <span>Tel: " . esc_html($office_tel) . "</span><br>
+									<span>Email: " . esc_html($office_email) . "</span><br>
+									<span>Address: " . esc_html($office_address) . "</span>
 		                        </td>
 		                    </tr>
 		                </table>
