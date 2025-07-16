@@ -695,9 +695,10 @@ class MarineSync_Admin_Page {
 					    method_exists('MarineSync\\PostType\\MarineSync_Post_Type', 'get_boat_field')) {
 
 						// Add advert attr - check each field exists before adding
-						$status = MarineSync_Post_Type::get_boat_field('status', $post->ID);
-						if ($status) {
-							$boat->addAttribute('status', $status);
+						$terms = get_the_terms($post->ID, 'boat-status');
+						if (!empty($terms) && !is_wp_error($terms)) {
+							$status_names = wp_list_pluck($terms, 'name');
+							$boat->addAttribute('status', $status_names[0]); // First status name
 						}
 
 						$boat->addAttribute('last_modified', get_the_modified_date('Y-m-d\TH:i:s', $post->ID));
