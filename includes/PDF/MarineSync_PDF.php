@@ -164,7 +164,7 @@ final class MarineSync_PDF {
 
 		$details_html = $this->getDetailsSectionsHtml($this->boat_id);
 
-		$post_title = get_post_field($this->boat_id, 'post_title') ?? '';
+		$post_title = get_post_field('post_title', $this->boat_id) ?? '';
 
 		return "
 		    <style>
