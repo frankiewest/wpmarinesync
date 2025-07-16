@@ -444,3 +444,22 @@ function marinesync_register_boat_admin_role_and_admin_caps() {
 	}
 }
 add_action('init', __NAMESPACE__ . '\\marinesync_register_boat_admin_role_and_admin_caps');
+
+add_action('restrict_manage_posts', function($post_type) {
+	if ($post_type !== 'marinesync-boats') return;
+
+	$terms = get_terms([
+		'taxonomy' => 'boat-status',
+		'hide_empty' => false,
+	]);
+	if (empty($terms) || is_wp_error($terms)) return;
+
+	// Output buttons after the tabs but before bulk actions
+	echo '<div style="margin: 12px 0 8px; display: flex; gap: 10px;">';
+	foreach ($terms as $term) {
+		$url = admin_url('edit.php?boat-status=' . $term->slug . '&post_type=marinesync-boats');
+		$current = isset($_GET['boat-status']) && $_GET['boat-status'] === $term->slug;
+		echo '<a href="' . esc_url($url) . '" class="button' . ($current ? ' button-primary' : '') . '">' . esc_html($term->name) . '</a>';
+	}
+	echo '</div>';
+}, 10, 1);
