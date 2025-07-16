@@ -656,7 +656,7 @@ class MarineSync_Admin_Page {
 			// Add broker information
 			$broker = $xml->addChild('broker');
 			// Use a default broker code if not set
-			$broker_code = isset($this->options['broker_code']) ? $this->options['broker_code'] : 'default';
+			$broker_code = isset($this->options['broker_code']) ? $this->options['broker_code'] : '1';
 			$broker->addAttribute('code', $broker_code);
 			error_log('MS032: Added broker information');
 
