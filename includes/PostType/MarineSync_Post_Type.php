@@ -77,6 +77,12 @@ class MarineSync_Post_Type {
 			'query_var'         => true,
 			'rewrite'           => array('slug' => 'boat-cat'),
 			'show_in_rest'      => true,
+			'capabilities'      => [
+				'manage_terms' => 'manage_boat-cat',
+				'edit_terms'   => 'edit_boat-cat',
+				'delete_terms' => 'delete_boat-cat',
+				'assign_terms' => 'assign_boat-cat',
+			],
 		));
 
 		// Register boat status taxonomy
@@ -102,6 +108,12 @@ class MarineSync_Post_Type {
 			'query_var'         => true,
 			'rewrite'           => array('slug' => 'boat-status'),
 			'show_in_rest'      => true,
+			'capabilities'      => [
+				'manage_terms' => 'manage_boat-status',
+				'edit_terms'   => 'edit_boat-status',
+				'delete_terms' => 'delete_boat-status',
+				'assign_terms' => 'assign_boat-status',
+			],
 		));
 
 		// Register boat condition taxonomy
@@ -127,6 +139,12 @@ class MarineSync_Post_Type {
 			'query_var'         => true,
 			'rewrite'           => array('slug' => 'boat-condition'),
 			'show_in_rest'      => true,
+			'capabilities'      => [
+				'manage_terms' => 'manage_boat-condition',
+				'edit_terms'   => 'edit_boat-condition',
+				'delete_terms' => 'delete_boat-condition',
+				'assign_terms' => 'assign_boat-condition',
+			],
 		));
 
 		// Register boat type taxonomy
@@ -152,6 +170,12 @@ class MarineSync_Post_Type {
 			'query_var'         => true,
 			'rewrite'           => array('slug' => 'boat-type'),
 			'show_in_rest'      => true,
+			'capabilities'      => [
+				'manage_terms' => 'manage_boat-type',
+				'edit_terms'   => 'edit_boat-type',
+				'delete_terms' => 'delete_boat-type',
+				'assign_terms' => 'assign_boat-type',
+			],
 		));
 
 		// Register manufacturer taxonomy
@@ -177,6 +201,12 @@ class MarineSync_Post_Type {
 			'query_var'         => true,
 			'rewrite'           => array('slug' => 'manufacturer'),
 			'show_in_rest'      => true,
+			'capabilities'      => [
+				'manage_terms' => 'manage_manufacturer',
+				'edit_terms'   => 'edit_manufacturer',
+				'delete_terms' => 'delete_manufacturer',
+				'assign_terms' => 'assign_manufacturer',
+			],
 		));
 
 		// Register hooks for custom admin columns
