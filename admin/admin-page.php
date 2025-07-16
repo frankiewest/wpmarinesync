@@ -661,7 +661,7 @@ class MarineSync_Admin_Page {
 			error_log('MS032: Added broker information');
 
 			// Add offices information
-			$offices = $xml->addChild('offices');
+			$offices = $broker->addChild('offices');
 
 			// Check if ACF is active before using get_field
 			if (function_exists('get_field')) {
