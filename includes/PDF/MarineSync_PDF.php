@@ -101,6 +101,11 @@ final class MarineSync_PDF {
 	 * @return string
 	 */
 	private function getDetailsSectionsHtml($post_id) {
+		// Get the main post content
+		$post = get_post($post_id);
+		$post_content = $post ? apply_filters('the_content', $post->post_content) : '';
+
+		// The list of detail ACF fields
 		$acf_fields = [
 			'construction_details',
 			'machinery_details',
@@ -113,16 +118,23 @@ final class MarineSync_PDF {
 			'tenders_details',
 			'safety_details',
 		];
-		$desc = '';
+
+		$html = '';
+		// Add post content at the top
+		if (!empty($post_content)) {
+			$html .= $post_content . "\n";
+		}
+
+		// Loop through ACF detail fields and append if not empty
 		foreach ($acf_fields as $acf_field) {
 			$acf_value = get_field($acf_field, $post_id);
 			if (!empty($acf_value)) {
-				// Add a heading for each section
 				$label = ucwords(str_replace('_', ' ', str_replace('_details', '', $acf_field)));
-				$desc .= "<h3>{$label}</h3>\n" . $acf_value . "\n";
+				$html .= "<h3>{$label}</h3>\n" . $acf_value . "\n";
 			}
 		}
-		return $desc;
+
+		return $html;
 	}
 
 	/**
