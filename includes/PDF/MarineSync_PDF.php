@@ -35,7 +35,7 @@ final class MarineSync_PDF {
 
 		// Get featured image URL
 		$featured_image_id = get_post_thumbnail_id($this->boat_id);
-		$featured_image_url = wp_get_attachment_image_url($featured_image_id);
+		$featured_image_url = wp_get_attachment_image_url($featured_image_id, 'full');
 		error_log("MSPDF004: Featured image URL for boat_id={$this->boat_id} is " . ($featured_image_url ?: 'NOT FOUND'));
 
 		// Get all ACF fields
