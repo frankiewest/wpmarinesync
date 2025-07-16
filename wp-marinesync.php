@@ -324,68 +324,6 @@ function marinesync_handle_csv_template_download() {
 }
 add_action('admin_init', 'MarineSync\\marinesync_handle_csv_template_download');
 
-/**
- * Add custom columns to marinesync-boats post type admin screen
- */
-// Add custom columns to the marinesync-boats post type admin screen
-add_filter('manage_marinesync-boats_posts_columns', function($columns) {
-	$new_columns = [];
-	// Keep existing columns up to 'title'
-	foreach ($columns as $key => $value) {
-		$new_columns[$key] = $value;
-		if ($key === 'title') {
-			// Insert custom columns after title
-			$new_columns['boat_name'] = __('Boat Name', 'marinesync');
-			$new_columns['vessel_lying'] = __('Vessel Lying', 'marinesync');
-			$new_columns['asking_price'] = __('Asking Price', 'marinesync');
-		}
-	}
-	return $new_columns;
-});
-
-// Display data in custom columns
-add_action('manage_marinesync-boats_posts_custom_column', function($column_name, $post_id) {
-	switch ($column_name) {
-		case 'boat_name':
-			echo MarineSync_Post_Type::get_boat_name($post_id);
-			break;
-		case 'vessel_lying':
-			echo MarineSync_Post_Type::get_location($post_id);
-			break;
-		case 'asking_price':
-			$price = MarineSync_Post_Type::get_asking_price($post_id);
-            $currency = MarineSync_Post_Type::get_boat_field('currency', $post_id);
-			echo esc_html($price ? $currency . number_format($price, 2) : '');
-			break;
-	}
-}, 10, 2);
-
-// Make columns sortable
-add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
-	$columns['boat_name'] = 'boat_name';
-	$columns['vessel_lying'] = 'vessel_lying';
-	$columns['asking_price'] = 'asking_price';
-	return $columns;
-});
-
-// Handle sorting logic
-add_action('pre_get_posts', function($query) {
-	if (!is_admin() || !$query->is_main_query()) {
-		return;
-	}
-
-	if ($query->get('post_type') !== 'marinesync-boats') {
-		return;
-	}
-
-	$orderby = $query->get('orderby');
-
-	if (in_array($orderby, ['boat_name', 'vessel_lying', 'asking_price'])) {
-		$query->set('meta_key', $orderby);
-		$query->set('orderby', $orderby === 'asking_price' ? 'meta_value_num' : 'meta_value');
-	}
-});
-
 // Add role
 function marinesync_register_boat_admin_role_and_admin_caps() {
 	// 1. Add or update Boat Admin role
@@ -494,7 +432,6 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column, $pos
 		case 'featured_boat':
 			echo has_term('featured', 'boat-cat', $post_id) ? '<strong>Featured</strong>' : 'No';
 			break;
-		// Add others as needed...
 	}
 }, 10, 2);
 
@@ -584,6 +521,69 @@ add_shortcode('marinesync_pdf_button', function($atts) {
             <a href='{$pdf_url}' class='{$class}' target='_blank' rel='noopener'>{$label}</a>
             </div>";
 });
+
+/**
+ * Add custom columns to marinesync-boats post type admin screen
+ */
+// Add custom columns to the marinesync-boats post type admin screen
+add_filter('manage_marinesync-boats_posts_columns', function($columns) {
+	$new_columns = [];
+	// Keep existing columns up to 'title'
+	foreach ($columns as $key => $value) {
+		$new_columns[$key] = $value;
+		if ($key === 'title') {
+			// Insert custom columns after title
+			$new_columns['boat_name'] = __('Boat Name', 'marinesync');
+			$new_columns['vessel_lying'] = __('Vessel Lying', 'marinesync');
+			$new_columns['asking_price'] = __('Asking Price', 'marinesync');
+		}
+	}
+	return $new_columns;
+});
+
+// Display data in custom columns
+add_action('manage_marinesync-boats_posts_custom_column', function($column_name, $post_id) {
+	switch ($column_name) {
+		case 'boat_name':
+			echo MarineSync_Post_Type::get_boat_name($post_id);
+			break;
+		case 'vessel_lying':
+			echo MarineSync_Post_Type::get_location($post_id);
+			break;
+		case 'asking_price':
+			$price = MarineSync_Post_Type::get_asking_price($post_id);
+			$currency = MarineSync_Post_Type::get_boat_field('currency', $post_id);
+			echo esc_html($price ? $currency . number_format($price, 2) : '');
+			break;
+	}
+}, 10, 2);
+
+// Make columns sortable
+add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
+	$columns['boat_name'] = 'boat_name';
+	$columns['vessel_lying'] = 'vessel_lying';
+	$columns['asking_price'] = 'asking_price';
+	return $columns;
+});
+
+// Handle sorting logic
+add_action('pre_get_posts', function($query) {
+	if (!is_admin() || !$query->is_main_query()) {
+		return;
+	}
+
+	if ($query->get('post_type') !== 'marinesync-boats') {
+		return;
+	}
+
+	$orderby = $query->get('orderby');
+
+	if (in_array($orderby, ['boat_name', 'vessel_lying', 'asking_price'])) {
+		$query->set('meta_key', $orderby);
+		$query->set('orderby', $orderby === 'asking_price' ? 'meta_value_num' : 'meta_value');
+	}
+});
+
 add_action('init', function() {
 	if (!empty($_GET['marinesync_pdf']) && is_numeric($_GET['marinesync_pdf'])) {
 		$post_id = intval($_GET['marinesync_pdf']);
