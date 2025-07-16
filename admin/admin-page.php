@@ -845,10 +845,34 @@ class MarineSync_Admin_Page {
 							$asking_price->addAttribute( 'vat_country', $vat_country );
 						}
 
-						// Add marketing desc
 						$marketing_descs = $advert_features->addChild('marketing_descs');
 
+                        // Start with the post content
 						$desc = get_post_field('post_content', $post->ID);
+
+                        // Gather each ACF details field (HTML), if not empty, and append
+						$acf_fields = [
+							'construction_details',
+							'machinery_details',
+							'electrics_details',
+							'tankage_details',
+							'accommodation_details',
+							'domestic_details',
+							'deck_details',
+							'navigation_details',
+							'tenders_details',
+							'safety_details',
+						];
+
+						foreach ($acf_fields as $acf_field) {
+							$acf_value = get_field($acf_field, $post->ID);
+							if (!empty($acf_value)) {
+								// Add a heading for each section (optional)
+								$label = ucwords(str_replace('_', ' ', str_replace('_details', '', $acf_field)));
+								$desc .= "\n\n<h3>{$label}</h3>\n" . $acf_value;
+							}
+						}
+
 						$marketing_desc = $marketing_descs->addChild('marketing_desc');
 						$marketing_desc_node = dom_import_simplexml($marketing_desc);
 						$cdata = $marketing_desc_node->ownerDocument->createCDATASection($desc);
