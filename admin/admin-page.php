@@ -688,7 +688,7 @@ class MarineSync_Admin_Page {
 
 					// Add boat element
 					$boat = $adverts->addChild('advert');
-					$boat->addAttribute('ref', $post->ID);
+					$boat->addAttribute('ref', MarineSync_Post_Type::get_boat_field('boat_ref', $post->ID));
 
 					// Check if MarineSync_Post_Type class and method exist
 					if (class_exists('MarineSync\\PostType\\MarineSync_Post_Type') &&
