@@ -548,3 +548,19 @@ add_action('pre_get_posts', function($query) {
 });
 
 
+add_action('admin_menu', function() {
+	// Only add submenu if CPT exists
+	add_submenu_page(
+		'edit.php?post_type=marinesync-boats',
+		'Active Boats',
+		'Active',
+		'edit_posts',
+		'active-boats',
+		function() {
+			// Redirect to the main list filtered by 'active' boat-status
+			$url = admin_url('edit.php?post_type=marinesync-boats&boat-status=active');
+			echo '<script>window.location.href = "' . esc_url($url) . '";</script>';
+			exit;
+		}
+	);
+});
