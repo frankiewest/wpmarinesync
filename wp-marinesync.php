@@ -502,7 +502,7 @@ add_action('pre_get_posts', function($query) {
 	}
 
 	// Default to showing only 'active' boats unless filtering or searching
-	if (!isset($_GET['boat-status']) && !isset($_GET['s'])) {
+	if (isset($_GET['s'])) {
 		$tax_query = (array) $query->get('tax_query');
 		$tax_query[] = [
 			'taxonomy' => 'boat-status',
