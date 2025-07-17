@@ -371,6 +371,12 @@ function marinesync_register_boat_admin_role_and_admin_caps() {
 		'delete_boat-type',
 		'assign_boat-type',
 
+		// Taxonomies: manufacturer
+		'manage_manufacturer',
+		'edit_manufacturer',
+		'delete_manufacturer',
+		'assign_manufacturer',
+
 		// Posts
 		'edit_posts',
 		'edit_others_posts',
