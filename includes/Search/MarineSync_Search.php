@@ -150,7 +150,7 @@ class MarineSync_Search {
 		$tax_query = [];
 
 		// Exclude sold
-		if($query->is_search()){
+		if(!$query->is_search()){
 			$tax_query[] = [
 				'taxonomy' => 'boat-status',
 				'field'    => 'slug',
