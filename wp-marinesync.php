@@ -449,6 +449,7 @@ add_filter('manage_marinesync-boats_posts_columns', function($columns) {
 		$new_columns[$key] = $label;
 		if ($key === 'title') {
 			$new_columns['loa'] = __('Length (ft)', 'marinesync');
+			$new_columns['year'] = __('Year', 'marinesync');
 			$new_columns['featured_boat'] = __('Featured', 'marinesync');
 			$new_columns['boat_ref'] = __('Reference', 'marinesync');
         }
@@ -465,6 +466,10 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column, $pos
 			$length = get_field('loa', $post_id);
 			if ($length) echo esc_html($length);
 			break;
+		case 'year':
+			$length = get_field('year', $post_id);
+			if ($length) echo esc_html($length);
+			break;
 		case 'featured_boat':
 			echo has_term('featured', 'boat-cat', $post_id) ? '<strong>Featured</strong>' : 'No';
 			break;
@@ -473,6 +478,7 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column, $pos
 
 add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
 	$columns['loa'] = 'loa';
+	$columns['year'] = 'year';
 	$columns['featured_boat'] = 'featured_boat';
 	$columns['boat_ref'] = 'boat_ref';
 	return $columns;
@@ -489,6 +495,10 @@ add_action('pre_get_posts', function($query) {
 	}
 	if ($orderby === 'loa') {
 		$query->set('meta_key', 'loa');
+		$query->set('orderby', 'meta_value_num');
+	}
+	if ($orderby === 'year') {
+		$query->set('meta_key', 'year');
 		$query->set('orderby', 'meta_value_num');
 	}
 	if ($orderby === 'featured_boat') {
