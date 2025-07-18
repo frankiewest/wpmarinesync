@@ -940,7 +940,7 @@ class MarineSync_Admin_Page {
 						// Add dimensions
 						$dimensions = $boat_features->addChild('dimensions');
 
-						$dimension_fields = ['beam', 'draft', 'loa', 'engine_power'];
+						$dimension_fields = ['beam', 'draft', 'loa', 'engine_power', 'min_draft', 'max_draft', 'lwl'];
 						foreach ($dimension_fields as $field) {
 							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
 							$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
