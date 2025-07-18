@@ -732,7 +732,14 @@ add_action('pre_get_posts', function($query) {
 	if ($query->get('post_type') !== 'marinesync-boats') return;
 	if (empty($_GET['s'])) return;
 
-	add_filter('posts_join', 'MarineSync\\marinesync_custom_search_join');
-	add_filter('posts_where', 'MarineSync\\marinesync_custom_search_where');
-	add_filter('posts_groupby', 'MarineSync\\marinesync_custom_search_groupby');
-});
+	// Add filters only if not already applied
+	if (!has_filter('posts_join', 'MarineSync\\marinesync_custom_search_join')) {
+		add_filter('posts_join', 'MarineSync\\marinesync_custom_search_join');
+	}
+	if (!has_filter('posts_where', 'MarineSync\\marinesync_custom_search_where')) {
+		add_filter('posts_where', 'MarineSync\\marinesync_custom_search_where');
+	}
+	if (!has_filter('posts_groupby', 'MarineSync\\marinesync_custom_search_groupby')) {
+		add_filter('posts_groupby', 'MarineSync\\marinesync_custom_search_groupby');
+	}
+}, 15);
