@@ -683,3 +683,53 @@ add_shortcode('marinesync_video', function($atts) {
 		return '<div class="' . $class . '" style="max-width:640px;margin:auto;"><video width="100%" height="360" controls preload="metadata"><source src="' . esc_url($url) . '" type="video/mp4">Your browser does not support the video tag.</video></div>';
 	}
 });
+
+add_action('pre_get_posts', function($query) {
+	if (!is_admin() || !$query->is_main_query()) return;
+
+	// Must be marinesync-boats CPT
+	if ($query->get('post_type') !== 'marinesync-boats') return;
+
+	// Check if we're doing a search
+	if (empty($_GET['s'])) return;
+
+	// Check action=-1 to exclude bulk actions
+	if (isset($_GET['action']) && $_GET['action'] !== '-1') return;
+
+	// Enhance admin search for boat_name, year, loa
+	add_filter('posts_join', function($join) {
+		global $wpdb;
+
+		if (strpos($join, 'mt1') === false) {
+			$join .= " LEFT JOIN {$wpdb->postmeta} AS mt1 ON ({$wpdb->posts}.ID = mt1.post_id)";
+		}
+		if (strpos($join, 'mt2') === false) {
+			$join .= " LEFT JOIN {$wpdb->postmeta} AS mt2 ON ({$wpdb->posts}.ID = mt2.post_id)";
+		}
+		if (strpos($join, 'mt3') === false) {
+			$join .= " LEFT JOIN {$wpdb->postmeta} AS mt3 ON ({$wpdb->posts}.ID = mt3.post_id)";
+		}
+		return $join;
+	});
+
+	add_filter('posts_where', function($where) {
+		global $wpdb;
+		$search = esc_sql($wpdb->esc_like($_GET['s']));
+
+		$where = " AND (";
+		$where .= " {$wpdb->posts}.post_title LIKE '%{$search}%'";
+		$where .= " OR (mt1.meta_key = 'boat_name' AND mt1.meta_value LIKE '%{$search}%')";
+		$where .= " OR (mt2.meta_key = 'year' AND mt2.meta_value LIKE '%{$search}%')";
+		$where .= " OR (mt3.meta_key = 'loa' AND mt3.meta_value LIKE '%{$search}%')";
+		$where .= ")";
+		return $where;
+	});
+
+	add_filter('posts_groupby', function($groupby) {
+		global $wpdb;
+		if (!$groupby) {
+			$groupby = "{$wpdb->posts}.ID";
+		}
+		return $groupby;
+	});
+}, 15);
