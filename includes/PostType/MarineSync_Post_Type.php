@@ -209,6 +209,37 @@ class MarineSync_Post_Type {
 			],
 		));
 
+		// Register designer taxonomy
+		$designer_labels = array(
+			'name'              => _x('Designers', 'taxonomy general name', 'marinesync'),
+			'singular_name'     => _x('Designer', 'taxonomy singular name', 'marinesync'),
+			'search_items'      => __('Search Designers', 'marinesync'),
+			'all_items'         => __('All Designers', 'marinesync'),
+			'parent_item'       => __('Parent Designer', 'marinesync'),
+			'parent_item_colon' => __('Parent Designer:', 'marinesync'),
+			'edit_item'         => __('Edit Designer', 'marinesync'),
+			'update_item'       => __('Update Designer', 'marinesync'),
+			'add_new_item'      => __('Add New Designer', 'marinesync'),
+			'new_item_name'     => __('New Designer Name', 'marinesync'),
+			'menu_name'         => __('Designers', 'marinesync'),
+		);
+
+		register_taxonomy('manufacturer', array('marinesync-boats'), array(
+			'hierarchical'      => true,
+			'labels'            => $designer_labels,
+			'show_ui'           => true,
+			'show_admin_column' => false,
+			'query_var'         => true,
+			'rewrite'           => array('slug' => 'designer'),
+			'show_in_rest'      => true,
+			'capabilities'      => [
+				'manage_terms' => 'manage_designer',
+				'edit_terms'   => 'edit_designer',
+				'delete_terms' => 'delete_designer',
+				'assign_terms' => 'assign_designer',
+			],
+		));
+
 		// Register hooks for custom admin columns
 		add_filter('manage_marinesync-boats_posts_columns', [__CLASS__, 'set_custom_columns']);
 		add_action('manage_marinesync-boats_posts_custom_column', [__CLASS__, 'render_custom_column'], 10, 2);
