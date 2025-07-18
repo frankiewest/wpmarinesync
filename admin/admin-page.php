@@ -515,11 +515,6 @@ class MarineSync_Admin_Page {
                     $button.prop('disabled', true);
                     $message.html('<div class="notice notice-info"><p><?php _e('Generating export file, please wait...', 'marinesync'); ?></p></div>');
 
-                    // manual refresh of 3 seconds
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3000);
-
                     $.ajax({
                         url: ajaxurl,
                         type: 'POST',
@@ -534,6 +529,10 @@ class MarineSync_Admin_Page {
                                 if(response.data.url) {
                                     $message.append('<p><a href="' + response.data.url + '" class="button" target="_blank"><?php _e('Download Export File', 'marinesync'); ?></a></p>');
                                 }
+                                // manual refresh of 3 seconds
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 3000);
                             } else {
                                 $message.html('<div class="notice notice-error"><p>' + response.data.message + '</p></div>');
                             }
