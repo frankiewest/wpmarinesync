@@ -693,20 +693,6 @@ add_action('pre_get_posts', function($query) {
 
 	error_log('MS106: Search enhancement triggered for marinesync-boats');
 
-	// Defensive ordering
-	$current_orderby = $query->get('orderby');
-	if ($current_orderby === 'meta_value' || $current_orderby === 'meta_value_num') {
-		error_log("MS120: Removing unreliable meta_value sort: $current_orderby");
-		$query->set('orderby', 'title');
-		$query->set('order', 'ASC');
-	}
-
-	if (!$current_orderby) {
-		$query->set('orderby', 'title');
-		$query->set('order', 'ASC');
-		error_log("MS121: Forcing title ASC sort");
-	}
-
 	// JOINs
 	add_filter('posts_join', function($join) {
 		global $wpdb;
