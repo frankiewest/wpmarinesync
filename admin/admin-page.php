@@ -956,42 +956,164 @@ class MarineSync_Admin_Page {
 							}
 						}
 
-						// Add build
+						// ==========================
+						// BUILD
+						// ==========================
+						$build_fields = [
+							'designer', 'builder', 'where', 'year', 'hull_colour', 'hull_construction',
+							'hull_number', 'hull_type', 'super_structure_colour', 'super_structure_construction',
+							'deck_colour', 'deck_construction', 'cockpit_type', 'control_type',
+							'flybridge', 'keel_type', 'ballast', 'displacement', 'hin'
+						];
 						$build = $boat_features->addChild('build');
+						foreach ($build_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $build->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+								if (in_array($field, ['ballast', 'displacement'])) {
+									$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
+									if (!empty($unit)) {
+										$item->addAttribute('unit', $unit);
+									}
+								}
+							}
+						}
 
-						// Add build items
-						$year_item = $build->addChild('item', (string)MarineSync_Post_Type::get_boat_field('year', $post->ID));
-						$year_item->addAttribute('name', 'year');
-
-						$keel_type_item = $build->addChild('item', (string)MarineSync_Post_Type::get_boat_field('keel_type', $post->ID));
-						$keel_type_item->addAttribute('name', 'keel_type');
-
-						$hin_item = $build->addChild('item', (string)MarineSync_Post_Type::get_boat_field('hin', $post->ID));
-						$hin_item->addAttribute('name', 'hin');
+						// ==========================
+                        // GALLEY
+                        // ==========================
+						$galley_fields = ['oven', 'microwave', 'fridge', 'freezer', 'heating', 'air_conditioning'];
+						$galley = $boat_features->addChild('galley');
+						foreach ($galley_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $galley->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+							}
+						}
 
 						// Add engine
 						$engine = $boat_features->addChild('engine');
 
-						// Add engine items
-						$engine_manufacturer_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('engine_manufacturer', $post->ID));
-						$engine_manufacturer_item->addAttribute('name', 'engine_manufacturer');
+						// ==========================
+                        // ENGINE
+                        // ==========================
+						$engine_fields = [
+							'stern_thruster', 'bow_thruster', 'fuel', 'hours', 'cruising_speed',
+							'max_speed', 'horse_power', 'engine_manufacturer', 'engine_quantity',
+							'tankage', 'gallons_per_hour', 'litres_per_hour', 'engine_location',
+							'gearbox', 'cylinders', 'propeller_type', 'starting_type', 'drive_type',
+							'cooling_system'
+						];
+						$engine = $boat_features->addChild('engine');
+						foreach ($engine_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $engine->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+								if (in_array($field, ['horse_power', 'max_speed', 'tankage'])) {
+									$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
+									if (!empty($unit)) {
+										$item->addAttribute('unit', $unit);
+									}
+								}
+							}
+						}
 
-						$engine_model_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('engine_model', $post->ID));
-						$engine_model_item->addAttribute('name', 'engine_model');
+						// ==========================
+                        // NAVIGATION
+                        // ==========================
+						$navigation_fields = [
+							'navigation_lights', 'compass', 'depth_instrument', 'wind_instrument',
+							'autopilot', 'gps', 'vhf', 'plotter', 'speed_instrument', 'radar'
+						];
+						$navigation = $boat_features->addChild('navigation');
+						foreach ($navigation_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $navigation->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+							}
+						}
 
-						$horse_power_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('horse_power', $post->ID));
-						$horse_power_item->addAttribute('name', 'horse_power');
-						$horse_power_item->addAttribute('unit', (string)MarineSync_Post_Type::get_boat_field('horse_power_unit', $post->ID));
+						// ==========================
+                        // ACCOMMODATION
+                        // ==========================
+						$accommodation_fields = ['cabins', 'berths', 'toilet', 'shower', 'bath'];
+						$accommodation = $boat_features->addChild('accommodation');
+						foreach ($accommodation_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $accommodation->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+							}
+						}
 
-						$fuel_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('fuel', $post->ID));
-						$fuel_item->addAttribute('name', 'fuel');
+						// ==========================
+                        // SAFETY EQUIPMENT
+                        // ==========================
+						$safety_fields = ['life_raft', 'epirb', 'bilge_pump', 'fire_extinguisher', 'mob_system'];
+						$safety = $boat_features->addChild('safety_equipment');
+						foreach ($safety_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $safety->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+							}
+						}
 
-						$hours_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('hours', $post->ID));
-						$hours_item->addAttribute('name', 'hours');
+						// ==========================
+                        // RIG & SAILS
+                        // ==========================
+						$sails = $boat_features->addChild('rig_sails');
+						$sail_fields = ['genoa', 'spinnaker', 'tri_sail', 'storm_jib', 'main_sail', 'winches'];
+						foreach ($sail_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $sails->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+							}
+						}
 
-                        $max_speed_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('max_speed', $post->ID));
-                        $max_speed_item->addAttribute('name', 'max_speed');
-						$max_speed_item->addAttribute('unit', (string)MarineSync_Post_Type::get_boat_field('max_speed_unit', $post->ID));
+						// ==========================
+                        // ELECTRONICS
+                        // ==========================
+						$electronics_fields = ['battery', 'battery_charger', 'generator', 'inverter'];
+						$electronics = $boat_features->addChild('electronics');
+						foreach ($electronics_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $electronics->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+							}
+						}
+
+						// ==========================
+                        // GENERAL
+                        // ==========================
+						$general_fields = ['television', 'cd_player', 'dvd_player'];
+						$general = $boat_features->addChild('general');
+						foreach ($general_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $general->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+							}
+						}
+
+						// ==========================
+                        // EQUIPMENT
+                        // ==========================
+						$equipment_fields = ['Anchor', 'spray_hood', 'Bimini', 'fenders'];
+						$equipment = $boat_features->addChild('equipment');
+						foreach ($equipment_fields as $field) {
+							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($value !== '' && $value !== null) {
+								$item = $equipment->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+							}
+						}
 
 						// Add additional
 						$additional = $boat_features->addChild('additional');
