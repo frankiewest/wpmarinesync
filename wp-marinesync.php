@@ -685,36 +685,63 @@ add_shortcode('marinesync_video', function($atts) {
 });
 
 add_action('pre_get_posts', function($query) {
-	if (!is_admin() || !$query->is_main_query()) return;
+	error_log('MS100: pre_get_posts triggered');
 
-	// Must be marinesync-boats CPT
-	if ($query->get('post_type') !== 'marinesync-boats') return;
+	if (!is_admin()) {
+		error_log('MS101: Not admin — skipping');
+		return;
+	}
 
-	// Check if we're doing a search
-	if (empty($_GET['s'])) return;
+	if (!$query->is_main_query()) {
+		error_log('MS102: Not main query — skipping');
+		return;
+	}
 
-	// Check action=-1 to exclude bulk actions
-	if (isset($_GET['action']) && $_GET['action'] !== '-1') return;
+	if ($query->get('post_type') !== 'marinesync-boats') {
+		error_log('MS103: Not marinesync-boats — skipping');
+		return;
+	}
 
-	// Enhance admin search for boat_name, year, loa
+	if (empty($_GET['s'])) {
+		error_log('MS104: No search term (s=) — skipping');
+		return;
+	}
+
+	if (isset($_GET['action']) && $_GET['action'] !== '-1') {
+		error_log('MS105: Action not -1 — skipping');
+		return;
+	}
+
+	error_log('MS106: Search enhancement triggered for marinesync-boats');
+
+	// JOIN
 	add_filter('posts_join', function($join) {
 		global $wpdb;
+		error_log('MS107: posts_join filter running');
 
 		if (strpos($join, 'mt1') === false) {
+			error_log('MS108: Adding JOIN for mt1 (boat_name)');
 			$join .= " LEFT JOIN {$wpdb->postmeta} AS mt1 ON ({$wpdb->posts}.ID = mt1.post_id)";
 		}
 		if (strpos($join, 'mt2') === false) {
+			error_log('MS109: Adding JOIN for mt2 (year)');
 			$join .= " LEFT JOIN {$wpdb->postmeta} AS mt2 ON ({$wpdb->posts}.ID = mt2.post_id)";
 		}
 		if (strpos($join, 'mt3') === false) {
+			error_log('MS110: Adding JOIN for mt3 (loa)');
 			$join .= " LEFT JOIN {$wpdb->postmeta} AS mt3 ON ({$wpdb->posts}.ID = mt3.post_id)";
 		}
-		return $join;
-	});
 
+		return $join;
+	}, 15);
+
+	// WHERE
 	add_filter('posts_where', function($where) {
 		global $wpdb;
+		error_log('MS111: posts_where filter running');
+
 		$search = esc_sql($wpdb->esc_like($_GET['s']));
+		error_log('MS112: Search term = ' . $search);
 
 		$where = " AND (";
 		$where .= " {$wpdb->posts}.post_title LIKE '%{$search}%'";
@@ -722,14 +749,23 @@ add_action('pre_get_posts', function($query) {
 		$where .= " OR (mt2.meta_key = 'year' AND mt2.meta_value LIKE '%{$search}%')";
 		$where .= " OR (mt3.meta_key = 'loa' AND mt3.meta_value LIKE '%{$search}%')";
 		$where .= ")";
-		return $where;
-	});
+		error_log('MS113: WHERE clause built');
 
+		return $where;
+	}, 15);
+
+	// GROUP BY
 	add_filter('posts_groupby', function($groupby) {
 		global $wpdb;
+		error_log('MS114: posts_groupby filter running');
+
 		if (!$groupby) {
+			error_log('MS115: No GROUP BY, defaulting to posts.ID');
 			$groupby = "{$wpdb->posts}.ID";
+		} else {
+			error_log('MS116: Existing GROUP BY: ' . $groupby);
 		}
 		return $groupby;
-	});
+	}, 15);
 }, 15);
+
