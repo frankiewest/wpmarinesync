@@ -688,19 +688,20 @@ add_action('pre_get_posts', function($query) {
 	error_log('MS100: pre_get_posts triggered');
 
 	if (!is_admin()) return;
+	if (!$query->is_main_query()) return;
 	if ($query->get('post_type') !== 'marinesync-boats') return;
 	if (empty($_GET['s'])) return;
 
 	error_log('MS106: Search enhancement triggered for marinesync-boats');
 
-	// JOINs
+	// JOINs - Priority 5 to ensure this runs before WHERE (which is priority 15)
 	add_filter('posts_join', function($join) {
 		global $wpdb;
 		error_log('MS107: posts_join filter running');
 
 		$join .= " LEFT JOIN {$wpdb->postmeta} AS mt1 ON ({$wpdb->posts}.ID = mt1.post_id AND mt1.meta_key = 'boat_name')";
 		return $join;
-	}, 15);
+	}, 5); // <-- Lower priority ensures this runs earlier
 
 	// WHERE using CONCAT_WS
 	add_filter('posts_where', function($where) {
@@ -715,7 +716,7 @@ add_action('pre_get_posts', function($query) {
 		$where .= ")";
 		error_log('MS113: WHERE clause built (coalesced)');
 		return $where;
-	}, 15);
+	}, 15); // <-- This runs after JOIN
 
 	// GROUP BY
 	add_filter('posts_groupby', function($groupby) {
@@ -724,5 +725,3 @@ add_action('pre_get_posts', function($query) {
 		return "{$wpdb->posts}.ID";
 	}, 15);
 }, 15);
-
-
