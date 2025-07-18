@@ -627,7 +627,7 @@ add_action('pre_get_posts', function($query) {
 	// LOG: Base pre_get_posts logic triggered
 	error_log('MS100: pre_get_posts triggered');
 
-	// SEARCH ENHANCEMENT
+	/* SEARCH ENHANCEMENT
 	if (!empty($_GET['s'])) {
 		error_log('MS106: Search enhancement triggered for marinesync-boats');
 
@@ -661,7 +661,7 @@ add_action('pre_get_posts', function($query) {
 			error_log('MS114: posts_groupby filter running');
 			return "{$wpdb->posts}.ID";
 		}, 15);
-	}
+	}*/
 
 	// SORTING
 	$orderby = $query->get('orderby');
