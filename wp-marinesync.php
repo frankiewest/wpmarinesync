@@ -484,52 +484,6 @@ add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
 	return $columns;
 });
 
-add_action('pre_get_posts', function($query) {
-	if (!is_admin() || !$query->is_main_query() || $query->get('post_type') !== 'marinesync-boats') return;
-
-	$orderby = $query->get('orderby');
-
-	if ($orderby === 'boat_ref') {
-		$query->set('meta_key', 'boat_ref');
-		$query->set('orderby', 'meta_value');
-	}
-	if ($orderby === 'loa') {
-		$query->set('meta_key', 'loa');
-		$query->set('orderby', 'meta_value_num');
-	}
-	if ($orderby === 'year') {
-		$query->set('meta_key', 'year');
-		$query->set('orderby', 'meta_value_num');
-	}
-	if ($orderby === 'featured_boat') {
-		$query->set('tax_query', [[
-			'taxonomy' => 'boat-cat',
-			'field' => 'slug',
-			'terms' => 'featured',
-			'operator' => 'EXISTS'
-		]]);
-	}
-
-	// Force default ordering by length if not specified
-	if (!$orderby && !$query->get('order')) {
-		$query->set('meta_key', 'loa');
-		$query->set('orderby', 'meta_value_num');
-		$query->set('order', 'DESC');
-	}
-
-	// Default to showing only 'active' boats unless filtering or searching
-	if (!isset($_GET['boat-status']) && !isset($_GET['s']) && !isset($_GET['post_status'])) {
-		$tax_query = (array) $query->get('tax_query');
-		$tax_query[] = [
-			'taxonomy' => 'boat-status',
-			'field'    => 'slug',
-			'terms'    => ['active'],
-			'operator' => 'IN'
-		];
-		$query->set('tax_query', $tax_query);
-	}
-});
-
 
 add_action('admin_menu', function() {
 	// Only add submenu if CPT exists
@@ -612,24 +566,6 @@ add_filter('manage_edit-marinesync-boats_sortable_columns', function($columns) {
 	return $columns;
 });
 
-// Handle sorting logic
-add_action('pre_get_posts', function($query) {
-	if (!is_admin() || !$query->is_main_query()) {
-		return;
-	}
-
-	if ($query->get('post_type') !== 'marinesync-boats') {
-		return;
-	}
-
-	$orderby = $query->get('orderby');
-
-	if (in_array($orderby, ['boat_name', 'vessel_lying', 'asking_price'])) {
-		$query->set('meta_key', $orderby);
-		$query->set('orderby', $orderby === 'asking_price' ? 'meta_value_num' : 'meta_value');
-	}
-});
-
 add_action('init', function() {
 	if (!empty($_GET['marinesync_pdf']) && is_numeric($_GET['marinesync_pdf'])) {
 		$post_id = intval($_GET['marinesync_pdf']);
@@ -685,43 +621,83 @@ add_shortcode('marinesync_video', function($atts) {
 });
 
 add_action('pre_get_posts', function($query) {
+	if (!is_admin() || !$query->is_main_query()) return;
+	if ($query->get('post_type') !== 'marinesync-boats') return;
+
+	// LOG: Base pre_get_posts logic triggered
 	error_log('MS100: pre_get_posts triggered');
 
-	if (!is_admin()) return;
-	if (!$query->is_main_query()) return;
-	if ($query->get('post_type') !== 'marinesync-boats') return;
-	if (empty($_GET['s'])) return;
+	// SEARCH ENHANCEMENT
+	if (!empty($_GET['s'])) {
+		error_log('MS106: Search enhancement triggered for marinesync-boats');
 
-	error_log('MS106: Search enhancement triggered for marinesync-boats');
+		// JOIN boat_name
+		add_filter('posts_join', function($join) {
+			global $wpdb;
+			error_log('MS107: posts_join filter running');
 
-	// JOINs - Priority 5 to ensure this runs before WHERE (which is priority 15)
-	add_filter('posts_join', function($join) {
-		global $wpdb;
-		error_log('MS107: posts_join filter running');
+			$join .= " LEFT JOIN {$wpdb->postmeta} AS mt1 ON ({$wpdb->posts}.ID = mt1.post_id AND mt1.meta_key = 'boat_name')";
+			return $join;
+		}, 5);
 
-		$join .= " LEFT JOIN {$wpdb->postmeta} AS mt1 ON ({$wpdb->posts}.ID = mt1.post_id AND mt1.meta_key = 'boat_name')";
-		return $join;
-	}, 5); // <-- Lower priority ensures this runs earlier
+		// WHERE using CONCAT_WS
+		add_filter('posts_where', function($where) {
+			global $wpdb;
+			error_log('MS111: posts_where filter running');
 
-	// WHERE using CONCAT_WS
-	add_filter('posts_where', function($where) {
-		global $wpdb;
-		error_log('MS111: posts_where filter running');
+			$search = esc_sql($wpdb->esc_like($_GET['s']));
+			error_log('MS112: Search term = ' . $search);
 
-		$search = esc_sql($wpdb->esc_like($_GET['s']));
-		error_log('MS112: Search term = ' . $search);
+			$where .= " AND (";
+			$where .= " CONCAT_WS(' ', {$wpdb->posts}.post_title, mt1.meta_value) LIKE '%{$search}%'";
+			$where .= ")";
+			error_log('MS113: WHERE clause built (coalesced)');
+			return $where;
+		}, 15);
 
-		$where .= " AND (";
-		$where .= " CONCAT_WS(' ', {$wpdb->posts}.post_title, mt1.meta_value) LIKE '%{$search}%'";
-		$where .= ")";
-		error_log('MS113: WHERE clause built (coalesced)');
-		return $where;
-	}, 15); // <-- This runs after JOIN
+		// GROUP BY
+		add_filter('posts_groupby', function($groupby) {
+			global $wpdb;
+			error_log('MS114: posts_groupby filter running');
+			return "{$wpdb->posts}.ID";
+		}, 15);
+	}
 
-	// GROUP BY
-	add_filter('posts_groupby', function($groupby) {
-		global $wpdb;
-		error_log('MS114: posts_groupby filter running');
-		return "{$wpdb->posts}.ID";
-	}, 15);
+	// SORTING
+	$orderby = $query->get('orderby');
+	if ($orderby === 'boat_ref' || $orderby === 'boat_name' || $orderby === 'vessel_lying') {
+		$query->set('meta_key', $orderby);
+		$query->set('orderby', 'meta_value');
+	}
+	if ($orderby === 'year' || $orderby === 'loa' || $orderby === 'asking_price') {
+		$query->set('meta_key', $orderby);
+		$query->set('orderby', 'meta_value_num');
+	}
+	if ($orderby === 'featured_boat') {
+		$query->set('tax_query', [[
+			'taxonomy' => 'boat-cat',
+			'field'    => 'slug',
+			'terms'    => 'featured',
+			'operator' => 'EXISTS'
+		]]);
+	}
+
+	// DEFAULT SORT
+	if (!$orderby && !$query->get('order')) {
+		$query->set('meta_key', 'loa');
+		$query->set('orderby', 'meta_value_num');
+		$query->set('order', 'DESC');
+	}
+
+	// DEFAULT STATUS FILTER
+	if (!isset($_GET['boat-status']) && !isset($_GET['s']) && !isset($_GET['post_status'])) {
+		$tax_query = (array) $query->get('tax_query');
+		$tax_query[] = [
+			'taxonomy' => 'boat-status',
+			'field'    => 'slug',
+			'terms'    => ['active'],
+			'operator' => 'IN'
+		];
+		$query->set('tax_query', $tax_query);
+	}
 }, 15);
