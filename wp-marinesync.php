@@ -715,8 +715,6 @@ add_action('pre_get_posts', function($query) {
 		error_log('MS107: posts_join filter running');
 
 		$join .= " LEFT JOIN {$wpdb->postmeta} AS mt1 ON ({$wpdb->posts}.ID = mt1.post_id AND mt1.meta_key = 'boat_name')";
-		$join .= " LEFT JOIN {$wpdb->postmeta} AS mt2 ON ({$wpdb->posts}.ID = mt2.post_id AND mt2.meta_key = 'year')";
-		$join .= " LEFT JOIN {$wpdb->postmeta} AS mt3 ON ({$wpdb->posts}.ID = mt3.post_id AND mt3.meta_key = 'loa')";
 		return $join;
 	}, 15);
 
@@ -729,7 +727,7 @@ add_action('pre_get_posts', function($query) {
 		error_log('MS112: Search term = ' . $search);
 
 		$where .= " AND (";
-		$where .= " CONCAT_WS(' ', {$wpdb->posts}.post_title, mt1.meta_value, mt2.meta_value, mt3.meta_value) LIKE '%{$search}%'";
+		$where .= " CONCAT_WS(' ', {$wpdb->posts}.post_title, mt1.meta_value) LIKE '%{$search}%'";
 		$where .= ")";
 		error_log('MS113: WHERE clause built (coalesced)');
 		return $where;
