@@ -224,7 +224,7 @@ class MarineSync_Post_Type {
 			'menu_name'         => __('Designers', 'marinesync'),
 		);
 
-		register_taxonomy('manufacturer', array('marinesync-boats'), array(
+		register_taxonomy('designer', array('marinesync-boats'), array(
 			'hierarchical'      => true,
 			'labels'            => $designer_labels,
 			'show_ui'           => true,
