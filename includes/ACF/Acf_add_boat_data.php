@@ -661,22 +661,6 @@ class Acf_add_boat_data {
 		            'append' => '',
 	            ),
 	            array(
-		            'key' => 'field_min_draft_unit',
-		            'label' => 'Min Draft Unit',
-		            'name' => 'min_draft_unit',
-		            'type' => 'select',
-		            'choices' => array(
-			            'metres' => 'Metres',
-			            'feet' => 'Feet',
-		            ),
-		            'default_value' => 'feet',
-		            'allow_null' => 1,
-		            'multiple' => 0,
-		            'ui' => 1,
-		            'return_format' => 'value',
-		            'placeholder' => '',
-	            ),
-	            array(
 		            'key' => 'field_max_draft',
 		            'label' => 'Max Draft',
 		            'name' => 'max_draft',
@@ -698,6 +682,27 @@ class Acf_add_boat_data {
 		            'append' => '',
 	            ),
 	            array(
+		            'key' => 'field_min_draft_unit',
+		            'label' => 'Min Draft Unit',
+		            'name' => 'min_draft_unit',
+		            'type' => 'select',
+		            'choices' => array(
+			            'metres' => 'Metres',
+			            'feet' => 'Feet',
+		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
+		            ),
+		            'default_value' => 'feet',
+		            'allow_null' => 1,
+		            'multiple' => 0,
+		            'ui' => 1,
+		            'return_format' => 'value',
+		            'placeholder' => '',
+	            ),
+	            array(
 		            'key' => 'field_max_draft_unit',
 		            'label' => 'Max Draft Unit',
 		            'name' => 'max_draft_unit',
@@ -705,6 +710,11 @@ class Acf_add_boat_data {
 		            'choices' => array(
 			            'metres' => 'Metres',
 			            'feet' => 'Feet',
+		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
 		            ),
 		            'default_value' => 'feet',
 		            'allow_null' => 1,
