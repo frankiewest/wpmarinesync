@@ -684,17 +684,6 @@ add_shortcode('marinesync_video', function($atts) {
 	}
 });
 
-// Enhance admin search for marinesync-boats: include ACF fields (boat_name, year, loa)
-add_action('pre_get_posts', function($query) {
-	if (!is_admin() || !$query->is_main_query()) return;
-	if ($query->get('post_type') !== 'marinesync-boats') return;
-	if (empty($_GET['s'])) return;
-
-	add_filter('posts_join', 'marinesync_custom_search_join');
-	add_filter('posts_where', 'marinesync_custom_search_where');
-	add_filter('posts_groupby', 'marinesync_custom_search_groupby');
-});
-
 // Join postmeta table to search ACF fields
 function marinesync_custom_search_join($join) {
 	global $wpdb;
@@ -736,3 +725,14 @@ function marinesync_custom_search_groupby($groupby) {
 	}
 	return $groupby;
 }
+
+// Enhance admin search for marinesync-boats: include ACF fields (boat_name, year, loa)
+add_action('pre_get_posts', function($query) {
+	if (!is_admin() || !$query->is_main_query()) return;
+	if ($query->get('post_type') !== 'marinesync-boats') return;
+	if (empty($_GET['s'])) return;
+
+	add_filter('posts_join', 'marinesync_custom_search_join');
+	add_filter('posts_where', 'marinesync_custom_search_where');
+	add_filter('posts_groupby', 'marinesync_custom_search_groupby');
+});
