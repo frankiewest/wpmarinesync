@@ -977,6 +977,7 @@ class MarineSync_Admin_Page {
 
 						$horse_power_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('horse_power', $post->ID));
 						$horse_power_item->addAttribute('name', 'horse_power');
+						$horse_power_item->addAttribute('unit', 'horse_power_unit');
 
 						$fuel_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('fuel', $post->ID));
 						$fuel_item->addAttribute('name', 'fuel');
