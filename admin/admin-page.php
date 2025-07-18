@@ -967,12 +967,21 @@ class MarineSync_Admin_Page {
 							'deck_colour', 'deck_construction', 'cockpit_type', 'control_type',
 							'flybridge', 'keel_type', 'ballast', 'displacement', 'hin'
 						];
+
 						$build = $boat_features->addChild('build');
+
 						foreach ($build_fields as $field) {
-							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							if ($field === 'designer') {
+								$terms = wp_get_post_terms($post->ID, 'designer', ['fields' => 'names']);
+								$value = !empty($terms) ? implode(', ', $terms) : '';
+							} else {
+								$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
+							}
+
 							if ($value !== '' && $value !== null) {
-								$item = $build->addChild('item', (string)$value);
+								$item = $build->addChild('item', (string) $value);
 								$item->addAttribute('name', $field);
+
 								if (in_array($field, ['ballast', 'displacement'])) {
 									$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
 									if (!empty($unit)) {
