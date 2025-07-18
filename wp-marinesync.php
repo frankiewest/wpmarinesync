@@ -695,7 +695,7 @@ add_action('pre_get_posts', function($query) {
 
 	error_log('MS106: Search enhancement triggered for marinesync-boats');
 
-	// Remove any unreliable meta_value sorting
+	// Defensive ordering
 	$current_orderby = $query->get('orderby');
 	if ($current_orderby === 'meta_value' || $current_orderby === 'meta_value_num') {
 		error_log("MS120: Removing unreliable meta_value sort: $current_orderby");
@@ -703,14 +703,13 @@ add_action('pre_get_posts', function($query) {
 		$query->set('order', 'ASC');
 	}
 
-	// Force ordering for stability
 	if (!$current_orderby) {
 		$query->set('orderby', 'title');
 		$query->set('order', 'ASC');
 		error_log("MS121: Forcing title ASC sort");
 	}
 
-	// JOIN
+	// JOINs
 	add_filter('posts_join', function($join) {
 		global $wpdb;
 		error_log('MS107: posts_join filter running');
@@ -721,7 +720,7 @@ add_action('pre_get_posts', function($query) {
 		return $join;
 	}, 15);
 
-	// WHERE
+	// WHERE using CONCAT_WS
 	add_filter('posts_where', function($where) {
 		global $wpdb;
 		error_log('MS111: posts_where filter running');
@@ -730,12 +729,9 @@ add_action('pre_get_posts', function($query) {
 		error_log('MS112: Search term = ' . $search);
 
 		$where .= " AND (";
-		$where .= " {$wpdb->posts}.post_title LIKE '%{$search}%'";
-		$where .= " OR mt1.meta_value LIKE '%{$search}%'";
-		$where .= " OR mt2.meta_value LIKE '%{$search}%'";
-		$where .= " OR mt3.meta_value LIKE '%{$search}%'";
+		$where .= " CONCAT_WS(' ', {$wpdb->posts}.post_title, mt1.meta_value, mt2.meta_value, mt3.meta_value) LIKE '%{$search}%'";
 		$where .= ")";
-		error_log('MS113: WHERE clause built');
+		error_log('MS113: WHERE clause built (coalesced)');
 		return $where;
 	}, 15);
 
@@ -746,4 +742,5 @@ add_action('pre_get_posts', function($query) {
 		return "{$wpdb->posts}.ID";
 	}, 15);
 }, 15);
+
 
