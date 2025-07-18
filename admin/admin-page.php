@@ -941,18 +941,20 @@ class MarineSync_Admin_Page {
 						// Add boat features
 						$boat_features = $boat->addChild('boat_features');
 
-						// Add dimensions
+						// ==========================
+                        // DIMENSIONS
+                        // ==========================
 						$dimensions = $boat_features->addChild('dimensions');
-
 						$dimension_fields = ['beam', 'draft', 'loa', 'engine_power', 'min_draft', 'max_draft', 'lwl'];
 						foreach ($dimension_fields as $field) {
 							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
-							$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
-
-							$item = $dimensions->addChild('item', (string)$value);
-							$item->addAttribute('name', $field);
-							if ($unit) {
-								$item->addAttribute('unit', $unit);
+							if ($value !== '' && $value !== null) {
+								$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
+								$item = $dimensions->addChild('item', (string)$value);
+								$item->addAttribute('name', $field);
+								if (!empty($unit)) {
+									$item->addAttribute('unit', $unit);
+								}
 							}
 						}
 
