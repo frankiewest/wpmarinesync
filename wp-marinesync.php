@@ -687,6 +687,7 @@ add_shortcode('marinesync_video', function($atts) {
 add_action('pre_get_posts', function($query) {
 	error_log('MS100: pre_get_posts triggered');
 
+	// Sanity checks
 	if (!is_admin()) {
 		error_log('MS101: Not admin — skipping');
 		return;
@@ -714,7 +715,11 @@ add_action('pre_get_posts', function($query) {
 
 	error_log('MS106: Search enhancement triggered for marinesync-boats');
 
-	// JOIN
+	// Force a safe order to avoid DB choking
+	$query->set('orderby', 'title');
+	$query->set('order', 'ASC');
+
+	// JOIN filters
 	add_filter('posts_join', function($join) {
 		global $wpdb;
 		error_log('MS107: posts_join filter running');
@@ -731,11 +736,10 @@ add_action('pre_get_posts', function($query) {
 			error_log('MS110: Adding JOIN for mt3 (loa)');
 			$join .= " LEFT JOIN {$wpdb->postmeta} AS mt3 ON ({$wpdb->posts}.ID = mt3.post_id)";
 		}
-
 		return $join;
 	}, 15);
 
-	// WHERE
+	// WHERE filter
 	add_filter('posts_where', function($where) {
 		global $wpdb;
 		error_log('MS111: posts_where filter running');
@@ -754,7 +758,7 @@ add_action('pre_get_posts', function($query) {
 		return $where;
 	}, 15);
 
-	// GROUP BY
+	// GROUP BY filter to prevent duplicates
 	add_filter('posts_groupby', function($groupby) {
 		global $wpdb;
 		error_log('MS114: posts_groupby filter running');
