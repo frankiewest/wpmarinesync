@@ -817,7 +817,7 @@ class MarineSync_Admin_Page {
 						// Vessel lying
 						$vessel_lying = $advert_features->addChild('vessel_lying',
 							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('vessel_lying', $post->ID)));
-						$country = MarineSync_Post_Type::get_boat_field('vessel_lying_country', $post->ID);
+						$country = MarineSync_Post_Type::get_boat_field('country_code', $post->ID);
 						if ($country) {
 							$vessel_lying->addAttribute('country', $country);
 						}

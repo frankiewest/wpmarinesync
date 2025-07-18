@@ -319,6 +319,27 @@ class Acf_add_boat_data {
 		            'append' => '',
 	            ),
 	            array(
+		            'key' => 'field_67ae1799a6f3d',
+		            'label' => 'Country Code',
+		            'name' => 'country_code',
+		            'aria-label' => '',
+		            'type' => 'text',
+		            'instructions' => '',
+		            'required' => 0,
+		            'conditional_logic' => 0,
+		            'wrapper' => array(
+			            'width' => '',
+			            'class' => '',
+			            'id' => '',
+		            ),
+		            'default_value' => '',
+		            'maxlength' => '',
+		            'allow_in_bindings' => 0,
+		            'placeholder' => '',
+		            'prepend' => '',
+		            'append' => '',
+	            ),
+	            array(
 		            'key'            => 'field_67ae1799adwa4', // keep your existing key
 		            'label'          => 'POA',
 		            'name'           => 'poa',
