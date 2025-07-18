@@ -985,6 +985,10 @@ class MarineSync_Admin_Page {
 						$hours_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('hours', $post->ID));
 						$hours_item->addAttribute('name', 'hours');
 
+                        $max_speed_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('max_speed', $post->ID));
+                        $max_speed_item->addAttribute('name', 'max_speed');
+						$max_speed_item->addAttribute('unit', 'max_speed_unit');
+
 						// Add additional
 						$additional = $boat_features->addChild('additional');
 
