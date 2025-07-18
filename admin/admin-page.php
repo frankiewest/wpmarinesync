@@ -977,7 +977,7 @@ class MarineSync_Admin_Page {
 
 						$horse_power_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('horse_power', $post->ID));
 						$horse_power_item->addAttribute('name', 'horse_power');
-						$horse_power_item->addAttribute('unit', 'horse_power_unit');
+						$horse_power_item->addAttribute('unit', (string)MarineSync_Post_Type::get_boat_field('horse_power_unit', $post->ID));
 
 						$fuel_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('fuel', $post->ID));
 						$fuel_item->addAttribute('name', 'fuel');
@@ -987,7 +987,7 @@ class MarineSync_Admin_Page {
 
                         $max_speed_item = $engine->addChild('item', (string)MarineSync_Post_Type::get_boat_field('max_speed', $post->ID));
                         $max_speed_item->addAttribute('name', 'max_speed');
-						$max_speed_item->addAttribute('unit', 'max_speed_unit');
+						$max_speed_item->addAttribute('unit', (string)MarineSync_Post_Type::get_boat_field('max_speed_unit', $post->ID));
 
 						// Add additional
 						$additional = $boat_features->addChild('additional');
