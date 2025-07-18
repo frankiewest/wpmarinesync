@@ -688,10 +688,8 @@ add_action('pre_get_posts', function($query) {
 	error_log('MS100: pre_get_posts triggered');
 
 	if (!is_admin()) return;
-	if (!$query->is_main_query()) return;
 	if ($query->get('post_type') !== 'marinesync-boats') return;
 	if (empty($_GET['s'])) return;
-	if (isset($_GET['action']) && $_GET['action'] !== '-1') return;
 
 	error_log('MS106: Search enhancement triggered for marinesync-boats');
 
