@@ -515,6 +515,11 @@ class MarineSync_Admin_Page {
                     $button.prop('disabled', true);
                     $message.html('<div class="notice notice-info"><p><?php _e('Generating export file, please wait...', 'marinesync'); ?></p></div>');
 
+                    // manual refresh of 3 seconds
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+
                     $.ajax({
                         url: ajaxurl,
                         type: 'POST',
