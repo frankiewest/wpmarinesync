@@ -1004,29 +1004,52 @@ class MarineSync_Admin_Page {
 							}
 						}
 
-						// Add engine
-						$engine = $boat_features->addChild('engine');
-
 						// ==========================
                         // ENGINE
                         // ==========================
 						$engine_fields = [
-							'stern_thruster', 'bow_thruster', 'fuel', 'hours', 'cruising_speed',
-							'max_speed', 'horse_power', 'engine_manufacturer', 'engine_quantity',
-							'tankage', 'gallons_per_hour', 'litres_per_hour', 'engine_location',
-							'gearbox', 'cylinders', 'propeller_type', 'starting_type', 'drive_type',
-							'cooling_system'
+							'stern_thruster', 'bow_thruster', 'fuel', 'cruising_speed',
+							'max_speed', 'horse_power', 'engine_manufacturer', 'engine_model',
+							'engine_quantity', 'tankage', 'gallons_per_hour', 'litres_per_hour',
+							'engine_location', 'gear_box', 'cylinders', 'propeller_type',
+							'starting_type', 'drive_type', 'cooling_system'
 						];
+
 						$engine = $boat_features->addChild('engine');
+
+                        // Handle single engine fields directly under <engine>
 						foreach ($engine_fields as $field) {
 							$value = MarineSync_Post_Type::get_boat_field($field, $post->ID);
 							if ($value !== '' && $value !== null) {
 								$item = $engine->addChild('item', (string)$value);
 								$item->addAttribute('name', $field);
-								if (in_array($field, ['horse_power', 'max_speed', 'tankage'])) {
+								if (in_array($field, ['horse_power', 'max_speed', 'cruising_speed', 'tankage'])) {
 									$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
 									if (!empty($unit)) {
 										$item->addAttribute('unit', $unit);
+									}
+								}
+							}
+						}
+
+                        // Handle other_engines repeater
+						$other_engines_data = MarineSync_Post_Type::get_boat_field('other_engines', $post->ID);
+
+						if ($other_engines_data && is_array($other_engines_data)) {
+							$other_engines = $engine->addChild('other_engines');
+							foreach ($other_engines_data as $engine_data) {
+								$other_engine = $other_engines->addChild('engine');
+								foreach ($engine_fields as $field) {
+									$value = isset($engine_data[$field]) ? $engine_data[$field] : '';
+									if ($value !== '' && $value !== null) {
+										$item = $other_engine->addChild('item', (string)$value);
+										$item->addAttribute('name', $field);
+										if (in_array($field, ['horse_power', 'max_speed', 'cruising_speed', 'tankage'])) {
+											$unit = isset($engine_data[$field . '_unit']) ? $engine_data[$field . '_unit'] : '';
+											if (!empty($unit)) {
+												$item->addAttribute('unit', $unit);
+											}
+										}
 									}
 								}
 							}
