@@ -1074,9 +1074,9 @@ class MarineSync_Admin_Page {
 							}
 						}
 
-						// ==========================
+						// ===========================
                         // RIG & SAILS
-                        // ==========================
+                        // ===========================
 						$sails = $boat_features->addChild('rig_sails');
 						$sail_fields = ['genoa', 'spinnaker', 'tri_sail', 'storm_jib', 'main_sail', 'winches'];
 						foreach ($sail_fields as $field) {
