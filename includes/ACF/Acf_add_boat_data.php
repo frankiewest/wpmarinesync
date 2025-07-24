@@ -1237,7 +1237,7 @@ class Acf_add_boat_data {
 			            'class' => '',
 			            'id' => '',
 		            ),
-		            'layout' => 'table',
+		            'layout' => 'block',
 		            'pagination' => 0,
 		            'min' => 0,
 		            'max' => 0,
