@@ -1008,11 +1008,15 @@ class MarineSync_Admin_Page {
                         // ENGINE
                         // ==========================
 						$engine_fields = [
-							'stern_thruster', 'bow_thruster', 'fuel', 'cruising_speed',
-							'max_speed', 'horse_power', 'engine_manufacturer', 'engine_model',
-							'engine_quantity', 'tankage', 'gallons_per_hour', 'litres_per_hour',
-							'engine_location', 'gear_box', 'cylinders', 'propeller_type',
-							'starting_type', 'drive_type', 'cooling_system'
+							'engine_manufacturer',
+							'engine_model',
+							'hours',
+							'horse_power',
+							'engine_quantity',
+							'drive_type',
+							'fuel',
+							'propeller_type',
+							'engine_location'
 						];
 
 						$engine = $boat_features->addChild('engine');
@@ -1023,7 +1027,7 @@ class MarineSync_Admin_Page {
 							if ($value !== '' && $value !== null) {
 								$item = $engine->addChild('item', (string)$value);
 								$item->addAttribute('name', $field);
-								if (in_array($field, ['horse_power', 'max_speed', 'cruising_speed', 'tankage'])) {
+								if ($field === 'horse_power') {
 									$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
 									if (!empty($unit)) {
 										$item->addAttribute('unit', $unit);
@@ -1044,7 +1048,7 @@ class MarineSync_Admin_Page {
 									if ($value !== '' && $value !== null) {
 										$item = $other_engine->addChild('item', (string)$value);
 										$item->addAttribute('name', $field);
-										if (in_array($field, ['horse_power', 'max_speed', 'cruising_speed', 'tankage'])) {
+										if ($field === 'horse_power') {
 											$unit = isset($engine_data[$field . '_unit']) ? $engine_data[$field . '_unit'] : '';
 											if (!empty($unit)) {
 												$item->addAttribute('unit', $unit);
