@@ -2071,7 +2071,7 @@ class Acf_add_boat_data {
                     'append' => '',
                 ),
 	            array(
-		            'key' => 'field_67ae29ecccad2',
+		            'key' => 'field_67ae29ecccad254534',
 		            'label' => 'Rig & Sails',
 		            'name' => '',
 		            'aria-label' => '',
@@ -2110,7 +2110,7 @@ class Acf_add_boat_data {
                     'append' => '',
                 ),
 	            array(
-		            'key' => 'field_67ae105d5713d',
+		            'key' => 'field_67ae105d5713d5rff',
 		            'label' => 'Genoa Material',
 		            'name' => 'genoa_material',
 		            'aria-label' => '',
@@ -2131,7 +2131,7 @@ class Acf_add_boat_data {
 		            'append' => '',
 	            ),
 	            array(
-		            'key' => 'field_67ae105d5713d',
+		            'key' => 'field_67ae105d5713d54ffs',
 		            'label' => 'Genoa Furling',
 		            'name' => 'genoa_furling',
 		            'aria-label' => '',
@@ -2173,7 +2173,7 @@ class Acf_add_boat_data {
                     'append' => '',
                 ),
 	            array(
-		            'key' => 'field_67ae108e5713e',
+		            'key' => 'field_67ae108e5713ggrese',
 		            'label' => 'Spinnaker Material',
 		            'name' => 'spinnaker_material',
 		            'aria-label' => '',
@@ -2194,7 +2194,7 @@ class Acf_add_boat_data {
 		            'append' => '',
 	            ),
                 array(
-                    'key' => 'field_67ae10965713f',
+                    'key' => 'field_67ae10965713f4543s',
                     'label' => 'Tri Sail',
                     'name' => 'tri_sail',
                     'aria-label' => '',
@@ -2215,7 +2215,7 @@ class Acf_add_boat_data {
                     'append' => '',
                 ),
 	            array(
-		            'key' => 'field_67ae10965713f',
+		            'key' => 'field_67ae10965713f4535fes',
 		            'label' => 'Tri Sail Material',
 		            'name' => 'tri_sail_material',
 		            'aria-label' => '',
@@ -2257,7 +2257,7 @@ class Acf_add_boat_data {
                     'append' => '',
                 ),
 	            array(
-		            'key' => 'field_67ae109f57140',
+		            'key' => 'field_67ae109f57140frlef',
 		            'label' => 'Storm Jib Material',
 		            'name' => 'storm_jib_material',
 		            'aria-label' => '',
@@ -2278,7 +2278,7 @@ class Acf_add_boat_data {
 		            'append' => '',
 	            ),
                 array(
-                    'key' => 'field_67ae10ad57141',
+                    'key' => 'field_67ae10ad5714vfdg1',
                     'label' => 'Main Sail',
                     'name' => 'main_sail',
                     'aria-label' => '',
@@ -2320,7 +2320,7 @@ class Acf_add_boat_data {
 		            'append' => '',
 	            ),
                 array(
-                    'key' => 'field_67ae10b557142',
+                    'key' => 'field_67ae10b55714fesfe2',
                     'label' => 'Winches',
                     'name' => 'winches',
                     'aria-label' => '',
@@ -2341,7 +2341,7 @@ class Acf_add_boat_data {
                     'append' => '',
                 ),
 	            array(
-		            'key' => 'field_67ae29ecccad2',
+		            'key' => 'field_67ae29ecfesefccad2',
 		            'label' => 'Equipment',
 		            'name' => '',
 		            'aria-label' => '',
