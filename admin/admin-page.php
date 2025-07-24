@@ -1059,9 +1059,9 @@ class MarineSync_Admin_Page {
 							}
 						}
 
-						// ==========================
+						// ===========================
                         // NAVIGATION
-                        // ==========================
+                        // ===========================
 						$navigation_fields = [
 							'navigation_lights', 'compass', 'depth_instrument', 'wind_instrument',
 							'autopilot', 'gps', 'vhf', 'plotter', 'speed_instrument', 'radar'
