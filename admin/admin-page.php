@@ -1084,6 +1084,15 @@ class MarineSync_Admin_Page {
 							if ($value !== '' && $value !== null) {
 								$item = $sails->addChild('item', (string)$value);
 								$item->addAttribute('name', $field);
+								if ($field === 'genoa') {
+									$material = MarineSync_Post_Type::get_boat_field($field . '_material', $post->ID);
+									$furling = MarineSync_Post_Type::get_boat_field($field . '_furling', $post->ID);
+									$item->addAttribute('material', (string)$material);
+									$item->addAttribute('furling', (string)$furling);
+								} elseif ($field !== 'winches') {
+									$material = MarineSync_Post_Type::get_boat_field($field . '_material', $post->ID);
+									$item->addAttribute('material', (string)$material);
+								}
 							}
 						}
 
