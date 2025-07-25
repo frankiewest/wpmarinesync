@@ -250,8 +250,11 @@ class Acf_add_boat_data {
 		            'choices'       => array(
 			            'Tax Not Paid' => 'Tax Not Paid',
 			            'Tax Paid'     => 'Tax Paid',
+			            'Not Applicable' => 'Not Applicable',
+			            'Unknown' => 'Unknown',
+			            'Blank' => ''
 		            ),
-		            'default_value' => array(),
+		            'default_value' => 'Blank',
 		            'allow_null'    => 0,
 		            'multiple'      => 0,
 		            'ui'            => 0,
