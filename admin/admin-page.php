@@ -638,6 +638,18 @@ class MarineSync_Admin_Page {
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
 		);
+
+        // Remove 'removed' boats by default
+		$boat_args['tax_query'] = array(
+			'relation' => 'AND',
+			array(
+				'taxonomy' => 'boat-status',
+				'field' => 'slug',
+				'terms' => array('removed'),
+				'operator' => 'NOT IN'
+			)
+		);
+
 		if (get_option('marinesync_sold_boats_export', 'show') === 'hide') {
 			$boat_args['tax_query'] = array(
 				array(
