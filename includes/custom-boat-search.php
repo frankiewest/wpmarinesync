@@ -12,10 +12,33 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
 	<div class="custom_search_form_column">
 		<select name="manufacturer" class="custom_search_form_column">
 			<option value="">All Manufacturers</option>
-			<?php foreach($manufacturers as $manufacturer): ?>
-				<option value="<?= esc_attr(str_replace(' ', '_',$manufacturer)) ?>" <?= selected(isset($_GET['manufacturer']) ? $_GET['manufacturer'] : '', $manufacturer) ?>><?= esc_html($manufacturer) ?></option>
+			<?php foreach ($manufacturers as $manufacturer): ?>
+				<?php
+				// Make a slug-safe version for the option value
+				$manufacturer_value = strtolower($manufacturer);
+
+				// Remove apostrophes, commas, ampersands, and any punctuation
+				$manufacturer_value = preg_replace("/[^\w\s-]/", '', $manufacturer_value);
+
+				// Replace spaces with hyphens
+				$manufacturer_value = str_replace(' ', '-', $manufacturer_value);
+
+				// Collapse multiple hyphens (in case of double spaces, etc.)
+				$manufacturer_value = preg_replace('/-+/', '-', $manufacturer_value);
+
+				// Trim trailing hyphens
+				$manufacturer_value = trim($manufacturer_value, '-');
+
+				// Get the currently selected manufacturer from $_GET
+				$selected_value = isset($_GET['manufacturer']) ? $_GET['manufacturer'] : '';
+				?>
+                <option
+                        value="<?= esc_attr($manufacturer_value) ?>"
+					<?= selected($selected_value, $manufacturer_value) ?>>
+					<?= esc_html($manufacturer) ?>
+                </option>
 			<?php endforeach; ?>
-		</select>
+        </select>
 	</div>
 	<div class="custom_search_form_column">
 		<select name="price_range">
