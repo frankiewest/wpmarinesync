@@ -13,7 +13,7 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
 		<select name="manufacturer" class="custom_search_form_column">
 			<option value="">All Manufacturers</option>
 			<?php foreach($manufacturers as $manufacturer): ?>
-				<option value="<?= esc_attr(str_replace('', '_',$manufacturer)) ?>" <?= selected(isset($_GET['manufacturer']) ? $_GET['manufacturer'] : '', $manufacturer) ?>><?= esc_html($manufacturer) ?></option>
+				<option value="<?= esc_attr(str_replace(' ', '_',$manufacturer)) ?>" <?= selected(isset($_GET['manufacturer']) ? $_GET['manufacturer'] : '', $manufacturer) ?>><?= esc_html($manufacturer) ?></option>
 			<?php endforeach; ?>
 		</select>
 	</div>
