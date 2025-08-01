@@ -161,7 +161,7 @@ class MarineSync_Search {
 
 		// Add manufacturer filter
 		if(isset($_GET['manufacturer']) && !empty($_GET['manufacturer'])){
-			$manufacturer = sanitize_text_field(str_replace('_', ' ', $_GET['manufacturer']);
+			$manufacturer = sanitize_text_field(str_replace('_', ' ', $_GET['manufacturer']));
 			$tax_query[] = [
 				[
 					'taxonomy' => 'manufacturer',
