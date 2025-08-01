@@ -165,7 +165,7 @@ class MarineSync_Search {
 			$manufacturer_raw = sanitize_text_field($_GET['manufacturer']);
 
 			// Create slug-safe version: replace underscores with hyphens, strip ampersands
-			$manufacturer_slug = str_replace(['_', '&'], ['-', ''], strtolower($manufacturer_raw));
+			$manufacturer_slug = str_replace(['_', '_&_'], ['-', '_'], strtolower($manufacturer_raw));
 			$manufacturer_slug = sanitize_title($manufacturer_slug);
 
 			// Build the tax query using the slug
