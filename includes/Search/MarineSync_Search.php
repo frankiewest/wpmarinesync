@@ -383,7 +383,7 @@ class MarineSync_Search {
 					$query->set('order', 'ASC');
 					break;
 				default:
-					$query->set('meta_key', 'asking_price');
+					$query->set('meta_key', 'loa');
 					$query->set('orderby', 'meta_value_num');
 					$query->set('order', 'DESC');
 					break;
