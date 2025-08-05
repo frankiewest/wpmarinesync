@@ -392,7 +392,7 @@ class MarineSync_Search {
 			$meta_query[] = [
 				'key' => 'vessel_lying',
 				'value' => $vessel_lying,
-				'compare' => 'LIKE'
+				'compare' => '%LIKE%'
 			];
 		}
 
