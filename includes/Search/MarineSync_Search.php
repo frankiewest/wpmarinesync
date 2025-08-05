@@ -16,8 +16,7 @@ class MarineSync_Search {
 	public static function search_meta_value(
 		string $meta_key,
 		string $meta_value = '',
-		string $type = 'meta',
-		array $omit_statuses = []
+		string $type = 'meta'
 	): array|null {
 		if ($meta_key === '' && $meta_value === '') {
 			return null;
@@ -46,24 +45,6 @@ class MarineSync_Search {
 					);
 				}
 
-				// Exclude posts with unwanted boat-status terms
-				if (!empty($omit_statuses)) {
-					$placeholders = implode(',', array_fill(0, count($omit_statuses), '%s'));
-					$query .= $wpdb->prepare(
-						" AND p.ID NOT IN (
-                        SELECT tr.object_id
-                        FROM {$wpdb->term_relationships} AS tr
-                        INNER JOIN {$wpdb->term_taxonomy} AS tt 
-                            ON tr.term_taxonomy_id = tt.term_taxonomy_id
-                        INNER JOIN {$wpdb->terms} AS t 
-                            ON tt.term_id = t.term_id
-                        WHERE tt.taxonomy = %s
-                          AND t.slug IN ($placeholders)
-                    )",
-						array_merge(['boat-status'], $omit_statuses)
-					);
-				}
-
 				$query .= " ORDER BY meta_value ASC";
 
 			} elseif ($type === 'tax') {
@@ -86,24 +67,6 @@ class MarineSync_Search {
 					$query = $wpdb->prepare(
 						$query . " AND terms.name = %s",
 						$meta_value
-					);
-				}
-
-				// Exclude posts with unwanted boat-status terms
-				if (!empty($omit_statuses)) {
-					$placeholders = implode(',', array_fill(0, count($omit_statuses), '%s'));
-					$query .= $wpdb->prepare(
-						" AND p.ID NOT IN (
-                        SELECT tr.object_id
-                        FROM {$wpdb->term_relationships} AS tr
-                        INNER JOIN {$wpdb->term_taxonomy} AS tt 
-                            ON tr.term_taxonomy_id = tt.term_taxonomy_id
-                        INNER JOIN {$wpdb->terms} AS t 
-                            ON tt.term_id = t.term_id
-                        WHERE tt.taxonomy = %s
-                          AND t.slug IN ($placeholders)
-                    )",
-						array_merge(['boat-status'], $omit_statuses)
 					);
 				}
 
