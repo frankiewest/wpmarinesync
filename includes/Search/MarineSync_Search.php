@@ -146,6 +146,8 @@ class MarineSync_Search {
 	 * @return void
 	 */
 	public static function custom_search_query($query): void {
+		global $wpdb;
+
 		$meta_query = [];
 		$tax_query = [];
 
@@ -391,8 +393,8 @@ class MarineSync_Search {
 			$vessel_lying = sanitize_text_field($_GET['vessel_lying']);
 			$meta_query[] = [
 				'key' => 'vessel_lying',
-				'value' => $vessel_lying,
-				'compare' => '%LIKE%'
+				'value' => '%' . $wpdb->esc_like($vessel_lying) . '%',
+				'compare' => 'LIKE'
 			];
 		}
 
