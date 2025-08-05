@@ -158,7 +158,7 @@ class MarineSync_Search {
 			$tax_query[] = [
 				'taxonomy' => 'boat-status',
 				'field'    => 'slug',
-				'terms'    => [ 'sold' ],
+				'terms'    => [ 'sold', 'inactive', 'removed' ],
 				'operator' => 'NOT IN'
 			];
 		}
