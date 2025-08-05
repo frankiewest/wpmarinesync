@@ -91,7 +91,7 @@ class Acf_add_boat_data {
 			            'class' => '',
 			            'id' => '',
 		            ),
-		            'default_value' => array(),    // no default
+		            'default_value' => array(),    // no
 		            'allow_null'    => 0,
 		            'multiple'      => 0,
 		            'ui'            => 0,          // whether to use the nicer Select2 UI
