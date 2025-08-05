@@ -620,6 +620,26 @@ add_shortcode('marinesync_video', function($atts) {
 	}
 });
 
+add_shortcode('enquire_button', function($atts) {
+    $atts = shortcode_atts([
+            'id' => get_the_ID()
+    ], $atts);
+
+    if(is_admin()) return null;
+
+    $boat = get_post($atts['id']);
+
+    // Check if post is boat
+    if($boat->post_type === 'marinesync-boats') return null;
+
+    return '
+    <div class="w-btn-wrapper align_center">
+        <a class="w-btn us-btn-style_1 icon_atright" href="'.get_permalink($boat->ID) . '?boat=' . $boat->post_title .'">
+            <span class="w-btn-label">Enquire</span> <i class="fas fa-paper-plane"></i>
+        </a>
+    </div>';
+});
+
 add_action('pre_get_posts', function($query) {
 	if (!is_admin() || !$query->is_main_query()) return;
 	if ($query->get('post_type') !== 'marinesync-boats') return;
