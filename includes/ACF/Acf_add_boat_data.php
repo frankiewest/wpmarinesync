@@ -72,7 +72,7 @@ class Acf_add_boat_data {
 			            'class' => '',
 			            'id' => '',
 		            ),
-		            'default_value' => Functions_MarineSync::get_office_field() ?? '',
+		            'default_value' => '',
 		            'maxlength' => '',
 		            'allow_in_bindings' => 0,
 		            'placeholder' => '',
