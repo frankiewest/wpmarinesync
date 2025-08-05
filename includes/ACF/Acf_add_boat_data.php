@@ -1,6 +1,8 @@
 <?php
 namespace MarineSync\ACF;
 
+use MarineSync\Functions_MarineSync;
+
 class Acf_add_boat_data {
     public static function add_boat_data() {
         error_log('MS020: Starting ACF field group creation');
@@ -70,7 +72,7 @@ class Acf_add_boat_data {
 			            'class' => '',
 			            'id' => '',
 		            ),
-		            'default_value' => '',
+		            'default_value' => Functions_MarineSync::get_office_field() ?? '',
 		            'maxlength' => '',
 		            'allow_in_bindings' => 0,
 		            'placeholder' => '',

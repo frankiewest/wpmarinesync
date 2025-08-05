@@ -55,4 +55,26 @@ class Functions_MarineSync {
 			return get_field($atts['field'], $id);
 		}
 	}
+
+	/**
+	 * @param string $field
+	 * @param int $i
+	 *
+	 * @return string|null
+	 * @description Get field value from offices ACF options
+	 */
+	public static function get_office_field(
+		string $field = 'id',
+		int $i = 0
+	): string|null
+	{
+		// Get office repeater
+		$offices = get_field('offices', 'option');
+
+		// Sanity check
+		if(empty($offices)) return null;
+
+		// Return specified value
+		return $offices[$i][$field];
+	}
 }
