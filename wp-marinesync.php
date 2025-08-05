@@ -631,7 +631,7 @@ add_shortcode('enquire_button', function($atts) {
 
     return '
     <div class="w-btn-wrapper align_center">
-        <a class="w-btn us-btn-style_1 icon_atright" href="contact-us?boat=' . $boat->post_title .'">
+        <a class="w-btn us-btn-style_1 icon_atright" href="/contact-us?boat=' . $boat->post_title .'">
             <span class="w-btn-label">Enquire</span> <i class="fas fa-paper-plane"></i>
         </a>
     </div>';
