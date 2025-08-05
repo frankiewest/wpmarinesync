@@ -400,6 +400,38 @@ class MarineSync_Search {
 			];
 		}
 
+		if (isset($_GET['s']) && !empty($_GET['s'])) {
+			global $wpdb;
+
+			// Sanitize and normalize search input
+			$keyword = sanitize_text_field($_GET['s']);
+			$keyword = preg_replace("/[^\p{L}\p{N}\s]/u", "", $keyword); // remove punctuation, keep letters/numbers
+			$keyword_like = '%' . $wpdb->esc_like($keyword) . '%';
+
+			// Extend meta_query to look for keyword in specific custom fields
+			$meta_query[] = [
+				'relation' => 'OR',
+				[
+					'key'     => 'vessel_lying',
+					'value'   => $keyword_like,
+					'compare' => 'LIKE'
+				],
+				[
+					'key'     => 'manufacturer',
+					'value'   => $keyword_like,
+					'compare' => 'LIKE'
+				],
+				[
+					'key'     => 'boat_type',
+					'value'   => $keyword_like,
+					'compare' => 'LIKE'
+				],
+			];
+
+			// Also apply keyword search to post_title for good measure
+			$query->set('s', $keyword);
+		}
+
 		// Add post_type
 		$query->set('post_type', 'marinesync-boats');
 
