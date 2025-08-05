@@ -386,6 +386,16 @@ class MarineSync_Search {
 			}
 		}
 
+		// Add vessel lying filter
+		if(isset($_GET['vessel_lying']) && !empty($_GET['vessel_lying'])) {
+			$vessel_lying = sanitize_text_field($_GET['vessel_lying']);
+			$meta_query[] = [
+				'key' => 'vessel_lying',
+				'value' => $vessel_lying,
+				'compare' => '='
+			];
+		}
+
 		// Add post_type
 		$query->set('post_type', 'marinesync-boats');
 
