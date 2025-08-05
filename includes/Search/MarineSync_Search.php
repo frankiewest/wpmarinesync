@@ -401,7 +401,6 @@ class MarineSync_Search {
 		}
 
 		if (isset($_GET['s']) && !empty($_GET['s'])) {
-
 			// Sanitize and normalize search input
 			$keyword = sanitize_text_field($_GET['s']);
 			$keyword = preg_replace("/[^\p{L}\p{N}\s]/u", "", $keyword); // remove punctuation, keep letters/numbers
