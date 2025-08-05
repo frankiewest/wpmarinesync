@@ -630,7 +630,7 @@ add_shortcode('enquire_button', function($atts) {
     $boat = get_post($atts['id']);
 
     // Check if post is boat
-    if($boat->post_type === 'marinesync-boats') return null;
+    if($boat->post_type !== 'marinesync-boats') return null;
 
     return '
     <div class="w-btn-wrapper align_center">
