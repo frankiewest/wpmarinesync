@@ -70,11 +70,12 @@ class Functions_MarineSync {
 	{
 		// Get office repeater
 		$offices = get_field('offices', 'option');
+		error_log(print_r($offices, true));
 
 		// Sanity check
 		if(empty($offices)) return null;
 
 		// Return specified value
-		return $offices[$i][$field];
+		return (string) $offices[$i][$field];
 	}
 }
