@@ -66,7 +66,7 @@ class Acf_add_boat_data {
 		            'required' => 0,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
-			            'width' => '',
+			            'width' => '50',
 			            'class' => '',
 			            'id' => '',
 		            ),
@@ -85,6 +85,11 @@ class Acf_add_boat_data {
 		            'choices'       => array(
 			            'Power' => 'Power',
 			            'Sail'  => 'Sail',
+		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
 		            ),
 		            'default_value' => array(),    // no default
 		            'allow_null'    => 0,
@@ -254,6 +259,11 @@ class Acf_add_boat_data {
 			            'Unknown' => 'Unknown',
 			            '' => ''
 		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
+		            ),
 		            'default_value' => '',
 		            'allow_null'    => 0,
 		            'multiple'      => 0,
@@ -270,6 +280,11 @@ class Acf_add_boat_data {
 		            'choices'       => array(
 			            'excl. VAT' => 'excl. VAT',
 			            'incl. VAT' => 'incl. VAT',
+		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
 		            ),
 		            'default_value' => array(),
 		            'allow_null'    => 0,
@@ -352,6 +367,11 @@ class Acf_add_boat_data {
 			            'False' => 'False',
 		            ),
 		            'layout'         => 'horizontal',
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
+		            ),
 		            'default_value'  => 'False',
 		            'allow_null'     => 0,
 		            'other_choice'   => 0,
@@ -367,6 +387,11 @@ class Acf_add_boat_data {
 			            'False' => 'False',
 		            ),
 		            'layout'         => 'horizontal',
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
+		            ),
 		            'default_value'  => 'False',
 		            'allow_null'     => 0,
 		            'other_choice'   => 0,
@@ -380,6 +405,11 @@ class Acf_add_boat_data {
 		            'choices'       => array(
 			            'New'  => 'New',
 			            'Used' => 'Used',
+		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
 		            ),
 		            'default_value' => array(),
 		            'allow_null'    => 0,
