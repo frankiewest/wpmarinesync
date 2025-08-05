@@ -575,6 +575,11 @@ class Acf_add_boat_data {
 			            'metres' => 'Metres',
 			            'feet' => 'Feet',
 		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
+		            ),
 		            'default_value' => 'feet',
 		            'allow_null' => 1,
 		            'multiple' => 0,
@@ -614,6 +619,11 @@ class Acf_add_boat_data {
 		            'choices' => array(
 			            'metres' => 'Metres',
 			            'feet' => 'Feet',
+		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
 		            ),
 		            'default_value' => 'feet',
 		            'allow_null' => 1,
@@ -655,6 +665,11 @@ class Acf_add_boat_data {
 			            'metres' => 'Metres',
 			            'feet' => 'Feet',
 		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
+		            ),
 		            'default_value' => 'feet',
 		            'allow_null' => 1,
 		            'multiple' => 0,
@@ -694,6 +709,11 @@ class Acf_add_boat_data {
 		            'choices' => array(
 			            'metres' => 'Metres',
 			            'feet' => 'Feet',
+		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
 		            ),
 		            'default_value' => 'feet',
 		            'allow_null' => 1,
@@ -824,6 +844,11 @@ class Acf_add_boat_data {
 		            'choices' => array(
 			            'metres' => 'Metres',
 			            'feet' => 'Feet',
+		            ),
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
 		            ),
 		            'default_value' => 'feet',
 		            'allow_null' => 1,
