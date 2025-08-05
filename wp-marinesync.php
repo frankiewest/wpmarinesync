@@ -629,9 +629,6 @@ add_shortcode('enquire_button', function($atts) {
 
     $boat = get_post($atts['id']);
 
-    // Check if post is boat
-    if($boat->post_type !== 'marinesync-boats') return null;
-
     return '
     <div class="w-btn-wrapper align_center">
         <a class="w-btn us-btn-style_1 icon_atright" href="'.get_permalink($boat->ID) . 'contact-us?boat=' . $boat->post_title .'">
