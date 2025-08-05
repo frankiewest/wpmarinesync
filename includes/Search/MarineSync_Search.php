@@ -245,38 +245,38 @@ class MarineSync_Search {
 		}
 
 		// Add price range filter
-		if(isset($_GET['loa']) && !empty($_GET['loa'])){
+		if (isset($_GET['loa']) && !empty($_GET['loa'])) {
 			$loa = sanitize_text_field($_GET['loa']);
-			switch($loa){
-				case 'up-to-10m':
+			switch ($loa) {
+				case 'up-to-35ft':
 					$meta_query[] = [
 						'key' => 'loa',
-						'value' => 10,
-						'compare' => '<',
+						'value' => 35,
+						'compare' => '<=',
 						'type' => 'NUMERIC'
 					];
 					break;
-				case '10m-15m':
+				case '35ft-50ft':
 					$meta_query[] = [
 						'key' => 'loa',
-						'value' => [10, 15],
+						'value' => [35, 50],
 						'compare' => 'BETWEEN',
 						'type' => 'NUMERIC'
 					];
 					break;
-				case '15m-20m':
+				case '50ft-65ft':
 					$meta_query[] = [
 						'key' => 'loa',
-						'value' => [15, 20],
+						'value' => [50, 65],
 						'compare' => 'BETWEEN',
 						'type' => 'NUMERIC'
 					];
 					break;
-				case 'over-20m':
+				case 'over-65ft':
 					$meta_query[] = [
 						'key' => 'loa',
-						'value' => 20,
-						'compare' => '>',
+						'value' => 65,
+						'compare' => '>=',
 						'type' => 'NUMERIC'
 					];
 					break;
@@ -285,6 +285,7 @@ class MarineSync_Search {
 					break;
 			}
 		}
+
 		// Add year range filter
 		if (isset($_GET['year_range']) && !empty($_GET['year_range'])) {
 			$year_range = sanitize_text_field($_GET['year_range']);

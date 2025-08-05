@@ -67,13 +67,13 @@ $locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type
 		</select>
 	</div>
 	<div class="custom_search_form_column">
-		<select name="loa" class="custom_search_form_column">
-			<option value="">LOA (m)</option>
-			<option value="up-to-10m" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', 'up-to-10m') ?>>Up to 10m</option>
-			<option value="10m-15m" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', '10m-15m') ?>>10m - 15m</option>
-			<option value="15m-20m" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', '15m-20m') ?>>15m - 20m</option>
-			<option value="over-20m" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', 'over-20m') ?>>Over 20m</option>
-		</select>
+        <select name="loa" class="custom_search_form_column">
+            <option value="">LOA (ft)</option>
+            <option value="up-to-35ft" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', 'up-to-35ft') ?>>Up to 35ft</option>
+            <option value="35ft-50ft" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', '35ft-50ft') ?>>35ft - 50ft</option>
+            <option value="50ft-65ft" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', '50ft-65ft') ?>>50ft - 65ft</option>
+            <option value="over-65ft" <?= selected(isset($_GET['loa']) ? $_GET['loa'] : '', 'over-65ft') ?>>Over 65ft</option>
+        </select>
 	</div>
 	<div class="custom_search_form_column">
 		<select name="year_range" class="custom_search_form_column">
