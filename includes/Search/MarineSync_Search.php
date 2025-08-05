@@ -382,17 +382,16 @@ class MarineSync_Search {
 					$query->set('orderby', 'meta_value_num');
 					$query->set('order', 'ASC');
 					break;
-				case '':
-					$query->set('meta_key', 'loa');
-					$query->set('orderby', 'meta_value_num');
-					$query->set('order', 'DESC');
-					break;
 				default:
 					$query->set('meta_key', 'loa');
 					$query->set('orderby', 'meta_value_num');
 					$query->set('order', 'DESC');
 					break;
 			}
+		} else {
+			$query->set('meta_key', 'loa');
+			$query->set('orderby', 'meta_value_num');
+			$query->set('order', 'DESC');
 		}
 
 		// Add vessel lying filter
