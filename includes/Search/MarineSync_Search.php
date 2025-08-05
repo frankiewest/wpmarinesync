@@ -13,7 +13,12 @@ class MarineSync_Search {
 	 *
 	 * @return array|null
 	 */
-	public static function search_meta_value(string $meta_key, string $meta_value = '', string $type = 'meta'): array|null {
+	public static function search_meta_value(
+		string $meta_key,
+		string $meta_value = '',
+		string $type = 'meta',
+		array $omit_statuses = []
+	): array|null {
 		if ($meta_key === '' && $meta_value === '') {
 			return null;
 		}
@@ -38,6 +43,24 @@ class MarineSync_Search {
 					$query = $wpdb->prepare(
 						$query . " AND meta_value = %s",
 						$meta_value
+					);
+				}
+
+				// Exclude posts with unwanted boat-status terms
+				if (!empty($omit_statuses)) {
+					$placeholders = implode(',', array_fill(0, count($omit_statuses), '%s'));
+					$query .= $wpdb->prepare(
+						" AND p.ID NOT IN (
+                        SELECT tr.object_id
+                        FROM {$wpdb->term_relationships} AS tr
+                        INNER JOIN {$wpdb->term_taxonomy} AS tt 
+                            ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                        INNER JOIN {$wpdb->terms} AS t 
+                            ON tt.term_id = t.term_id
+                        WHERE tt.taxonomy = %s
+                          AND t.slug IN ($placeholders)
+                    )",
+						array_merge(['boat-status'], $omit_statuses)
 					);
 				}
 
@@ -66,6 +89,24 @@ class MarineSync_Search {
 					);
 				}
 
+				// Exclude posts with unwanted boat-status terms
+				if (!empty($omit_statuses)) {
+					$placeholders = implode(',', array_fill(0, count($omit_statuses), '%s'));
+					$query .= $wpdb->prepare(
+						" AND p.ID NOT IN (
+                        SELECT tr.object_id
+                        FROM {$wpdb->term_relationships} AS tr
+                        INNER JOIN {$wpdb->term_taxonomy} AS tt 
+                            ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                        INNER JOIN {$wpdb->terms} AS t 
+                            ON tt.term_id = t.term_id
+                        WHERE tt.taxonomy = %s
+                          AND t.slug IN ($placeholders)
+                    )",
+						array_merge(['boat-status'], $omit_statuses)
+					);
+				}
+
 				$query .= " ORDER BY terms.name ASC";
 
 			} else {
@@ -83,7 +124,7 @@ class MarineSync_Search {
 
 			return array_filter($results, 'strlen');
 
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			error_log('Exception in search_meta_value: ' . $e->getMessage());
 			return null;
 		}

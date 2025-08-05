@@ -3,8 +3,8 @@
 use MarineSync\Search\MarineSync_Search;
 
 // Get manufacturers, location
-$manufacturers = MarineSync_Search::search_meta_value(meta_key: 'manufacturer', type: 'tax');
-$locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type: 'meta');
+$manufacturers = MarineSync_Search::search_meta_value(meta_key: 'manufacturer', type: 'tax', omit_statuses: ['removed', 'inactive', 'sold']);
+$locations = MarineSync_Search::search_meta_value(meta_key: 'vessel_lying', type: 'meta', omit_statuses: ['removed', 'inactive', 'sold']);
 
 ?>
 
