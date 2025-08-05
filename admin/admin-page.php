@@ -992,6 +992,7 @@ class MarineSync_Admin_Page {
 
 							if ($value !== '' && $value !== null) {
 								$item = $build->addChild('item', (string) $value);
+								$item->addAttribute('name', $field);
 
 								if (in_array($field, ['ballast', 'displacement'])) {
 									$unit = MarineSync_Post_Type::get_boat_field($field . '_unit', $post->ID);
@@ -1192,7 +1193,6 @@ class MarineSync_Admin_Page {
 						($val = MarineSync_Post_Type::get_boat_field('water_tanks_capacity', $post->ID))
 							? $additional->addChild('item', (string)$val)->addAttribute('name', 'water_tanks_capacity')
 							: null;
-
 					} else {
 						error_log('MS039: MarineSync_Post_Type class or method not found');
 					}
