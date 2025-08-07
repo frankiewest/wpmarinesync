@@ -233,7 +233,7 @@ final class MarineSync_PDF {
 		                    <tr>
 		                        <td style='width: 70%;line-height: 0.7em'>
 		                            <h2 style='margin: 0;'>" . $post_title . "</h2>
-		                            <span style='display: block; font-size: 20px; margin: 10px 0;'>£" . esc_html(number_format($boat_data['price'])) . " " . esc_html($boat_data['vat_type'])."</span>
+		                            <span style='display: block; font-size: 20px; margin: 10px 0;'>" . esc_html($boat_data['currency']) . esc_html(number_format($boat_data['asking_price'])) . " " . esc_html($boat_data['vat_type'])."</span>
 		                            <span style='display: block;'>" . esc_html($boat_data['vessel_lying']) . "</span>
 		                        </td>
 		                        <td style='width: 30%; text-align: right;'>
@@ -276,7 +276,7 @@ final class MarineSync_PDF {
 		                        </tr>
 		                        <tr>
 		                            <td style='border: 1px solid #000; padding: 8px; color: #888;'>Price:</td>
-		                            <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>£" . esc_html(number_format($boat_data['price'])) . "</strong></td>
+		                            <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['currency']) . esc_html(number_format($boat_data['asking_price'])) . "</strong></td>
 		                            <td style='border: 1px solid #000; padding: 8px; color: #888;'>Max Speed:</td>
 		                            <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['max_speed']) . "</strong></td>
 		                        </tr>
