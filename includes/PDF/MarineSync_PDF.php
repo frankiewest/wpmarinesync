@@ -232,55 +232,43 @@ final class MarineSync_PDF {
                         <h2>Boat Details</h2>
                         <hr style='border: 1px solid #000; margin: 10px 0 20px 0;'>
                         <table class='boat-details-table' style='width: 100%; border-collapse: collapse; border: 1px solid #000;'>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Manufacturer:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['manufacturer']) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Model:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['model']) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Hull Material:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['hull_type']) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Year:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['year']) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Length:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['loa']) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>LWL:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['lwl'] ?? '') . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Beam:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['beam']) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Draft:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['max_draft'] ?? ($boat_data['draft'] ?? '')) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Engine Type:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['engine_type'] ?? '') . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Engine Fuel:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html(ucfirst($boat_data['fuel'])) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Price:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['currency']) . esc_html(number_format($boat_data['asking_price'])) . "</strong></td>
-                            </tr>
-                            <tr>
-                                <td style='border: 1px solid #000; padding: 8px; color: #888;'>Location:</td>
-                                <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['vessel_lying']) . "</strong></td>
-                            </tr>
-                        </table>
+						    <tr>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Manufacturer:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['manufacturer']) . "</strong></td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Model:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['model']) . "</strong></td>
+						    </tr>
+						    <tr>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Hull Material:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['hull_type']) . "</strong></td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Year:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['year']) . "</strong></td>
+						    </tr>
+						    <tr>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Length:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['loa']) . "</strong></td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>LWL:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['lwl'] ?? '') . "</strong></td>
+						    </tr>
+						    <tr>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Beam:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['beam']) . "</strong></td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Draft:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['max_draft'] ?? ($boat_data['draft'] ?? '')) . "</strong></td>
+						    </tr>
+						    <tr>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Engine Type:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['engine_type'] ?? '') . "</strong></td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Engine Fuel:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html(ucfirst($boat_data['fuel'])) . "</strong></td>
+						    </tr>
+						    <tr>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Price:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['currency']) . esc_html(number_format($boat_data['asking_price'])) . "</strong></td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #888;'>Location:</td>
+						        <td style='border: 1px solid #000; padding: 8px; color: #336699;'><strong>" . esc_html($boat_data['vessel_lying']) . "</strong></td>
+						    </tr>
+						</table>
                     </div>
                 </div>
                 <div style='color: black;'>
