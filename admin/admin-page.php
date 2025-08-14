@@ -745,7 +745,13 @@ class MarineSync_Admin_Page {
 						$terms = get_the_terms($post->ID, 'boat-status');
 						if (!empty($terms) && !is_wp_error($terms)) {
 							$status_names = wp_list_pluck($terms, 'name');
-							$boat->addAttribute('status', $status_names[0]); // First status name
+							$status_name_add = match($status_names[0]) {
+                                'Active' => 'Available',
+                                'Under Offer' => 'UnderOffer',
+                                default => $status_names[0]
+                            };
+                            $boat->addAttribute('status', $status_name_add);
+
 						}
 
 						$boat->addAttribute('last_modified', get_the_modified_date('Y-m-d\TH:i:s', $post->ID));
