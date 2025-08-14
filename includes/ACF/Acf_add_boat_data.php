@@ -4065,7 +4065,7 @@ class Acf_add_boat_data {
 					'label' => 'Rig & Sails',
 					'name' => 'rig_sails_template',
 					'aria-label' => '',
-					'type' => 'textarea',
+					'type' => 'wysiwyg',
 					'instructions' => '',
 					'required' => 0,
 					'conditional_logic' => 0,
