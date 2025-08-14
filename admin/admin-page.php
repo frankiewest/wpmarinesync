@@ -931,7 +931,7 @@ class MarineSync_Admin_Page {
 						$cdata = $marketing_desc_node->ownerDocument->createCDATASection($desc);
 						$marketing_desc_node->appendChild($cdata);
 
-						$lang = MarineSync_Post_Type::get_boat_field('marketing_desc_language', $post->ID);
+						$lang = MarineSync_Post_Type::get_boat_field('marketing_desc_language', $post->ID) ?? 'en';
 						if ($lang) {
 							$marketing_desc->addAttribute('language', $lang);
 						}
