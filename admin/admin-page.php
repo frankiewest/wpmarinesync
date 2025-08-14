@@ -896,6 +896,8 @@ class MarineSync_Admin_Page {
 						$vat_country = MarineSync_Post_Type::get_boat_field('vat_country', $post->ID);
 						if ($vat_country) {
 							$asking_price->addAttribute( 'vat_country', $vat_country );
+						} else {
+							$asking_price->addAttribute( 'vat_country', '' );
 						}
 
 						$marketing_descs = $advert_features->addChild('marketing_descs');
