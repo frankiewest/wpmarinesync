@@ -1195,22 +1195,40 @@ class MarineSync_Admin_Page {
 						// Add additional
 						$additional = $boat_features->addChild('additional');
 
-						// Add additional items
-						($val = MarineSync_Post_Type::get_boat_field('dry_weight', $post->ID))
-							? $additional->addChild('item', (string)$val)->addAttribute('name', 'dry_weight')
-							: null;
+                        // Add additional items
+						$additional_fields = [
+							['field' => 'dry_weight', 'name' => 'dry_weight'],
+							['field' => 'fuel_tanks_capacity', 'name' => 'fuel_tanks_capacity'],
+							['field' => 'hull_type', 'name' => 'hull_m'],
+							['field' => 'water_tanks_capacity', 'name' => 'water_tanks_capacity'],
+							['field' => 'hull_material', 'name' => 'hull_m'],
+							['field' => 'holding_tanks', 'name' => 'holding_tanks'],
+							['field' => 'bow_thruster', 'name' => 'bow_thruster'],
+							['field' => 'double_berths_count', 'name' => 'double_berths_count'],
+							['field' => 'heads_count', 'name' => 'heads_count'],
+							['field' => 'fuel_tanks', 'name' => 'fuel_tanks', 'unit_field' => 'fuel_tanks_unit'],
+							['field' => 'fresh_water_tanks', 'name' => 'fresh_water_tanks', 'unit_field' => 'fresh_water_tanks_unit'],
+							['field' => 'speed_log', 'name' => 'speed_log'],
+							['field' => 'windlass', 'name' => 'windlass'],
+							['field' => 'loa_m', 'name' => 'loa', 'unit_field' => 'loa_unit'],
+							['field' => 'hob', 'name' => 'hob'],
+							['field' => 'grill', 'name' => 'grill'],
+							['field' => 'stern_thruster', 'name' => 'stern_thruster'],
+						];
 
-						($val = MarineSync_Post_Type::get_boat_field('fuel_tanks_capacity', $post->ID))
-							? $additional->addChild('item', (string)$val)->addAttribute('name', 'fuel_tanks_capacity')
-							: null;
-
-						($val = MarineSync_Post_Type::get_boat_field('hull_type', $post->ID))
-							? $additional->addChild('item', (string)$val)->addAttribute('name', 'hull_m')
-							: null;
-
-						($val = MarineSync_Post_Type::get_boat_field('water_tanks_capacity', $post->ID))
-							? $additional->addChild('item', (string)$val)->addAttribute('name', 'water_tanks_capacity')
-							: null;
+						foreach ($additional_fields as $add_field) {
+							$val = MarineSync_Post_Type::get_boat_field($add_field['field'], $post->ID);
+							if ($val !== '' && $val !== null) {
+								$item = $additional->addChild('item', (string)$val);
+								$item->addAttribute('name', $add_field['name']);
+								if (isset($add_field['unit_field'])) {
+									$unit = MarineSync_Post_Type::get_boat_field($add_field['unit_field'], $post->ID);
+									if (!empty($unit)) {
+										$item->addAttribute('unit', $unit);
+									}
+								}
+							}
+						}
 					} else {
 						error_log('MS039: MarineSync_Post_Type class or method not found');
 					}
