@@ -65,7 +65,7 @@ class Acf_add_boat_data {
 		            'aria-label' => '',
 		            'type' => 'text',
 		            'instructions' => '',
-		            'required' => 0,
+		            'required' => 1,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
 			            'width' => '50',
@@ -100,6 +100,7 @@ class Acf_add_boat_data {
 		            'ajax'          => 0,
 		            'return_format' => 'value',    // store the value, not the label
 		            'placeholder'   => '',
+		            'required' => 1, // make this field required
 	            ),
 	            array(
 		            'key' => 'field_67addd0d896da',
@@ -108,7 +109,7 @@ class Acf_add_boat_data {
 		            'aria-label' => '',
 		            'type' => 'text',
 		            'instructions' => '',
-		            'required' => 0,
+		            'required' => 1,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
 			            'width' => '50',
@@ -122,27 +123,27 @@ class Acf_add_boat_data {
 		            'prepend' => '',
 		            'append' => '',
 	            ),
-	            array(
-		            'key' => 'field_67adf9781b187',
-		            'label' => 'Designer',
-		            'name' => 'designer',
-		            'aria-label' => '',
-		            'type' => 'text',
-		            'instructions' => '',
-		            'required' => 0,
-		            'conditional_logic' => 0,
-		            'wrapper' => array(
-			            'width' => '50',
-			            'class' => '',
-			            'id' => '',
-		            ),
-		            'default_value' => '',
-		            'maxlength' => '',
-		            'allow_in_bindings' => 0,
-		            'placeholder' => '',
-		            'prepend' => '',
-		            'append' => '',
-	            ),
+//	            array(
+//		            'key' => 'field_67adf9781b187',
+//		            'label' => 'Designer',
+//		            'name' => 'designer',
+//		            'aria-label' => '',
+//		            'type' => 'text',
+//		            'instructions' => '',
+//		            'required' => 0,
+//		            'conditional_logic' => 0,
+//		            'wrapper' => array(
+//			            'width' => '50',
+//			            'class' => '',
+//			            'id' => '',
+//		            ),
+//		            'default_value' => '',
+//		            'maxlength' => '',
+//		            'allow_in_bindings' => 0,
+//		            'placeholder' => '',
+//		            'prepend' => '',
+//		            'append' => '',
+//	            ),
 	            array(
 		            'key' => 'field_67ae1d4c31ccc',
 		            'label' => 'Model',
@@ -150,7 +151,7 @@ class Acf_add_boat_data {
 		            'aria-label' => '',
 		            'type' => 'text',
 		            'instructions' => '',
-		            'required' => 0,
+		            'required' => 1,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
 			            'width' => '50',
@@ -162,7 +163,7 @@ class Acf_add_boat_data {
 		            'allow_in_bindings' => 0,
 		            'placeholder' => '',
 		            'prepend' => '',
-		            'append' => '',
+		            'append' => ''
 	            ),
 	            array(
 		            'key' => 'field_67adfa211b189',
@@ -171,7 +172,7 @@ class Acf_add_boat_data {
 		            'aria-label' => '',
 		            'type' => 'text',
 		            'instructions' => '',
-		            'required' => 0,
+		            'required' => 1,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
 			            'width' => '50',
@@ -185,27 +186,27 @@ class Acf_add_boat_data {
 		            'prepend' => '',
 		            'append' => '',
 	            ),
-	            array(
-		            'key' => 'field_67ae17bda6f40',
-		            'label' => 'Manufacturer',
-		            'name' => 'manufacturer',
-		            'aria-label' => '',
-		            'type' => 'text',
-		            'instructions' => '',
-		            'required' => 0,
-		            'conditional_logic' => 0,
-		            'wrapper' => array(
-			            'width' => '50',
-			            'class' => '',
-			            'id' => '',
-		            ),
-		            'default_value' => '',
-		            'maxlength' => '',
-		            'allow_in_bindings' => 0,
-		            'placeholder' => '',
-		            'prepend' => '',
-		            'append' => '',
-	            ),
+//	            array(
+//		            'key' => 'field_67ae17bda6f40',
+//		            'label' => 'Manufacturer',
+//		            'name' => 'manufacturer',
+//		            'aria-label' => '',
+//		            'type' => 'text',
+//		            'instructions' => '',
+//		            'required' => 0,
+//		            'conditional_logic' => 0,
+//		            'wrapper' => array(
+//			            'width' => '50',
+//			            'class' => '',
+//			            'id' => '',
+//		            ),
+//		            'default_value' => '',
+//		            'maxlength' => '',
+//		            'allow_in_bindings' => 0,
+//		            'placeholder' => '',
+//		            'prepend' => '',
+//		            'append' => '',
+//	            ),
 	            array(
 		            'key' => 'field_67ae17ht67',
 		            'label' => 'Currency',
@@ -213,7 +214,7 @@ class Acf_add_boat_data {
 		            'aria-label' => '',
 		            'type' => 'text',
 		            'instructions' => '',
-		            'required' => 0,
+		            'required' => 1,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
 			            'width' => '50',
@@ -273,6 +274,7 @@ class Acf_add_boat_data {
 		            'ajax'          => 0,
 		            'return_format' => 'value',
 		            'placeholder'   => '',
+		            'required' => 1, // make this field required
 	            ),
 	            array(
 		            'key'           => 'field_vat_included',
@@ -280,8 +282,8 @@ class Acf_add_boat_data {
 		            'name'          => 'vat_included',
 		            'type'          => 'select',
 		            'choices'       => array(
-			            'excl. VAT' => 'excl. VAT',
-			            'incl. VAT' => 'incl. VAT',
+			            'false' => 'excl. VAT',
+			            'true' => 'incl. VAT',
 		            ),
 		            'wrapper' => array(
 			            'width' => '50',
@@ -295,6 +297,7 @@ class Acf_add_boat_data {
 		            'ajax'          => 0,
 		            'return_format' => 'value',
 		            'placeholder'   => '',
+		            'required' => 1, // make this field required
 	            ),
 	            array(
 		            'key' => 'field_vat_country',
@@ -303,7 +306,7 @@ class Acf_add_boat_data {
 		            'aria-label' => '',
 		            'type' => 'text',
 		            'instructions' => '',
-		            'required' => 0,
+		            'required' => 1,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
 			            'width' => '50',
@@ -324,7 +327,7 @@ class Acf_add_boat_data {
 		            'aria-label' => '',
 		            'type' => 'text',
 		            'instructions' => '',
-		            'required' => 0,
+		            'required' => 1,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
 			            'width' => '50',
@@ -345,7 +348,7 @@ class Acf_add_boat_data {
 		            'aria-label' => '',
 		            'type' => 'text',
 		            'instructions' => '',
-		            'required' => 0,
+		            'required' => 1,
 		            'conditional_logic' => 0,
 		            'wrapper' => array(
 			            'width' => '50',
@@ -378,6 +381,7 @@ class Acf_add_boat_data {
 		            'allow_null'     => 0,
 		            'other_choice'   => 0,
 		            'save_other_choice' => 0,
+		            'required' => 1, // make this field required
 	            ),
 	            array(
 		            'key'            => 'field_67ae1abcd1234', // generate your own unique key!
@@ -398,6 +402,7 @@ class Acf_add_boat_data {
 		            'allow_null'     => 0,
 		            'other_choice'   => 0,
 		            'save_other_choice' => 0,
+		            'required' => 1, // make this field required
 	            ),
 	            array(
 		            'key'           => 'field_67ae178da6f3c',
@@ -420,6 +425,7 @@ class Acf_add_boat_data {
 		            'ajax'          => 0,
 		            'return_format' => 'value',
 		            'placeholder'   => '',
+		            'required' => 1, // make this field required
 	            ),
 	            array(
 		            'key' => 'field_67ae1786a6f3b',
@@ -3030,6 +3036,27 @@ class Acf_add_boat_data {
                     'append' => '',
                 ),
 	            array(
+		            'key' => 'field_67ae17afa6f3343uuhdsf',
+		            'label' => 'Marketing Description Language',
+		            'name' => 'marketing_desc_language',
+		            'aria-label' => '',
+		            'type' => 'text',
+		            'instructions' => '',
+		            'required' => 0,
+		            'conditional_logic' => 0,
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
+		            ),
+		            'default_value' => 'en',
+		            'maxlength' => '',
+		            'allow_in_bindings' => 0,
+		            'placeholder' => '',
+		            'prepend' => '',
+		            'append' => '',
+	            ),
+	            array(
 		            'key' => 'field_67ae17afa6f3f',
 		            'label' => 'Marketing Short Description',
 		            'name' => 'marketing_short_desc',
@@ -4038,7 +4065,7 @@ class Acf_add_boat_data {
 					'label' => 'Rig & Sails',
 					'name' => 'rig_sails_template',
 					'aria-label' => '',
-					'type' => 'wysiwyg',
+					'type' => 'text',
 					'instructions' => '',
 					'required' => 0,
 					'conditional_logic' => 0,

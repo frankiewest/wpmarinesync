@@ -838,10 +838,10 @@ class MarineSync_Admin_Page {
 						$asking_price = $advert_features->addChild('asking_price',
 							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('asking_price', $post->ID)));
 
-						$hide_price = MarineSync_Post_Type::get_boat_field('hide_price', $post->ID);
-						if ($hide_price) {
-							$asking_price->addAttribute('hide_price', $hide_price);
-						}
+//						$hide_price = MarineSync_Post_Type::get_boat_field('hide_price', $post->ID);
+//						if ($hide_price) {
+//							$asking_price->addAttribute('hide_price', $hide_price);
+//						}
 
 						$currency = MarineSync_Post_Type::get_boat_field('currency', $post->ID);
 						if ($currency) {
@@ -882,7 +882,12 @@ class MarineSync_Admin_Page {
 
 						$vat_included = MarineSync_Post_Type::get_boat_field('vat_included', $post->ID);
 						if ($vat_included) {
-							$asking_price->addAttribute('vat_included', $vat_included);
+							($vat_included === 'incl. VAT'
+                             || $vat_included === 'inc. VAT'
+                             || $vat_included === 'incl VAT'
+							 || $vat_included === 'inc VAT')
+                                ? $asking_price->addAttribute('vat_included', 'true')
+                                : $asking_price->addAttribute('vat_included', 'false');
 						}
 
 						$vat_type = MarineSync_Post_Type::get_boat_field('vat_type', $post->ID);
@@ -945,8 +950,14 @@ class MarineSync_Admin_Page {
 						}
 
 						// Add manufacturer and model
-						$advert_features->addChild('manufacturer',
-							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('manufacturer', $post->ID)));
+                        if(wp_get_post_terms( $post->ID, 'manufacturer', [ 'fields' => 'names' ] )) {
+                            $terms = wp_get_post_terms( $post->ID, 'manufacturer', [ 'fields' => 'names' ] );
+                            $value = ! empty( $terms ) ? implode( ', ', $terms ) : '';
+                            $advert_features->addChild('manufacturer', htmlspecialchars((string)$value));
+                        } else {
+                            $advert_features->addChild('manufacturer', htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('manufacturer', $post->ID)));
+                        }
+
 						$advert_features->addChild('model',
 							htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('model', $post->ID)));
 
