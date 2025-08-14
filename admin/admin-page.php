@@ -639,23 +639,21 @@ class MarineSync_Admin_Page {
 			'post_status' => 'publish',
 		);
 
-        // Remove 'removed' and 'inactive' boats by default
-		$boat_args['tax_query'] = array(
-			'relation' => 'AND',
-			array(
-				'taxonomy' => 'boat-status',
-				'field'    => 'slug',
-				'terms'    => array('removed', 'inactive'),
-				'operator' => 'NOT IN',
-			),
-		);
-
 		if (get_option('marinesync_sold_boats_export', 'show') === 'hide') {
-			$boat_args['tax_query'][] = array(
+			$boat_args['tax_query'] = array(
 				array(
 					'taxonomy' => 'boat-status',
 					'field' => 'slug',
-					'terms' => array('sold'),
+					'terms' => array('sold', 'removed', 'inactive'),
+					'operator' => 'NOT IN'
+				)
+			);
+		} else {
+			$boat_args['tax_query'] = array(
+				array(
+					'taxonomy' => 'boat-status',
+					'field' => 'slug',
+					'terms' => array('removed', 'inactive'),
 					'operator' => 'NOT IN'
 				)
 			);
