@@ -846,6 +846,7 @@ class MarineSync_Admin_Page {
 							$symbol_map = [
 								'£'   => 'GBP',
 								'€'   => 'EUR',
+								'Euros'   => 'EUR',
 								'$'   => 'USD',
 								'¥'   => 'JPY',
 								'₣'   => 'CHF',
