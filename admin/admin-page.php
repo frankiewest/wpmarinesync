@@ -1204,8 +1204,8 @@ class MarineSync_Admin_Page {
 							? $additional->addChild('item', (string)$val)->addAttribute('name', 'fuel_tanks_capacity')
 							: null;
 
-						($val = MarineSync_Post_Type::get_boat_field('hull_material', $post->ID))
-							? $additional->addChild('item', (string)$val)->addAttribute('name', 'hull_material')
+						($val = MarineSync_Post_Type::get_boat_field('hull_type', $post->ID))
+							? $additional->addChild('item', (string)$val)->addAttribute('name', 'hull_m')
 							: null;
 
 						($val = MarineSync_Post_Type::get_boat_field('water_tanks_capacity', $post->ID))
