@@ -818,32 +818,37 @@ class MarineSync_Post_Type {
 	 * @return string
 	 */
 	public static function marinesync_shortcode($atts): string {
-		// Check if in admin interface
-		if(is_admin()) {
+		if (is_admin()) {
 			return 'In admin interface';
 		}
 
 		$atts = shortcode_atts(array(
 			'field' => 'boat_ref',
+			'type'  => 'value', // key or value
 			'number_format' => 'no'
 		), $atts, 'marinesync');
 
-		// Get the ID of the current post
 		$id = get_the_ID();
-
-		// Check if the post type is 'marinesync-boats'
 		if (get_post_type($id) !== 'marinesync-boats') {
 			return 'Not a boat! Invalid use of shortcode.';
 		}
 
-		if(!get_field($atts['field'], $id)) {
+		$field = function_exists('get_field_object') ? get_field_object($atts['field'], $id) : null;
+
+		if (!$field || empty($field['value'])) {
 			return '';
 		}
 
-		if($atts['field'] === 'asking_price' && $atts['number_format'] === 'yes') {
-			return number_format(get_field($atts['field'], $id), 2);
+		$value = $field['value'];
+
+		if ($atts['type'] === 'value' && isset($field['choices'][$value])) {
+			$value = $field['choices'][$value];
 		}
 
-		return get_field($atts['field'], $id);
+		if ($atts['number_format'] === 'yes' && is_numeric($value)) {
+			$value = number_format((float)$value, 2);
+		}
+
+		return $value;
 	}
 }
