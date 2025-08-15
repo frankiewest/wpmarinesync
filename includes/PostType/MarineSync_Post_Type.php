@@ -823,7 +823,7 @@ class MarineSync_Post_Type {
 			'type'           => 'key',   // 'key' or 'value'
 			'number_format'  => '0',     // '1' => apply number_format()
 			'dec'            => '2',     // decimals for number_format()
-		), $atts, 'marinesync' );
+		), $atts, 'ms_field' );
 
 		if ( is_admin() || empty( $atts['field'] ) ) return '';
 
