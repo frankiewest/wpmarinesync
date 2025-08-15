@@ -817,92 +817,33 @@ class MarineSync_Post_Type {
 	 * @param $atts
 	 * @return string
 	 */
-	public function marinesync_shortcode( $atts ) {
-		$atts = shortcode_atts( array(
-			'field'          => '',
-			'type'           => 'key',   // 'key' or 'value'
-			'number_format'  => '0',     // '1' => apply number_format()
-			'dec'            => '2',     // decimals for number_format()
-		), $atts, 'ms_field' );
-
-		if ( is_admin() || empty( $atts['field'] ) ) return '';
-
-		$post_id = get_the_ID();
-		if ( ! $post_id || get_post_type( $post_id ) !== 'marinesync-boats' ) return '';
-
-		$field_name = $atts['field'];
-		$type       = strtolower( trim( $atts['type'] ) );
-		$type       = ($type === 'value') ? 'value' : 'key';
-
-		$use_num_format  = $atts['number_format'] === '1';
-		$decimals        = is_numeric( $atts['dec'] ) ? (int) $atts['dec'] : 2;
-
-		// Fallback if ACF not active
-		if ( ! function_exists( 'get_field_object' ) ) {
-			$raw = get_post_meta( $post_id, $field_name, true );
-			return esc_html( (string) self::ms_format_value( $raw, $type, $use_num_format, $decimals ) );
+	public static function marinesync_shortcode($atts): string {
+		// Check if in admin interface
+		if(is_admin()) {
+			return 'In admin interface';
 		}
 
-		$field = get_field_object( $field_name, $post_id );
-		if ( ! $field ) {
-			$raw = get_post_meta( $post_id, $field_name, true );
-			return esc_html( (string) self::ms_format_value( $raw, $type, $use_num_format, $decimals ) );
+		$atts = shortcode_atts(array(
+			'field' => 'boat_ref',
+			'number_format' => 'no'
+		), $atts, 'marinesync');
+
+		// Get the ID of the current post
+		$id = get_the_ID();
+
+		// Check if the post type is 'marinesync-boats'
+		if (get_post_type($id) !== 'marinesync-boats') {
+			return 'Not a boat! Invalid use of shortcode.';
 		}
 
-		$value   = $field['value'] ?? '';
-		$choices = isset( $field['choices'] ) && is_array( $field['choices'] ) ? $field['choices'] : [];
-
-		// Map to label if requested
-		if ( $type === 'value' ) {
-			if ( is_array( $value ) ) {
-				$value = array_map( function( $k ) use ( $choices ) {
-					return $choices[$k] ?? $k;
-				}, $value );
-			} else {
-				$value = $choices[ $value ] ?? $value;
-			}
+		if(!get_field($atts['field'], $id)) {
+			return '';
 		}
 
-		$formatted = self::ms_format_value( $value, $type, $use_num_format, $decimals );
-
-		if ( is_array( $formatted ) ) {
-			$formatted = implode( ', ', array_map( 'strval', $formatted ) );
+		if($atts['field'] === 'asking_price' && $atts['number_format'] === 'yes') {
+			return number_format(get_field($atts['field'], $id), 2);
 		}
 
-		return esc_html( (string) $formatted );
-	}
-
-	/**
-	 * Format value: key outputs as "0" or "1" for boolean-like values.
-	 */
-	private static function ms_format_value( $value, string $type, bool $use_num_format, int $decimals ) {
-		// If key type and scalar boolean-like, force to "0" or "1"
-		if ( $type === 'key' && ! is_array( $value ) ) {
-			$truthy = ['1','true','yes','on','y','t',1,true];
-			$falsy  = ['0','false','no','off','n','f',0,false,''];
-
-			$norm = is_string( $value ) ? strtolower( trim( $value ) ) : $value;
-
-			if ( in_array( $norm, $truthy, true ) ) return '1';
-			if ( in_array( $norm, $falsy, true ) )  return '0';
-		}
-
-		// Number formatting?
-		if ( $use_num_format ) {
-			$format_one = function( $v ) use ( $decimals ) {
-				if ( is_numeric( $v ) ) {
-					return number_format( (float) $v, $decimals );
-				}
-				return $v;
-			};
-
-			if ( is_array( $value ) ) {
-				return array_map( $format_one, $value );
-			}
-
-			return $format_one( $value );
-		}
-
-		return $value;
+		return get_field($atts['field'], $id);
 	}
 }
