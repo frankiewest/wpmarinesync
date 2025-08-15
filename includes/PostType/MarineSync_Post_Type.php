@@ -687,24 +687,35 @@ class MarineSync_Post_Type {
 	 * @param $post_id
 	 * @return string
 	 */
-	public static function get_boat_field($field_name, $post_id = null): string {
+	public static function get_boat_field($field_name, $post_id = null, $type = 'key'): string {
 		if (!$post_id) {
 			$post_id = get_the_ID();
 		}
 
-		$value = '';
+		$result = '';
 
 		// Try ACF first
-		if (function_exists('get_field')) {
-			$value = get_field($field_name, $post_id);
+		if (function_exists('get_field_object')) {
+			$field = get_field_object($field_name, $post_id);
+
+			if ($field) {
+				if ($type === 'key') {
+					// Return stored DB value
+					$result = $field['value'] ?? '';
+				} elseif ($type === 'value') {
+					// Return the human-readable label if it's a choice field
+					$key = $field['value'] ?? '';
+					$result = $field['choices'][$key] ?? $key;
+				}
+			}
 		}
 
-		// Fallback to post meta
-		if (empty($value)) {
-			$value = get_post_meta($post_id, $field_name, true);
+		// Fallback to post meta if ACF is missing or value is empty
+		if (empty($result)) {
+			$result = get_post_meta($post_id, $field_name, true);
 		}
 
-		return $value;
+		return (string) $result;
 	}
 
 	/**

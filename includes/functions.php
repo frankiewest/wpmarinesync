@@ -38,22 +38,65 @@ class Functions_MarineSync {
 	 */
 	public function marinesync_shortcode( $atts ) {
 		$atts = shortcode_atts( array(
-			'field' => ''
+			'field' => '',
+			'type'  => 'value', // 'key' (stored) or 'value' (label)
 		), $atts, 'marinesync' );
 
-		// Check we're in the admin area
-		if(is_admin()) return;
-
-		// Check the post we are on is of the post type marinesync-boats
-		$id = get_the_ID();
-		if(get_post_type($id) != 'marinesync-boats') return;
-
-		// Get the field value
-		if (!class_exists('ACF')) {
-			return get_post_meta($id, $atts['field'], true);
-		} else {
-			return get_field($atts['field'], $id);
+		// Admin or missing field name -> no output
+		if ( is_admin() || empty( $atts['field'] ) ) {
+			return '';
 		}
+
+		$post_id = get_the_ID();
+		if ( ! $post_id || get_post_type( $post_id ) !== 'marinesync-boats' ) {
+			return '';
+		}
+
+		$field_name = $atts['field'];
+		$type       = strtolower( trim( $atts['type'] ) );
+		if ( $type !== 'value' ) {
+			$type = 'key'; // default safety
+		}
+
+		// If ACF isn't available, fall back to raw post meta
+		if ( ! function_exists( 'get_field_object' ) ) {
+			$raw = get_post_meta( $post_id, $field_name, true );
+			// Always return stored value when ACF isn't available
+			return esc_html( is_array( $raw ) ? implode( ', ', $raw ) : (string) $raw );
+		}
+
+		$field = get_field_object( $field_name, $post_id );
+		if ( ! $field ) {
+			// Unknown field — fallback to meta
+			$raw = get_post_meta( $post_id, $field_name, true );
+			return esc_html( is_array( $raw ) ? implode( ', ', $raw ) : (string) $raw );
+		}
+
+		$value   = $field['value'] ?? '';
+		$choices = isset( $field['choices'] ) && is_array( $field['choices'] ) ? $field['choices'] : [];
+
+		// Normalize arrays (checkbox/multi-select)
+		if ( is_array( $value ) ) {
+			if ( $type === 'key' ) {
+				$out = implode( ', ', array_map( 'strval', $value ) );
+			} else {
+				// Map each selected key to its label if available, else keep key
+				$labels = array_map( function ( $k ) use ( $choices ) {
+					return isset( $choices[ $k ] ) ? $choices[ $k ] : $k;
+				}, $value );
+				$out = implode( ', ', $labels );
+			}
+			return esc_html( $out );
+		}
+
+		// Scalar values (select/radio/text etc.)
+		if ( $type === 'key' ) {
+			return esc_html( (string) $value );
+		}
+
+		// type === 'value' → try to map to label (if choices exist), else return the stored value
+		$label = isset( $choices[ $value ] ) ? $choices[ $value ] : $value;
+		return esc_html( (string) $label );
 	}
 
 	/**
