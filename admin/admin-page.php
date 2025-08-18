@@ -1209,7 +1209,7 @@ class MarineSync_Admin_Page {
                                         ? $loa_num * 0.3048
                                         : $loa_num;
 
-                                $loa_m = round($loa_m, 3);
+                                $loa_m = round($loa_m, 2);
 
                                 $item = $additional->addChild('item', (string) $loa_m);
                                 $item->addAttribute('name', 'loa_m');
