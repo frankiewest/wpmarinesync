@@ -622,16 +622,23 @@ add_shortcode('marinesync_video', function($atts) {
 
 add_shortcode('enquire_button', function($atts) {
     $atts = shortcode_atts([
-            'id' => get_the_ID()
+            'id' => get_the_ID(),
+            'office_id' => '516'
     ], $atts); //
 
     if(is_admin()) return null;
 
     $boat = get_post($atts['id']);
 
+    foreach(get_field('offices', 'option') as $office) {
+
+    }
+
+    $office_id = $atts['office_id'];
+
     return '
     <div class="w-btn-wrapper align_center">
-        <a class="w-btn us-btn-style_1 icon_atright" href="/contact-us?boat=' . urlencode($boat->post_title) .'">
+        <a class="w-btn us-btn-style_1 icon_atright" href="/contact-us?boat=' . urlencode($boat->post_title) .' &boat_id=' . $boat->ID . '&office_id=' . esc_attr($office_id) . '" target="_blank" rel="noopener">
             <span class="w-btn-label">Enquire</span> <i class="fas fa-paper-plane"></i>
         </a>
     </div>';
