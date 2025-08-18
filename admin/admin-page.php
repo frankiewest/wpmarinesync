@@ -847,45 +847,42 @@ class MarineSync_Admin_Page {
 //							$asking_price->addAttribute('hide_price', $hide_price);
 //						}
 
-						$currency = MarineSync_Post_Type::get_boat_field('currency', $post->ID);
-//						if ($currency) {
-//							$symbol_map = [
-//								'£'   => 'GBP',
-//								'€'   => 'EUR',
-//								'Euros'   => 'EUR',
-//								'$'   => 'USD',
-//								'¥'   => 'JPY',
-//								'₣'   => 'CHF',
-//								'₹'   => 'INR',
-//								'₽'   => 'RUB',
-//								'₩'   => 'KRW',
-//								'₺'   => 'TRY',
-//								'₪'   => 'ILS',
-//								'₫'   => 'VND',
-//								'₦'   => 'NGN',
-//								'A$'  => 'AUD',
-//								'C$'  => 'CAD',
-//								'NZ$' => 'NZD',
-//								'R$'  => 'BRL',
-//								'₱'   => 'PHP',
-//								'฿'   => 'THB',
-//								'₴'   => 'UAH',
-//								'د.إ' => 'AED',
-//								'₲'   => 'PYG',
-//							];
-//							$currency_code = $currency;
-//							if (isset($symbol_map[$currency])) {
-//								$currency_code = $symbol_map[$currency];
-//							} else {
-//								$first = mb_substr($currency, 0, 1);
-//								if (isset($symbol_map[$first])) {
-//									$currency_code = $symbol_map[$first];
-//								}
-//							}
-//							$asking_price->addAttribute('currency', $currency_code);
-//						}
+                        $currency = MarineSync_Post_Type::get_boat_field('currency', $post->ID);
 
-                        $asking_price->addAttribute('currency', $currency);
+                        if ($currency) {
+                            $symbol_map = [
+                                    '£'   => 'GBP',
+                                    '€'   => 'EUR',
+                                    'Euros' => 'EUR',
+                                    '$'   => 'USD',
+                                    '¥'   => 'JPY',
+                                    '₣'   => 'CHF',
+                                    '₹'   => 'INR',
+                                    '₽'   => 'RUB',
+                                    '₩'   => 'KRW',
+                                    '₺'   => 'TRY',
+                                    '₪'   => 'ILS',
+                                    '₫'   => 'VND',
+                                    '₦'   => 'NGN',
+                                    'A$'  => 'AUD',
+                                    'C$'  => 'CAD',
+                                    'NZ$' => 'NZD',
+                                    'R$'  => 'BRL',
+                                    '₱'   => 'PHP',
+                                    '฿'   => 'THB',
+                                    '₴'   => 'UAH',
+                                    'د.إ' => 'AED',
+                                    '₲'   => 'PYG',
+                            ];
+
+                            $currency_code = $currency;
+
+                            if (isset($symbol_map[$currency])) {
+                                $currency_code = $symbol_map[$currency];
+                            }
+
+                            $asking_price->addAttribute('currency', $currency_code);
+                        }
 
 						$vat_included = MarineSync_Post_Type::get_boat_field('vat_included', $post->ID);
 						if ($vat_included === 'incl. VAT'
