@@ -1213,7 +1213,7 @@ class MarineSync_Admin_Page {
 
                                 $item = $additional->addChild('item', (string) $loa_m);
                                 $item->addAttribute('name', 'loa_m');
-                                $item->addAttribute('unit', 'm');
+                                $item->addAttribute('unit', 'metres');
                             }
                         }
 
