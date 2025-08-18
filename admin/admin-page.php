@@ -950,10 +950,8 @@ class MarineSync_Admin_Page {
 						$short_cdata = $marketing_short_desc_node->ownerDocument->createCDATASection($short_desc);
 						$marketing_short_desc_node->appendChild($short_cdata);
 
-						$short_lang = MarineSync_Post_Type::get_boat_field('marketing_short_desc_language', $post->ID);
-						if ($short_lang) {
-							$marketing_short_desc->addAttribute('language', $short_lang);
-						}
+						$marketing_short_desc->addAttribute('language', $lang);
+
 
 						// Add manufacturer and model
                         if(wp_get_post_terms( $post->ID, 'manufacturer', [ 'fields' => 'names' ] )) {
