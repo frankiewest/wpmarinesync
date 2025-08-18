@@ -1192,43 +1192,65 @@ class MarineSync_Admin_Page {
 							}
 						}
 
-						// Add additional
-						$additional = $boat_features->addChild('additional');
+                        // Add additional
+                        $additional = $boat_features->addChild('additional');
 
-                        // Add additional items
-						$additional_fields = [
-							['field' => 'dry_weight', 'name' => 'dry_weight'],
-							['field' => 'fuel_tanks_capacity', 'name' => 'fuel_tanks_capacity'],
-							['field' => 'hull_material', 'name' => 'hull_m'],
-							['field' => 'water_tanks_capacity', 'name' => 'water_tanks_capacity'],
-							['field' => 'holding_tanks', 'name' => 'holding_tanks'],
-							['field' => 'bow_thruster', 'name' => 'bow_thruster'],
-							['field' => 'double_berths_count', 'name' => 'double_berths_count'],
-							['field' => 'heads_count', 'name' => 'heads_count'],
-							['field' => 'fuel_tanks', 'name' => 'fuel_tanks', 'unit_field' => 'fuel_tanks_unit'],
-							['field' => 'fresh_water_tanks', 'name' => 'fresh_water_tanks', 'unit_field' => 'fresh_water_tanks_unit'],
-							['field' => 'speed_log', 'name' => 'speed_log'],
-							['field' => 'windlass', 'name' => 'windlass'],
-							['field' => 'loa_m', 'name' => 'loa', 'unit_field' => 'loa_unit'],
-							['field' => 'hob', 'name' => 'hob'],
-							['field' => 'grill', 'name' => 'grill'],
-							['field' => 'stern_thruster', 'name' => 'stern_thruster'],
-						];
+                        // --- Special case: derive loa_m from loa + loa_unit ---
+                        $loa_val  = MarineSync_Post_Type::get_boat_field('loa', $post->ID);
+                        $loa_unit = strtolower(trim((string) MarineSync_Post_Type::get_boat_field('loa_unit', $post->ID)));
 
-						foreach ($additional_fields as $add_field) {
-							$val = MarineSync_Post_Type::get_boat_field($add_field['field'], $post->ID);
-							if ($val !== '' && $val !== null) {
-								$item = $additional->addChild('item', (string)$val);
-								$item->addAttribute('name', $add_field['name']);
-								if (isset($add_field['unit_field'])) {
-									$unit = MarineSync_Post_Type::get_boat_field($add_field['unit_field'], $post->ID);
-									if (!empty($unit)) {
-										$item->addAttribute('unit', $unit);
-									}
-								}
-							}
-						}
-					} else {
+                        if ($loa_val !== '' && $loa_val !== null) {
+                            $loa_num = (float) str_replace(',', '.', (string) $loa_val);
+
+                            if ($loa_num > 0) {
+                                // If unit is feet, convert to metres
+                                $feet_units = ['ft', 'ft.', 'feet', 'foot', "'"];
+                                $loa_m = in_array($loa_unit, $feet_units, true)
+                                        ? $loa_num * 0.3048
+                                        : $loa_num;
+
+                                $loa_m = round($loa_m, 3);
+
+                                $item = $additional->addChild('item', (string) $loa_m);
+                                $item->addAttribute('name', 'loa_m');
+                                $item->addAttribute('unit', 'm');
+                            }
+                        }
+
+                        // Continue with the other additional fields
+                        $additional_fields = [
+                                ['field' => 'dry_weight',            'name' => 'dry_weight'],
+                                ['field' => 'fuel_tanks_capacity',   'name' => 'fuel_tanks_capacity'],
+                                ['field' => 'hull_material',         'name' => 'hull_m'],
+                                ['field' => 'water_tanks_capacity',  'name' => 'water_tanks_capacity'],
+                                ['field' => 'holding_tanks',         'name' => 'holding_tanks'],
+                                ['field' => 'bow_thruster',          'name' => 'bow_thruster'],
+                                ['field' => 'double_berths_count',   'name' => 'double_berths_count'],
+                                ['field' => 'heads_count',           'name' => 'heads_count'],
+                                ['field' => 'fuel_tanks',            'name' => 'fuel_tanks',           'unit_field' => 'fuel_tanks_unit'],
+                                ['field' => 'fresh_water_tanks',     'name' => 'fresh_water_tanks',    'unit_field' => 'fresh_water_tanks_unit'],
+                                ['field' => 'speed_log',             'name' => 'speed_log'],
+                                ['field' => 'windlass',              'name' => 'windlass'],
+                            // removed wrong loa_m entry
+                                ['field' => 'hob',                   'name' => 'hob'],
+                                ['field' => 'grill',                 'name' => 'grill'],
+                                ['field' => 'stern_thruster',        'name' => 'stern_thruster'],
+                        ];
+
+                        foreach ($additional_fields as $add_field) {
+                            $val = MarineSync_Post_Type::get_boat_field($add_field['field'], $post->ID);
+                            if ($val !== '' && $val !== null) {
+                                $item = $additional->addChild('item', (string) $val);
+                                $item->addAttribute('name', $add_field['name']);
+                                if (isset($add_field['unit_field'])) {
+                                    $unit = MarineSync_Post_Type::get_boat_field($add_field['unit_field'], $post->ID);
+                                    if (!empty($unit)) {
+                                        $item->addAttribute('unit', $unit);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
 						error_log('MS039: MarineSync_Post_Type class or method not found');
 					}
 				} catch (\Exception $e) {
