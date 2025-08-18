@@ -3165,7 +3165,34 @@ class Acf_add_boat_data {
                     'prepend' => '',
                     'append' => '',
                 ),
-                array(
+	            array(
+		            'key' => 'field_67adfac41b19433tgdfs5',
+		            'label' => 'Ballast Unit',
+		            'name' => 'ballast_unit',
+		            'aria-label' => '',
+		            'type' => 'select',
+		            'instructions' => '',
+		            'required' => 0,
+		            'conditional_logic' => 0,
+		            'wrapper' => array(
+			            'width' => '50',
+			            'class' => '',
+			            'id' => '',
+		            ),
+		            'choices' => array(
+			            'kgs' => 'kgs',
+			            'lbs' => 'lbs',
+			            'tonnes' => 'tonnes'
+		            ),
+		            'default_value' => false,
+		            'allow_null' => 0,
+		            'multiple' => 0,
+		            'ui' => 0,
+		            'return_format' => 'value',
+		            'ajax' => 0,
+		            'placeholder' => '',
+	            ),
+	            array(
                     'key' => 'field_67adfacc1b196',
                     'label' => 'Displacement',
                     'name' => 'displacement',
