@@ -1220,7 +1220,7 @@ class MarineSync_Admin_Page {
                         $additional_fields = [
                                 ['field' => 'dry_weight',            'name' => 'dry_weight'],
                                 ['field' => 'fuel_tanks_capacity',   'name' => 'fuel_tanks_capacity'],
-                                ['field' => 'hull_material',         'name' => 'hull_m'],
+                                ['field' => 'hull_material',         'name' => 'hull_material'],
                                 ['field' => 'water_tanks_capacity',  'name' => 'water_tanks_capacity'],
                                 ['field' => 'holding_tanks',         'name' => 'holding_tanks'],
                                 ['field' => 'bow_thruster',          'name' => 'bow_thruster'],
