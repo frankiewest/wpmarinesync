@@ -847,6 +847,11 @@ class MarineSync_Admin_Page {
 //							$asking_price->addAttribute('hide_price', $hide_price);
 //						}
 
+                        $poa = MarineSync_Post_Type::get_boat_field('poa', $post->ID) ?? 'false';
+                        if ($poa) {
+                            $asking_price->addAttribute('poa', $poa);
+                        }
+
                         $currency = MarineSync_Post_Type::get_boat_field('currency', $post->ID);
 
                         if ($currency) {
