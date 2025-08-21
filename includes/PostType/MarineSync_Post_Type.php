@@ -849,6 +849,22 @@ class MarineSync_Post_Type {
 			$value = number_format((float)$value, 2);
 		}
 
+		// Special handling for vat_type
+		if ($atts['field'] === 'vat_type') {
+			if (!in_array($value, ['Tax Not Paid', 'Tax Paid'], true)) {
+				return '';
+			}
+		}
+
+		// Special handling for vat_included (true/false field)
+		if ($atts['field'] === 'vat_included') {
+			if (!in_array($value, [true, false, 1, 0, '1', '0'], true)) {
+				return '';
+			}
+			// Normalise output to "Yes" / "No"
+			$value = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'Yes' : 'No';
+		}
+
 		return $value;
 	}
 }
