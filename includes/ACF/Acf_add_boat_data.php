@@ -305,14 +305,14 @@ class Acf_add_boat_data {
 			            'Tax Paid'     => 'Tax Paid',
 			            'Not Applicable' => 'Not Applicable',
 			            'Unknown' => 'Unknown',
-			            '' => ''
+			            'Blank' => 'Blank'
 		            ),
 		            'wrapper' => array(
 			            'width' => '50',
 			            'class' => '',
 			            'id' => '',
 		            ),
-		            'default_value' => '',
+		            'default_value' => 'Blank',
 		            'allow_null'    => 0,
 		            'multiple'      => 0,
 		            'ui'            => 0,
@@ -329,14 +329,14 @@ class Acf_add_boat_data {
 		            'choices'       => array(
 			            'false' => 'excl. VAT',
 			            'true' => 'incl. VAT',
-			            '' => ''
+			            'Blank' => 'Blank'
 		            ),
 		            'wrapper' => array(
 			            'width' => '50',
 			            'class' => '',
 			            'id' => '',
 		            ),
-		            'default_value' => '',
+		            'default_value' => 'Blank',
 		            'allow_null'    => 0,
 		            'multiple'      => 0,
 	 	            'ui'            => 0,
