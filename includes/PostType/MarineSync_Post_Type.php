@@ -858,7 +858,7 @@ class MarineSync_Post_Type {
 
 		// Special handling for vat_included (true/false field)
 		if ($atts['field'] === 'vat_included') {
-			if (!in_array($value, [true, false, 1, 0, '1', '0'], true)) {
+			if (!in_array($value, ['incl. VAT', 'excl. VAT'], true)) {
 				return '';
 			}
 			// Normalise output to "Yes" / "No"
