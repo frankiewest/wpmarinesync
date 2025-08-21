@@ -329,6 +329,7 @@ class Acf_add_boat_data {
 		            'choices'       => array(
 			            'false' => 'excl. VAT',
 			            'true' => 'incl. VAT',
+			            '' => ''
 		            ),
 		            'wrapper' => array(
 			            'width' => '50',
