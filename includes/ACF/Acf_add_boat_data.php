@@ -336,7 +336,7 @@ class Acf_add_boat_data {
 			            'class' => '',
 			            'id' => '',
 		            ),
-		            'default_value' => array(),
+		            'default_value' => 'false',
 		            'allow_null'    => 0,
 		            'multiple'      => 0,
 	 	            'ui'            => 0,
