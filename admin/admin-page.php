@@ -905,9 +905,11 @@ class MarineSync_Admin_Page {
                         }
 
 						$vat_type = MarineSync_Post_Type::get_boat_field('vat_type', $post->ID);
-						if ($vat_type) {
+						if ($vat_type === 'Tax Not Paid' || $vat_type === 'Tax Paid') {
 							$asking_price->addAttribute('vat_type', $vat_type);
-						}
+						} else {
+                            $asking_price->addAttribute('vat_type', '');
+                        }
 
 						$vat_country = MarineSync_Post_Type::get_boat_field('vat_country', $post->ID);
 						if ($vat_country) {
