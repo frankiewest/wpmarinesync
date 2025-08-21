@@ -895,9 +895,14 @@ class MarineSync_Admin_Page {
 						    || $vat_included === 'incl VAT'
 						    || $vat_included === 'inc VAT') {
                             $asking_price->addAttribute('vat_included', 'true');
-						} else {
+						} else if ($vat_included === 'excl. VAT'
+                                   || $vat_included === 'exc. VAT'
+                                   || $vat_included === 'excl VAT'
+                                   || $vat_included === 'exc VAT') {
 							$asking_price->addAttribute('vat_included', 'false');
-						}
+						} else {
+                            $asking_price->addAttribute('vat_included', '');
+                        }
 
 						$vat_type = MarineSync_Post_Type::get_boat_field('vat_type', $post->ID);
 						if ($vat_type) {
