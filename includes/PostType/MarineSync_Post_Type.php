@@ -861,8 +861,6 @@ class MarineSync_Post_Type {
 			if (!in_array($value, ['incl. VAT', 'excl. VAT'], true)) {
 				return '';
 			}
-			// Normalise output to "Yes" / "No"
-			$value = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'Yes' : 'No';
 		}
 
 		return $value;
