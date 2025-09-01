@@ -921,7 +921,11 @@ class MarineSync_Admin_Page {
 						$marketing_descs = $advert_features->addChild('marketing_descs');
 
                         // Start with the post content
-						$desc = get_post_field('post_content', $post->ID);
+                        $desc = get_post_field('post_content', $post->ID);
+
+                        // Convert literal \n or actual newlines in post_content into <br />
+                        $desc = str_replace("\\n", "\n", $desc);   // handle literal "\n"
+                        $desc = nl2br($desc, true);                // convert to <br />
 
                         // Gather each ACF details field (HTML), if not empty, and append
 						$acf_fields = [
