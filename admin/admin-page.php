@@ -823,13 +823,8 @@ class MarineSync_Admin_Page {
 
                             if (!empty($videos)) {
                                 foreach ($videos as $video) {
-                                    // Skip if the image is the same as the primary image
-                                    if (isset($video['video_url'])) {
-                                        continue;
-                                    }
-
                                     // Get image URL
-                                    $url = isset($video['video_url']) ? $video['video_url'] : '';
+                                    $url = $video['video_url'];
 
                                     // Create media element
                                     $media = $advert_media->addChild('media', $url);
