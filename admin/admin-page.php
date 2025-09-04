@@ -793,6 +793,7 @@ class MarineSync_Admin_Page {
 
 						if (function_exists('get_field')) {
 							$images = get_field('boat_media', $post->ID);
+                            $videos = get_field('videos', $post->ID);
 							if (!empty($images)) {
 								foreach ($images as $image) {
 									// Skip if the image is the same as the primary image
@@ -819,6 +820,24 @@ class MarineSync_Admin_Page {
 									$media->addAttribute('file_mtime', date('Y-m-d\TH:i:s', $mtime));
 								}
 							}
+
+                            if (!empty($videos)) {
+                                foreach ($videos as $video) {
+                                    // Skip if the image is the same as the primary image
+                                    if (isset($video['video_url'])) {
+                                        continue;
+                                    }
+
+                                    // Get image URL
+                                    $url = isset($video['video_url']) ? $video['video_url'] : '';
+
+                                    // Create media element
+                                    $media = $advert_media->addChild('media', $url);
+                                    $media->addAttribute('type', 'video/mp4');
+                                    $media->addAttribute('primary', 'false'); // Explicitly mark as not primary
+                                    $media->addAttribute('caption', '');
+                                }
+                            }
 						}
 
 						// Add advert features
