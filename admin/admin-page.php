@@ -940,7 +940,7 @@ class MarineSync_Admin_Page {
                         // Convert literal \n or actual newlines in post_content into <br />
                         $desc = str_replace("\\n", "\n", $desc);   // handle literal "\n"
                         $desc = nl2br($desc, true);                // convert to <br />
-                        $desc = str_replace('<br />', '<br /><br />', $desc);
+                        $desc = preg_replace('/(<br\s*\/?>)(?!\s*<br\s*\/?>)/i', '$1<br />', $desc);
 
                         // Gather each ACF details field (HTML), if not empty, and append
 						$acf_fields = [
