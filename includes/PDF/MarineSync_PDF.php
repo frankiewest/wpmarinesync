@@ -147,7 +147,9 @@ final class MarineSync_PDF {
 		$boat_data = $this->parseBoatMeta();
 		error_log("MSPDF010: Parsed boat data for HTML generation for boat_id={$this->boat_id}");
 
-		$images = array_slice($boat_data['boat_media'], 0, 2);
+		$images = ($boat_data['boat_media'])
+			? array_slice($boat_data['boat_media'], 0, 2)
+			: [];
 
 		$office_id = $boat_data['office_id'] ?? '';
 		$office = $this->getOfficeDetails($office_id);
