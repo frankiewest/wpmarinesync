@@ -841,7 +841,7 @@ class MarineSync_Admin_Page {
 						// Add child elements directly
 						$advert_features->addChild('title', htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('title', $post->ID)));
 						$advert_features->addChild('boat_type', htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('boat_type', $post->ID)));
-						$advert_features->addChild('boat_category', htmlspecialchars(wp_get_object_terms($post->ID, 'boat-cat', ['fields' => 'names'])[0]));
+						$advert_features->addChild('boat_category', htmlspecialchars(wp_get_object_terms($post->ID, 'boat-cat', ['fields' => 'names'])[0]) ?? MarineSync_Post_Type::get_boat_field('boat_category', $post->ID));
 						$advert_features->addChild('new_or_used', htmlspecialchars((string)MarineSync_Post_Type::get_boat_field('new_or_used', $post->ID)));
 
 						// Vessel lying
