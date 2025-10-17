@@ -353,6 +353,12 @@ function marinesync_register_boat_admin_role_and_admin_caps() {
 		'delete_boat-cat',
 		'assign_boat-cat',
 
+		// Taxonomies: boat-feature-cat
+		'manage_boat-feature-cat',
+		'edit_boat-feature-cat',
+		'delete_boat-feature-cat',
+		'assign_boat-feature-cat',
+
 		// Taxonomies: boat-status
 		'manage_boat-status',
 		'edit_boat-status',
