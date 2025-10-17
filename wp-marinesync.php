@@ -477,7 +477,7 @@ add_action('manage_marinesync-boats_posts_custom_column', function($column, $pos
 			if ($length) echo esc_html($length);
 			break;
 		case 'featured_boat':
-			echo has_term('featured', 'boat-cat', $post_id) ? '<strong>Featured</strong>' : 'No';
+			echo has_term('featured', 'boat-feature-cat', $post_id) ? '<strong>Featured</strong>' : 'No';
 			break;
 	}
 }, 10, 2);
@@ -701,7 +701,7 @@ add_action('pre_get_posts', function($query) {
 	}
 	if ($orderby === 'featured_boat') {
 		$query->set('tax_query', [[
-			'taxonomy' => 'boat-cat',
+			'taxonomy' => 'boat-feature-cat',
 			'field'    => 'slug',
 			'terms'    => 'featured',
 			'operator' => 'EXISTS'
