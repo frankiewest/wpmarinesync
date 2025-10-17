@@ -85,6 +85,37 @@ class MarineSync_Post_Type {
 			],
 		));
 
+		// Register boat featured taxonomy
+		$featured_labels = array(
+			'name'              => _x('Feature Categories', 'taxonomy general name', 'marinesync'),
+			'singular_name'     => _x('Feature Category', 'taxonomy singular name', 'marinesync'),
+			'search_items'      => __('Search Boat Feature Categories', 'marinesync'),
+			'all_items'         => __('All Boat Feature Categories', 'marinesync'),
+			'parent_item'       => __('Parent Boat Feature Category', 'marinesync'),
+			'parent_item_colon' => __('Parent Boat Feature Category:', 'marinesync'),
+			'edit_item'         => __('Edit Boat Feature', 'marinesync'),
+			'update_item'       => __('Update Boat Feature', 'marinesync'),
+			'add_new_item'      => __('Add New Boat Feature', 'marinesync'),
+			'new_item_name'     => __('New Boat Feature Name', 'marinesync'),
+			'menu_name'         => __('Boat Feature Categories', 'marinesync'),
+		);
+
+		register_taxonomy('boat-feature-cat', array('marinesync-boats'), array(
+			'hierarchical'      => true,
+			'labels'            => $featured_labels,
+			'show_ui'           => true,
+			'show_admin_column' => false,
+			'query_var'         => true,
+			'rewrite'           => array('slug' => 'boat-feature-cat'),
+			'show_in_rest'      => true,
+			'capabilities'      => [
+				'manage_terms' => 'manage_boat-feature-cat',
+				'edit_terms'   => 'edit_boat-feature-cat',
+				'delete_terms' => 'delete_boat-feature-cat',
+				'assign_terms' => 'assign_boat-feature-cat',
+			],
+		));
+
 		// Register boat status taxonomy
 		$status_labels = array(
 			'name'              => _x('Boat Statuses', 'taxonomy general name', 'marinesync'),
